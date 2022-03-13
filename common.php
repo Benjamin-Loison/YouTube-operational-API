@@ -4,9 +4,18 @@
 	define('WEBSITE_URL', 'https://' . DOMAIN_NAME . '/');
 	define('SUB_VERSION_STR', '1.9999099');
 
-	define('MUSIC_VERSION', SUB_VERSION_STR);
+	define('MUSIC_VERSION', '2.9999099');//SUB_VERSION_STR);
 	define('CLIENT_VERSION', '1.9999099');
 	define('UI_KEY', 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'); // this isn't a YouTube Data API v3 key
+
+    function isRedirection($url)
+	{
+	    $ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_exec($ch);
+		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		return $code == 303;
+	}
 
 	function getRemote($url, $opts = [])
 	{
@@ -60,6 +69,11 @@
 	{
 		return checkRegex('[a-zA-Z0-9-_]{11}', $videoId);
 	}
+
+	function isHashTag($hashTag)
+    {
+        return checkRegex('[a-zA-Z0-9_]+', $hashTag);
+    }
 
 	function doesPathExist($json, $path)
     {
