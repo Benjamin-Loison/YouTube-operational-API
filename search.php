@@ -1,78 +1,143 @@
 <?php
 
+	// StackOverflow source: https://stackoverflow.com/a/70793047/7123660
+	$searchTests = [['snippet&channelId=UC4QobU6STFB0P71PMvOGN5A&order=viewCount', 'items/0/id/videoId', 'jNQXAC9IVRw']];
+
 // copy YT perfectly (answers and arguments) - slower because not always everything from answer in one request for me
 // make an API based on one request I receive involves one request on my side - more precise in terms of complexity
 // can from this last model also just include "the interesting data" and nothing repetitive with the YouTube Data API v3, I mean that from the videoId we can get all details we want from the official API so maybe no need to repeat some here even if there are in the answer of my request
 
-if(isset($_GET['part'], $_GET['channelId'], $_GET['order']))
+include_once 'common.php';
+
+$realOptions = ['id', 'snippet'];
+
+// really necessary ?
+foreach($realOptions as $realOption)
+    $options[$realOption] = false;
+
+if(isset($_GET['part'], $_GET['order']) && (isset($_GET['channelId']) || isset($_GET['hashTag'])))
 {
-	// TODO: check parameters no hack
 	$part = $_GET['part'];
-	if(!in_array($part, ['snippet']))
-		die('invalid part');
-	$channelId = $_GET['channelId'];
+    $parts = explode(',', $part, count($realOptions));
+    foreach($parts as $part)
+        if(!in_array($part, $realOptions))
+            die('invalid part ' . $part);
+        else
+            $options[$part] = true;
+
+	$id = '';
+	if(isset($_GET['channelId']))
+	{
+		$id = $_GET['channelId'];
 	
-	if(preg_match('/^[a-zA-Z0-9-_]{24}$/', $channelId) !== 1)
-    	die('invalid channelId');
+		if(!isChannelId($id))
+    		die('invalid channelId');
+	}
+	else if($_GET['hashTag'])
+	{
+	    $id = $_GET['hashTag'];
+
+		if(!isHashTag($id))
+		    die('invalid hashTag');
+	}
+	else
+		die('no channelId or hashTag field was provided');
+
 	$order = $_GET['order'];
-	if(!in_array($order, ['viewCount']))
+	if(!in_array($order, ['viewCount', 'relevance']))
 		die('invalid order');
 	$continuationToken = '';
 	if(isset($_GET['pageToken']))
 	{
 		$continuationToken = $_GET['pageToken'];
 		// what checks to do ?
-		if(!preg_match('/^[A-Za-z0-9=]+$/', $continuationToken))
+		if(!isContinuationToken($continuationToken))
 			die('invalid continuationToken');
 	}
-	echo getAPI($channelId, $order, $continuationToken);
+	echo getAPI($id, $order, $continuationToken);
 }
 
-function getAPI($channelId, $order, $continuationToken)
+function getAPI($id, $order, $continuationToken)
 {
-	$orderBase64 = 'EgZ2aWRlb3MYASAAMAE=';
+	global $options;
+    $items = null;
 	$continuationTokenProvided = $continuationToken != '';
-	$rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"2.2022011"}},"' . ($continuationTokenProvided ? 'continuation":"' . $continuationToken : 'browseId":"' . $channelId . '","params":"' . $orderBase64) . '"}';
-	$opts = [
-    	"http" => [
-        	"method" => "POST",
-        	"header" => "Content-Type: application/json",
-            "content" => $rawData,
-    	]
-	];
-
-	$context = stream_context_create($opts);
-
-	$res = file_get_contents('https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8', false, $context);
-
-	$result = json_decode($res, true);
-	// repeated on official API but not in UI requests
-	//if(!$continuationTokenProvided)
-	//	$regionCode = $result['topbar']['desktopTopbarRenderer']['countryCode'];
+	if($_GET['hashTag'])
+	{
+		if($continuationTokenProvided)
+		{
+			$rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+			$opts = [
+				"http" => [
+					"method" => "POST",
+					"header" => "Content-Type: application/json",
+					"content" => $rawData
+				]
+			];
+			$json = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $opts);
+		}
+		else
+    		$json = getJSONFromHTML('https://www.youtube.com/hashtag/' . $id);
+		$items = $continuationTokenProvided ? $json['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['richGridRenderer']['contents'];
+	}
+	else
+	{
+		$orderBase64 = 'EgZ2aWRlb3MYASAAMAE=';
+		$rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"' . ($continuationTokenProvided ? 'continuation":"' . $continuationToken : 'browseId":"' . $channelId . '","params":"' . $orderBase64) . '"}';
+		$opts = [
+    		"http" => [
+        		"method" => "POST",
+        		"header" => "Content-Type: application/json",
+            	"content" => $rawData,
+    		]
+		];
+	
+		$result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $opts);
+		// repeated on official API but not in UI requests
+		//if(!$continuationTokenProvided)
+		//	$regionCode = $result['topbar']['desktopTopbarRenderer']['countryCode'];
+		$items = $continuationTokenProvided ? $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'] : $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][1]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
+	}
 	$answerItems = [];
-	$items = $continuationTokenProvided ? $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'] : $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][1]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
 	$itemsCount = count($items);
-	for($itemsIndex = 0; $itemsIndex < $itemsCount - 1; $itemsIndex++)
+	for($itemsIndex = 0; $itemsIndex < $itemsCount - ($continuationTokenProvided || $_GET['hashTag'] ? 1 : 0); $itemsIndex++) // check upper bound for hashtags
 	{
 		$item = $items[$itemsIndex];
 		$gridVideoRenderer = $item['gridVideoRenderer'];
-		$videoId = $gridVideoRenderer['videoId'];
-		$title = $gridVideoRenderer['title']['runs'][0]['text'];
 		$answerItem = [
 			'kind' => 'youtube#searchResult',
-			'etag' => 'NotImplemented',
-			'id' => [
-				'kind' => 'youtube#video',
-				'videoId' => $videoId
-			],
-			'snippet' => [
-				'channelId' => $channelId,
-				'title' => $title
-			]
+			'etag' => 'NotImplemented'
 		];
+		if($options['id'])
+		{
+			if($_GET['hashTag'])
+				$videoId = $item['richItemRenderer']['content']['videoRenderer']['videoId'];
+			else
+				$videoId = $gridVideoRenderer['videoId'];
+			$answerItem['id'] = [
+                'kind' => 'youtube#video',
+                'videoId' => $videoId
+            ];
+		}
+		if($options['snippet'])
+		{
+			$title = $gridVideoRenderer['title']['runs'][0]['text'];
+		    $answerItem['snippet'] = [
+                'channelId' => $channelId,
+                'title' => $title
+            ];
+		}
 		array_push($answerItems, $answerItem);
 	}
-	$nextContinuationToken = str_replace('%3D', '=', $items[30]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']); // it doesn't seem random but hard to reverse-engineer
+	if($_GET['hashTag'])
+		$nextContinuationToken = $itemsCount > 60 ? $items[60] : '';
+	else
+		$nextContinuationToken = $itemsCount > 30 ? $items[30] : ''; // it doesn't seem random but hard to reverse-engineer
+	if($nextContinuationToken !== '')
+	{
+		$nextContinuationToken = $nextContinuationToken['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
+		$nextContinuationToken = str_replace('%3D', '=', $nextContinuationToken);
+	}
 	$answer = [
 		'kind' => 'youtube#searchListResponse',
 		'etag' => 'NotImplemented'
