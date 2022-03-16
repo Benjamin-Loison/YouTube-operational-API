@@ -72,8 +72,13 @@
 
 	function isHashTag($hashTag)
     {
-        return checkRegex('[a-zA-Z0-9_]+', $hashTag);
+        return true;//checkRegex('[a-zA-Z0-9_]+', $hashTag); // 'é'is a valid hashtag for instance
     }
+
+	function isSAPISIDHASH($SAPISIDHASH)
+	{
+		return checkRegex('[1-9][0-9]{9}_[a-f0-9]{40}', $SAPISIDHASH);
+	}
 
 	function doesPathExist($json, $path)
     {

@@ -11,7 +11,7 @@
 
 	include_once 'common.php';
 
-	$realOptions = ['status', 'contentDetails', 'music', 'short'];
+	$realOptions = ['status', 'contentDetails', 'music', 'short', 'impressions'];
 
 	// really necessary ?
 	foreach($realOptions as $realOption)
@@ -33,6 +33,8 @@
 		foreach($realIds as $realId)
 			if(!isVideoId($realId))
 				die('invalid id');
+		if($options['impressions'] && (!isset($_GET['SAPISIDHASH']) || !isSAPISIDHASH($_GET['SAPISIDHASH'])))
+			die('invalid SAPISIDHASH');
 		echo getAPI($realIds);
 	}
 
@@ -103,6 +105,27 @@
 				'available' => !isRedirection('https://www.youtube.com/shorts/' . $id)
 			];
 			$item['short'] = $short;
+		}
+
+		if($options['impressions'])
+		{
+			$headers = [
+	            "x-origin: https://studio.youtube.com",
+				"authorization: SAPISIDHASH " . $_GET['SAPISIDHASH'],
+				"Content-Type:",
+				"cookie: HSID=A4BqSu4moNA0Be1N9; SSID=AA0tycmNyGWo-Z_5v; APISID=a; SAPISID=zRbK-_14V7wIAieP/Ab_wY1sjLVrKQUM2c; SID=HwhYm6rJKOn_3R9oOrTNDJjpHIiq9Uos0F5fv4LPdMRSqyVHA1EDZwbLXo0kuUYAIN_MUQ."
+    	    ];
+			$rawData = '{"screenConfig":{"entity":{"videoId":"' . $id . '"}},"desktopState":{"tabId":"ANALYTICS_TAB_ID_REACH"}}';
+        	$opts = [
+            	"http" => [
+                	"method" => "POST",
+	                "header" => $headers,
+    	            "content" => $rawData,
+        	    ]
+        	];
+        	$json = getJSON('https://studio.youtube.com/youtubei/v1/analytics_data/get_screen?key=' . UI_KEY, $opts);
+			$impressions = $json['cards'][0]['keyMetricCardData']['keyMetricTabs'][0]['primaryContent']['total']; 
+			$item['impressions'] = $impressions;
 		}
 
 		return $item;
