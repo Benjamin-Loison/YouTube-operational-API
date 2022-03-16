@@ -11,7 +11,7 @@
 
 	include_once 'common.php';
 
-	$realOptions = ['status', 'contentDetails', 'music', 'short', 'impressions'];
+	$realOptions = ['status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic'];
 
 	// really necessary ?
 	foreach($realOptions as $realOption)
@@ -126,6 +126,18 @@
         	$json = getJSON('https://studio.youtube.com/youtubei/v1/analytics_data/get_screen?key=' . UI_KEY, $opts);
 			$impressions = $json['cards'][0]['keyMetricCardData']['keyMetricTabs'][0]['primaryContent']['total']; 
 			$item['impressions'] = $impressions;
+		}
+
+		if($options['containsMusic'])
+		{
+			$opts = [
+				"http" => [
+					"header" => 'Accept-Language: en'
+				]
+			];
+			$json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $opts);
+		    $containsMusic = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][1]['videoSecondaryInfoRenderer']['metadataRowContainer']['metadataRowContainerRenderer']['rows'] !== null;
+		    $item['containsMusic'] = $containsMusic;
 		}
 
 		return $item;

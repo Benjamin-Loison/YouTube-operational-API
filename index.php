@@ -10,6 +10,8 @@
 
 <?php
 
+	include_once 'common.php';
+
 	function url($url)
 	{
 		return '<a href="' . $url . '">' . $url . '</a>';
@@ -23,18 +25,19 @@
 	function feature($feature)
 	{
 		$suburl = $feature[0];
+		$webpage = explode('/', $suburl)[0];
 		$url = $feature[1];
 		$name = ucfirst(str_replace('/', ': ' , $suburl));
-		echo 'Based on <a href="https://developers.google.com/youtube/v3/docs/' . $suburl . '">' . $name . '</a>: ' . url($url) . '<br/>';
+		echo 'Based on <a href="https://developers.google.com/youtube/v3/docs/' . $suburl . '">' . $name . '</a>: ' . url(WEBSITE_URL . $webpage . '?part=' . $url) . '<br/>';
 	}
 
-	$domainName = 'yt.lemnoslife.com';
-	$websiteURL = 'https://' . $domainName . '/';
 	// don't know if already written but making a table may be nice
-	$features = [['channels/list', $websiteURL . 'channels?part=snippet&forUsername=USERNAME'],
-	             ['videos/list', $websiteURL . 'videos?part=status,contentDetails,music&id=VIDEO_ID'],
-                 ['search/list', $websiteURL . 'search?part=snippet&channelId=CHANNEL_ID&order=viewCount(&pageToken=PAGE_TOKEN)'],
-				 ['playlistItems/list', $websiteURL . 'playlistItems?part=snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)']];
+	$features = [['channels/list', 'snippet&forUsername=USERNAME'],
+				 ['commentThreads/list', 'snippet,replies&videoId=VIDEO_ID(&pageToken=PAGE_TOKEN)'],
+				 ['playlists/list', 'statistics&id=PLAYLIST_ID'],
+				 ['playlistItems/list', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
+                 ['search/list', 'id,snippet&channelId=CHANNEL_ID&hashTag=HASH_TAG&order=viewCount,relevance(&pageToken=PAGE_TOKEN)'],
+	             ['videos/list', 'status,contentDetails,music,short,impressions,containsMusic&id=VIDEO_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
 	// adding some comments may be useful later (not useful if in native documenation I would say) - maybe adding an example could be nice too
 
 ?>
@@ -53,15 +56,15 @@
 <!--<br/>We provide also webhooks:<br/><br/>-->
 
 <!---For triggering an event when a live is started:<br/>-->
-<!--<?php echo url($websiteURL . 'webhooks?event=live&channelId=CHANNEL_ID&endpoint=YOUR_ENDPOINT'); ?> don't forget to replace CHANNEL_ID and YOUR_ENDPOINT (for instance <?php echo url('https://yourwebsite.com/listener.php'); ?> for the endpoint), the latter will receive after maximum one minute when a live started, a request from the IP resolved from <?php echo $domainName; ?> with POST values event and channelId as precised in the request webhook URL.<br/>-->
-<!--An example of listener.php is available here: <?php echo url($websiteURL . 'listener.php?code'); ?>-->
+<!--<?php echo url(WEBSITE_URL . 'webhooks?event=live&channelId=CHANNEL_ID&endpoint=YOUR_ENDPOINT'); ?> don't forget to replace CHANNEL_ID and YOUR_ENDPOINT (for instance <?php echo url('https://yourwebsite.com/listener.php'); ?> for the endpoint), the latter will receive after maximum one minute when a live started, a request from the IP resolved from <?php echo DOMAIN_NAME; ?> with POST values event and channelId as precised in the request webhook URL.<br/>-->
+<!--An example of listener.php is available here: <?php echo url(WEBSITE_URL . 'listener.php?code'); ?>-->
 
 <!-- making anchor to this part for instance for https://stackoverflow.com/questions/70739465/youtube-data-api-i-get-a-quota-exceeded-error-with-a-new-project?noredirect=1#comment125389223_70739465 -->
 
 <h2>Make <?php yt(); ?> request WITHOUT ANY KEY:</h2>
 
-To make <strong>ANY <?php yt(); ?> request WITHOUT ANY KEY/USING YOUR QUOTA</strong>, you can use: <?php $noKey = 'noKey'/*used to be yt*/; echo url($websiteURL . $noKey . '/YOUR_REQUEST'); ?><br/>
-For instance you can use: <?php $example = 'videos?part=snippet&id=VIDEO_ID'; echo url($websiteURL . $noKey . '/' . $example); ?> instead of <?php echo url('https://www.googleapis.com/youtube/v3/' . $example); ?><br/>
+To make <strong>ANY <?php yt(); ?> request WITHOUT ANY KEY/USING YOUR QUOTA</strong>, you can use: <?php $noKey = 'noKey'/*used to be yt*/; echo url(WEBSITE_URL . $noKey . '/YOUR_REQUEST'); ?><br/>
+For instance you can use: <?php $example = 'videos?part=snippet&id=VIDEO_ID'; echo url(WEBSITE_URL . $noKey . '/' . $example); ?> instead of <?php echo url('https://www.googleapis.com/youtube/v3/' . $example); ?><br/>
 I may add in the future limitation per IP etc if the quota need to be better shared among the persons using this API.<br/>
 <?php
 
