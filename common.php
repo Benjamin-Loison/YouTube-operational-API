@@ -80,6 +80,11 @@
 		return checkRegex('[1-9][0-9]{9}_[a-f0-9]{40}', $SAPISIDHASH);
 	}
 
+	function isQuery($q)
+	{
+		return true; // should restrain
+	}
+
 	function doesPathExist($json, $path)
     {
         $parts = explode('/', $path);

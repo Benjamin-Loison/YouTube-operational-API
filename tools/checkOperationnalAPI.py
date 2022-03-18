@@ -1,20 +1,21 @@
-import subprocess, json
-
-def exec(cmd):
-    cmd = cmd.replace("'", '"')
-    return subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True).communicate()[0]
+import json, requests
 
 channelId = 'UCt5USYpzzMCYhkirVQGHwKQ'
+query = 'test'
+
+def getURL(url):
+    return requests.get(url).text
 
 videoIds = []
 
-def getVideos(pageToken = ''):
+def getVideos(pageToken = '', callsIndex = 0):
     global videoIds
-    cmd = "curl -s 'https://yt.lemnoslife.com/search?part=snippet&channelId=" + channelId + "&order=viewCount"
+    url = 'https://yt.lemnoslife.com/'
+    #url += "search?part=snippet&channelId=" + channelId + "&order=viewCount"
+    url += "search?part=id&q=" + query + "&type=video"
     if pageToken != '':
-        cmd += '&pageToken=' + pageToken
-    cmd += "'"
-    res = exec(cmd)
+        url += '&pageToken=' + pageToken
+    res = getURL(url)
     data = json.loads(res)
     for item in data['items']:
         #print(item)
@@ -22,9 +23,10 @@ def getVideos(pageToken = ''):
         #print(videoId)
         if not videoId in videoIds:
             videoIds += [videoId]
-            print(len(videoIds), videoId)
+            #print(len(videoIds), videoId)
+    print(len(videoIds), callsIndex)
     if 'nextPageToken' in data:
-        getVideos(data['nextPageToken'])
+        getVideos(data['nextPageToken'], callsIndex + 1)
 
 getVideos()
 

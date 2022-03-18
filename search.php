@@ -15,7 +15,7 @@ $realOptions = ['id', 'snippet'];
 foreach($realOptions as $realOption)
     $options[$realOption] = false;
 
-if(isset($_GET['part'], $_GET['order']) && (isset($_GET['channelId']) || isset($_GET['hashTag'])))
+if(isset($_GET['part']) && (isset($_GET['channelId']) || isset($_GET['hashTag']) || isset($_GET['q'])) && (isset($_GET['order']) || isset($_GET['q'])))
 {
 	$part = $_GET['part'];
     $parts = explode(',', $part, count($realOptions));
@@ -40,12 +40,22 @@ if(isset($_GET['part'], $_GET['order']) && (isset($_GET['channelId']) || isset($
 		if(!isHashTag($id))
 		    die('invalid hashTag');
 	}
-	else
-		die('no channelId or hashTag field was provided');
+	else if($_GET['q'])
+	{
+		$id = $_GET['q'];
 
-	$order = $_GET['order'];
-	if(!in_array($order, ['viewCount', 'relevance']))
-		die('invalid order');
+		if(!isQuery($id))
+			die('invalid q');
+	}
+	else
+		die('no channelId or hashTag or q field was provided');
+
+	if(isset($_GET['order']) || !isset($_GET['q']))
+	{
+		$order = $_GET['order'];
+		if(!in_array($order, ['viewCount', 'relevance']))
+			die('invalid order');
+	}
 	$continuationToken = '';
 	if(isset($_GET['pageToken']))
 	{
@@ -62,7 +72,7 @@ function getAPI($id, $order, $continuationToken)
 	global $options;
     $items = null;
 	$continuationTokenProvided = $continuationToken != '';
-	if($_GET['hashTag'])
+	if(isset($_GET['hashTag']))
 	{
 		if($continuationTokenProvided)
 		{
@@ -77,8 +87,22 @@ function getAPI($id, $order, $continuationToken)
 			$json = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $opts);
 		}
 		else
-    		$json = getJSONFromHTML('https://www.youtube.com/hashtag/' . $id);
+    		$json = getJSONFromHTML('https://www.youtube.com/hashtag/' . urlencode($id));
 		$items = $continuationTokenProvided ? $json['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['richGridRenderer']['contents'];
+	}
+	else if(isset($_GET['q']))
+	{
+		$typeBase64 = 'EgIQAQ==';
+		$rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}}' . ($continuationTokenProvided ? ',"continuation":"' . $continuationToken . '"' : ',"query":"' . $_GET['q'] . '"' . ($typeBase64 !== '' ? ',"params":"' . $typeBase64 . '"' : '')) . '}';
+		$opts = [
+           	"http" => [
+               	"method" => "POST",
+               	"header" => "Content-Type: application/json",
+               	"content" => $rawData,
+           	]
+        ];
+		$json = getJSON('https://www.youtube.com/youtubei/v1/search?key=' . UI_KEY, $opts);
+		$items = $continuationTokenProvided ? $json['continuationContents']['sectionListContinuation']['contents'][0]['itemSectionRenderer']['contents'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'];
 	}
 	else
 	{
@@ -103,17 +127,21 @@ function getAPI($id, $order, $continuationToken)
 	for($itemsIndex = 0; $itemsIndex < $itemsCount - ($continuationTokenProvided || $_GET['hashTag'] ? 1 : 0); $itemsIndex++) // check upper bound for hashtags
 	{
 		$item = $items[$itemsIndex];
-		$gridVideoRenderer = $item['gridVideoRenderer'];
+		$path = '';
+		if(isset($_GET['hashTag']))
+			$path = 'richItemRenderer/content/videoRenderer';
+		else if(isset($_GET['q']))
+			$path = 'videoRenderer';
+		else
+			$path = 'gridVideoRenderer';
+		$gridVideoRenderer = getValue($item, $path);
 		$answerItem = [
 			'kind' => 'youtube#searchResult',
 			'etag' => 'NotImplemented'
 		];
 		if($options['id'])
 		{
-			if($_GET['hashTag'])
-				$videoId = $item['richItemRenderer']['content']['videoRenderer']['videoId'];
-			else
-				$videoId = $gridVideoRenderer['videoId'];
+			$videoId = $gridVideoRenderer['videoId'];
 			$answerItem['id'] = [
                 'kind' => 'youtube#video',
                 'videoId' => $videoId
@@ -129,15 +157,15 @@ function getAPI($id, $order, $continuationToken)
 		}
 		array_push($answerItems, $answerItem);
 	}
-	if($_GET['hashTag'])
+	if(isset($_GET['hashTag']))
 		$nextContinuationToken = $itemsCount > 60 ? $items[60] : '';
 	else
 		$nextContinuationToken = $itemsCount > 30 ? $items[30] : ''; // it doesn't seem random but hard to reverse-engineer
 	if($nextContinuationToken !== '')
-	{
 		$nextContinuationToken = $nextContinuationToken['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
-		$nextContinuationToken = str_replace('%3D', '=', $nextContinuationToken);
-	}
+	if(isset($_GET['q']))
+		$nextContinuationToken = ($continuationTokenProvided ? $json['continuationContents']['sectionListContinuation'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer'])['continuations'][0]['nextContinuationData']['continuation'];
+	$nextContinuationToken = str_replace('%3D', '=', $nextContinuationToken);
 	$answer = [
 		'kind' => 'youtube#searchListResponse',
 		'etag' => 'NotImplemented'
