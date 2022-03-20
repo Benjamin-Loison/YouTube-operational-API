@@ -11,13 +11,13 @@
 
 	include_once 'common.php';
 
-	$realOptions = ['status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic'];
+	$realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic'];
 
 	// really necessary ?
 	foreach($realOptions as $realOption)
 		$options[$realOption] = false;
 
-	if(isset($_GET['part'], $_GET['id']))
+	if(isset($_GET['part']) && (isset($_GET['id']) || isset($_GET['clipId'])))
 	{
 		$part = $_GET['part'];
 		$parts = explode(',', $part, count($realOptions));
@@ -26,13 +26,17 @@
 				die('invalid part ' . $part);
 			else
 				$options[$part] = true;
-		$ids = $_GET['id'];
+
+		$isClip = isset($_GET['clipId']);
+		$field = $isClip ? 'clipId' : 'id';
+		$ids = $_GET[$field];
 		$realIds = str_contains($ids, ',') ? explode(',', $ids, 50) : [$ids];
 		if(count($realIds) == 0)
 			die('invalid id');
 		foreach($realIds as $realId)
-			if(!isVideoId($realId))
-				die('invalid id');
+			if((!$isClip && !isVideoId($realId)) || !isClipId($realId))
+				die('invalid ' . $field);
+
 		if($options['impressions'] && (!isset($_GET['SAPISIDHASH']) || !isSAPISIDHASH($_GET['SAPISIDHASH'])))
 			die('invalid SAPISIDHASH');
 		echo getAPI($realIds);
@@ -138,6 +142,13 @@
 			$json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $opts);
 		    $containsMusic = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][1]['videoSecondaryInfoRenderer']['metadataRowContainer']['metadataRowContainerRenderer']['rows'] !== null;
 		    $item['containsMusic'] = $containsMusic;
+		}
+
+		if($options['id'] && isset($_GET['clipId']))
+		{
+			$json = getJSONFromHTML('https://www.youtube.com/clip/' . $id);
+			$videoId = $json['currentVideoEndpoint']['watchEndpoint']['videoId'];
+			$item['videoId'] = $videoId;
 		}
 
 		return $item;

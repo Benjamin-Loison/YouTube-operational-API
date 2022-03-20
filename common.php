@@ -85,6 +85,11 @@
 		return true; // should restrain
 	}
 
+	function isClipId($clipId)
+	{
+		return checkRegex('[a-zA-Z0-9-_]{36}', $clipId); // may be more precise
+	}
+
 	function doesPathExist($json, $path)
     {
         $parts = explode('/', $path);
