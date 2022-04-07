@@ -28,15 +28,18 @@
 		return json_decode(getRemote($url, $opts), true);
 	}
 
-	function getJSONStringFromHTML($html)
+	function getJSONStringFromHTML($html, $scriptVariable = '')
 	{
-		return explode(';</script>', explode('">var ytInitialData = ', $html)[1])[0]; // otherwise having troubles with people using ';' in their channel description
+		// don't use as default variable because getJSONFromHTML call this function with empty string
+		if($scriptVariable === '')
+			$scriptVariable = 'ytInitialData';
+		return explode(';</script>', explode('">var ' . $scriptVariable . ' = ', $html)[1])[0]; // otherwise having troubles with people using ';' in their channel description
 	}
 
-	function getJSONFromHTML($url, $opts = [])
+	function getJSONFromHTML($url, $opts = [], $scriptVariable = '')
 	{
 		$res = getRemote($url, $opts);
-        $res = getJSONStringFromHTML($res);
+        $res = getJSONStringFromHTML($res, $scriptVariable);
 		return json_decode($res, true);
 	}
 

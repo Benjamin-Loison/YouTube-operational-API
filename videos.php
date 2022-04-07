@@ -11,7 +11,7 @@
 
 	include_once 'common.php';
 
-	$realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic'];
+	$realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion']; // could load index.php from that
 
 	// really necessary ?
 	foreach($realOptions as $realOption)
@@ -34,7 +34,7 @@
 		if(count($realIds) == 0)
 			die('invalid id');
 		foreach($realIds as $realId)
-			if((!$isClip && !isVideoId($realId)) || !isClipId($realId))
+			if((!$isClip && !isVideoId($realId)) && !isClipId($realId))
 				die('invalid ' . $field);
 
 		if($options['impressions'] && (!isset($_GET['SAPISIDHASH']) || !isSAPISIDHASH($_GET['SAPISIDHASH'])))
@@ -149,6 +149,13 @@
 			$json = getJSONFromHTML('https://www.youtube.com/clip/' . $id);
 			$videoId = $json['currentVideoEndpoint']['watchEndpoint']['videoId'];
 			$item['videoId'] = $videoId;
+		}
+
+		if($options['isPaidPromotion'])
+		{
+			$json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, [], 'ytInitialPlayerResponse');
+			$isPaidPromotion = array_key_exists('paidContentOverlay', $json);
+			$item['isPaidPromotion'] = $isPaidPromotion;
 		}
 
 		return $item;
