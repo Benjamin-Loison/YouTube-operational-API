@@ -11,7 +11,7 @@
 
 	include_once 'common.php';
 
-	$realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion']; // could load index.php from that
+	$realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium']; // could load index.php from that
 
 	// really necessary ?
 	foreach($realOptions as $realOption)
@@ -156,6 +156,13 @@
 			$json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, [], 'ytInitialPlayerResponse');
 			$isPaidPromotion = array_key_exists('paidContentOverlay', $json);
 			$item['isPaidPromotion'] = $isPaidPromotion;
+		}
+
+		if($options['isPremium'])
+		{
+			$json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+			$isPremium = array_key_exists('offerModule', $json['contents']['twoColumnWatchNextResults']['secondaryResults']['secondaryResults']);
+			$item['isPremium'] = $isPremium;
 		}
 
 		return $item;
