@@ -93,6 +93,11 @@
 		return checkRegex('[a-zA-Z0-9-_]{36}', $clipId); // may be more precise
 	}
 
+	function isEventType($eventType)
+	{
+		return in_array($eventType, ['completed', 'live', 'upcoming']);
+	}
+
 	function doesPathExist($json, $path)
     {
         $parts = explode('/', $path);

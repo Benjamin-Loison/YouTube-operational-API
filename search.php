@@ -15,7 +15,9 @@ $realOptions = ['id', 'snippet'];
 foreach($realOptions as $realOption)
     $options[$realOption] = false;
 
-if(isset($_GET['part']) && (isset($_GET['channelId']) || isset($_GET['hashTag']) || isset($_GET['q'])) && (isset($_GET['order']) || isset($_GET['q'])))
+if(isset($_GET['part']) &&
+  (isset($_GET['channelId']) || isset($_GET['channelId'], $_GET['eventType']) || isset($_GET['hashTag']) || isset($_GET['q'])) &&
+  (isset($_GET['order']) || isset($_GET['q']) || isset($_GET['eventType'])))
 {
 	$part = $_GET['part'];
     $parts = explode(',', $part, count($realOptions));
@@ -32,6 +34,13 @@ if(isset($_GET['part']) && (isset($_GET['channelId']) || isset($_GET['hashTag'])
 	
 		if(!isChannelId($id))
     		die('invalid channelId');
+	}
+	else if($_GET['eventType'])
+	{
+		$eventType = $_GET['eventType'];
+
+		if(!isEventType($eventType))
+			die('invalid eventType');
 	}
 	else if($_GET['hashTag'])
 	{
@@ -50,7 +59,7 @@ if(isset($_GET['part']) && (isset($_GET['channelId']) || isset($_GET['hashTag'])
 	else
 		die('no channelId or hashTag or q field was provided');
 
-	if(isset($_GET['order']) || !isset($_GET['q']))
+	if((isset($_GET['order']) || !isset($_GET['q'])) && !isset($_GET['eventType']))
 	{
 		$order = $_GET['order'];
 		if(!in_array($order, ['viewCount', 'relevance']))
@@ -89,6 +98,11 @@ function getAPI($id, $order, $continuationToken)
 		else
     		$json = getJSONFromHTML('https://www.youtube.com/hashtag/' . urlencode($id));
 		$items = $continuationTokenProvided ? $json['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['richGridRenderer']['contents'];
+	}
+	else if(isset($_GET['eventType']))
+	{
+		$json = getJSONFromHTML('https://www.youtube.com/channel/' . $_GET['channelId'] . '/videos?view=2&live_view=502');
+		$items = $json['contents']['twoColumnBrowseResultsRenderer']['tabs']['1']['tabRenderer']['content']['sectionListRenderer']['contents']['0']['itemSectionRenderer']['contents']['0']['gridRenderer']['items'];
 	}
 	else if(isset($_GET['q']))
 	{
