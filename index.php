@@ -37,13 +37,13 @@
 				 ['playlists/list', 'statistics&id=PLAYLIST_ID'],
 				 ['playlistItems/list', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
                  ['search/list', 'id,snippet&q=QUERY&channelId=CHANNEL_ID&eventType=upcoming&hashTag=HASH_TAG&type=video&order=viewCount,relevance(&pageToken=PAGE_TOKEN)'],
-	             ['videos/list', 'id,status,contentDetails,music,short,impressions,containsMusic,isPaidPromotion,isPremium&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
+	             ['videos/list', 'id,status,contentDetails,music,short,impressions,containsMusic,isPaidPromotion,isPremium,isMemberOnly&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
 	// adding some comments may be useful later (not useful if in native documenation I would say) - maybe adding an example could be nice too
 
 ?>
 
 <!-- could provide a detailed list of where YouTube fails but this API listed quite well these even if all aren't listed because not implemented -->
-<h1>YouTube operational API works where <?php yt(); ?> fails.</h1>
+<h1>YouTube operational API works when <?php yt(); ?> fails.</h1>
 
 <h2>Current implemented features:</h2>
 <?php

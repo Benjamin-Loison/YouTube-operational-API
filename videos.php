@@ -11,7 +11,7 @@
 
 	include_once 'common.php';
 
-	$realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium']; // could load index.php from that
+	$realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly']; // could load index.php from that
 
 	// really necessary ?
 	foreach($realOptions as $realOption)
@@ -163,6 +163,13 @@
 			$json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
 			$isPremium = array_key_exists('offerModule', $json['contents']['twoColumnWatchNextResults']['secondaryResults']['secondaryResults']);
 			$item['isPremium'] = $isPremium;
+		}
+
+		if($options['isMemberOnly'])
+		{
+			$json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $opts);
+			$isMemberOnly = array_key_exists('badges', $json["contents"]["twoColumnWatchNextResults"]["results"]["results"]["contents"]["0"]["videoPrimaryInfoRenderer"]);
+			$item['isMemberOnly'] = $isMemberOnly;
 		}
 
 		return $item;
