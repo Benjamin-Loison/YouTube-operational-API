@@ -1,0 +1,11 @@
+Options +FollowSymLinks
+RewriteEngine on
+
+RewriteRule ^search$ search.php
+RewriteRule ^videos$ videos.php
+RewriteRule ^playlists$ playlists.php
+RewriteRule ^playlistItems$ playlistItems.php
+RewriteRule ^channels$ channels.php
+RewriteRule ^webhooks$ webhooks.php
+RewriteRule ^commentThreads$ commentThreads.php
+RewriteRule ^lives$ lives.php

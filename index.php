@@ -49,7 +49,10 @@
 <?php
 
 	foreach($features as $feature)
-		feature($feature)
+		feature($feature);
+
+	echo '<br/>';
+	echo url(WEBSITE_URL . 'lives' . '?part=' . 'donations&id=VIDEO_ID') . '<br/>';
 
 ?>
 

@@ -28,6 +28,12 @@
 		return json_decode(getRemote($url, $opts), true);
 	}
 
+	function getJSONFromHTMLScriptPrefix($html, $scriptPrefix)
+	{
+		$html = explode(';</script>', explode('">' . $scriptPrefix, $html)[1])[0];
+		return json_decode($html, true);
+	}
+
 	function getJSONStringFromHTML($html, $scriptVariable = '')
 	{
 		// don't use as default variable because getJSONFromHTML call this function with empty string
