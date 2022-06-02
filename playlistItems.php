@@ -1,18 +1,23 @@
 <?php
 
+	// StackOverflow source: https://stackoverflow.com/a/70961128/7123660
+	$playlistItemsTests = [['snippet&playlistId=PLKAl8tt2R8OfMnDRnEABZ2M-tI7yJYvl1', 'items/0/snippet/publishedAt', '1520963713']]; // not precise :S
+
+include_once 'common.php';
+
 if(isset($_GET['part'], $_GET['playlistId']))
 {
 	$part = $_GET['part'];
 	if(!in_array($part, ['snippet']))
 		die('invalid part');
 	$playlistId = $_GET['playlistId'];
-	if(preg_match('/^[a-zA-Z0-9-_]+$/', $playlistId) !== 1)
+	if(!isPlaylistId($playlistId))
         die('invalid playlistId');
 	$continuationToken = '';
 	if(isset($_GET['pageToken']))
 	{
 		$continuationToken = $_GET['pageToken'];
-		if(!preg_match('/^[A-Za-z0-9=]+$/', $continuationToken))
+		if(!isContinuationToken($continuationToken))
 			die('invalid continuationToken');
 	}
 	echo getAPI($playlistId, $continuationToken);
@@ -25,8 +30,8 @@ function getAPI($playlistId, $continuationToken)
 	$url = '';
 	if($continuationTokenProvided)
 	{
-		$url = 'https://www.youtube.com/youtubei/v1/browse?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
-		$rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"2.2022011"}},"continuation":"' . $continuationToken . '"}';
+		$url = 'https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY;
+		$rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
 		$http['method'] = 'POST';
 		$http['header'] = 'Content-Type: application/json';
 		$http['content'] = $rawData;
@@ -41,12 +46,10 @@ function getAPI($playlistId, $continuationToken)
 		'http' => $http
 	];
 
-	$context = stream_context_create($options);
-
-	$res = file_get_contents($url, false, $context);
+	$res = getRemote($url, $options);
 
 	if(!$continuationTokenProvided)
-		$res = explode(';', explode('">var ytInitialData = ', $res)[1])[0];
+		$res = getJSONStringFromHTML($res);
 
 	// mr https://stackoverflow.com/users/7838847/hypnotizd ne veut pas dépenser plus de quota...
 
@@ -70,6 +73,7 @@ function getAPI($playlistId, $continuationToken)
 			$publishedAtParts = explode(' il y a ', $publishedAtRaw);
 			$publishedAtStr = $publishedAtParts[count($publishedAtParts) - 1]/*just taking 1 could allow remote code execution*/; // why french :O ?
 		}
+		$publishedAtStrSource = $publishedAtStr;
 		$publishedAtStr = str_replace($continuationTokenProvided ? 'seconds' : 'secondes', '* 1 +', $publishedAtStr);
 		$publishedAtStr = str_replace($continuationTokenProvided ? 'second' : 'seconde', '* 1 +', $publishedAtStr);
 		$publishedAtStr = str_replace('minutes', '* 60 +', $publishedAtStr);
@@ -84,8 +88,7 @@ function getAPI($playlistId, $continuationToken)
 		if($continuationTokenProvided)
 			$publishedAtStr = str_replace('month', '* 2592000 +', $publishedAtStr); // not sure
 		$publishedAtStr = str_replace($continuationTokenProvided ? 'years' : 'ans', '* 31104000 +', $publishedAtStr); // not sure
-		if($continuationTokenProvided)
-			$publishedAtStr = str_replace('year', '* 31104000 +', $publishedAtStr); // not sure
+		$publishedAtStr = str_replace($continuationTokenProvided ? 'year' : 'an', '* 31104000 +', $publishedAtStr);
 		$publishedAtStr = substr($publishedAtStr, 0, strlen($publishedAtStr) - 2);
 		$publishedAtStr = str_replace(' ', '', $publishedAtStr); // "security"
 		$publishedAtStr = preg_replace('/[[:^print:]]/', '', $publishedAtStr);
@@ -102,7 +105,7 @@ function getAPI($playlistId, $continuationToken)
 				}
 			}
 		}
-		$publishedAt = time() - eval('return ' . $publishedAtStr . ';'); // could check if only +,*,digits
+		$publishedAt = time() - eval('return ' . $publishedAtStr . ';'); // could check if only +,*,digits // $publishedAtStrSource
 		// the time is not perfectly accurate this way
 		// warning releasing source code may show security breaches
 		$answerItem = [

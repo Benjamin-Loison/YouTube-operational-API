@@ -4,7 +4,7 @@
 
 	include_once 'common.php';
 
-	$realOptions = ['statistics'];
+	$realOptions = ['snippet', 'statistics'];
 
 	// really necessary ?
 	foreach($realOptions as $realOption)
@@ -19,24 +19,32 @@
 				die('invalid part ' . $part);
 			else
 				$options[$part] = true;
-		$id = $_GET['id'];
-		if(!isPlaylistId($id))
-			die('invalid id');
-		echo getAPI($id);
+		$ids = $_GET['id'];
+        $realIds = str_contains($ids, ',') ? explode(',', $ids, 50) : [$ids];
+        if(count($realIds) == 0)
+            die('invalid id');
+        foreach($realIds as $realId)
+            if(!isPlaylistId($realId))
+                die('invalid id');
+        echo getAPI($realIds);
 	}
 	// could provide an error message if such fields aren't provided
 
 	function getItem($id)
 	{
 		global $options;
+		$opts = [
+            "http" => [
+                "header" => ['Cookie: CONSENT=YES+', 'Accept-Language: en']
+            ]
+        ];
+        $result = getJSONFromHTML('https://www.youtube.com/playlist?list=' . $id, $opts);
+		if($options['snippet'])
+		{
+			$title = $result['metadata']['playlistMetadataRenderer']['title'];
+		}
 		if($options['statistics'])
 		{
-			$opts = [
-            	"http" => [
-                	"header" => ['Cookie: CONSENT=YES+', 'Accept-Language: en']
-            	]
-        	];
-        	$result = getJSONFromHTML('https://www.youtube.com/playlist?list=' . $id, $opts);
 			$viewCount = $result['sidebar']['playlistSidebarRenderer']['items'][0]['playlistSidebarPrimaryInfoRenderer']['stats'][1]['simpleText'];
 			if($viewCount === 'No views')
 				$viewCount = 0;
@@ -50,6 +58,11 @@
             'etag' => 'NotImplemented'
         ];
 
+		if($options['snippet'])
+		{
+			$item['snippet'] = ['title' => $title];
+		}
+
 		if($options['statistics'])
 		{
 			$item['statistics'] = ['viewCount' => $viewCount];
@@ -58,10 +71,11 @@
 		return $item;
 	}
 
-	function getAPI($id)
+	function getAPI($ids)
 	{
 		$items = [];
-		array_push($items, getItem($id));
+		foreach($ids as $id)
+			array_push($items, getItem($id));
 
     	$answer = [
         	'kind' => 'youtube#playlistListResponse',

@@ -1,5 +1,10 @@
 <?php
 
+	// StackOverflow source: https://stackoverflow.com/a/71067222/7123660
+	$channelsTests = [['snippet&forUsername=FolkartTr', 'items/0/id', 'UCnS--2e1yzQCm5r4ClrMJBg']];
+
+	include_once 'common.php';
+
 	$realOptions = ['snippet'];
 
 	// really necessary ?
@@ -16,7 +21,7 @@
 			else
 				$options[$part] = true;
 		$forUsername = $_GET['forUsername'];
-		if(preg_match('/^[a-zA-Z0-9]+$/', $forUsername) !== 1) // what's minimal length ?
+		if(!isUsername($forUsername)) // what's minimal length ?
 			die('invalid forUsername');
 		echo getAPI($forUsername);
 	}
@@ -31,10 +36,7 @@
                 	"header" => 'Cookie: CONSENT=YES+'
             	]
         	];
-        	$context = stream_context_create($opts);
-        	$res = file_get_contents('https://www.youtube.com/c/' . $forUsername . '/about', false, $context);
-			$res = explode(';</script>', explode('">var ytInitialData = ', $res)[1])[0]; // otherwise having troubles with people using ';' in their channel description
-        	$result = json_decode($res, true);
+        	$result = getJSONFromHTML('https://www.youtube.com/c/' . $forUsername . '/about', $opts);
 			$id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
 		}
 

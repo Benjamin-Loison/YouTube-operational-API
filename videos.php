@@ -168,7 +168,7 @@
 		if($options['isMemberOnly'])
 		{
 			$json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $opts);
-			$isMemberOnly = array_key_exists('badges', $json["contents"]["twoColumnWatchNextResults"]["results"]["results"]["contents"]["0"]["videoPrimaryInfoRenderer"]);
+			$isMemberOnly = array_key_exists('badges', $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']);
 			$item['isMemberOnly'] = $isMemberOnly;
 		}
 

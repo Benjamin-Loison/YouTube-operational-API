@@ -99,7 +99,7 @@ function getAPI($videoId, $continuationToken)
 					'etag' => 'NotImplemented',
 					'id' => $commentId,
 					'snippet' => [
-						'textOriginal' => $text, // not exactly the same as official for â€™ for instance (different from ')
+						'textOriginal' => $text, // not exactly the same as official for â for instance (different from ')
 						'isHearted' => $isHearted
 					]
 				]
