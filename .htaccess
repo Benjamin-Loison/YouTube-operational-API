@@ -9,3 +9,4 @@ RewriteRule ^channels$ channels.php
 RewriteRule ^webhooks$ webhooks.php
 RewriteRule ^commentThreads$ commentThreads.php
 RewriteRule ^lives$ lives.php
+RewriteRule ^liveChats$ liveChats.php
