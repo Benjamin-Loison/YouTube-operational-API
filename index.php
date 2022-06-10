@@ -10,35 +10,35 @@
 
 <?php
 
-	include_once 'common.php';
+    include_once 'common.php';
 
-	function url($url)
-	{
-		return '<a href="' . $url . '">' . $url . '</a>';
-	}
+    function url($url)
+    {
+        return '<a href="' . $url . '">' . $url . '</a>';
+    }
 
-	function yt()
-	{
-		echo '<a href="https://developers.google.com/youtube/v3">YouTube Data API v3</a>';
-	}
+    function yt()
+    {
+        echo '<a href="https://developers.google.com/youtube/v3">YouTube Data API v3</a>';
+    }
 
-	function feature($feature)
-	{
-		$suburl = $feature[0];
-		$webpage = explode('/', $suburl)[0];
-		$url = $feature[1];
-		$name = ucfirst(str_replace('/', ': ' , $suburl));
-		echo 'Based on <a href="https://developers.google.com/youtube/v3/docs/' . $suburl . '">' . $name . '</a>: ' . url(WEBSITE_URL . $webpage . '?part=' . $url) . '<br/>';
-	}
+    function feature($feature)
+    {
+        $suburl = $feature[0];
+        $webpage = explode('/', $suburl)[0];
+        $url = $feature[1];
+        $name = ucfirst(str_replace('/', ': ', $suburl));
+        echo 'Based on <a href="https://developers.google.com/youtube/v3/docs/' . $suburl . '">' . $name . '</a>: ' . url(WEBSITE_URL . $webpage . '?part=' . $url) . '<br/>';
+    }
 
-	// don't know if already written but making a table may be nice
-	$features = [['channels/list', 'snippet&forUsername=USERNAME'],
-				 ['commentThreads/list', 'snippet,replies&videoId=VIDEO_ID(&pageToken=PAGE_TOKEN)'],
-				 ['playlists/list', 'statistics&id=PLAYLIST_ID'],
-				 ['playlistItems/list', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
+    // don't know if already written but making a table may be nice
+    $features = [['channels/list', 'snippet,premieres&forUsername=USERNAME&id=CHANNEL_ID'], // could use ',' instead of '&' to describes that `forUsername` and `id` have the same aim
+                 ['commentThreads/list', 'snippet,replies&videoId=VIDEO_ID(&pageToken=PAGE_TOKEN)'],
+                 ['playlists/list', 'statistics&id=PLAYLIST_ID'],
+                 ['playlistItems/list', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
                  ['search/list', 'id,snippet&q=QUERY&channelId=CHANNEL_ID&eventType=upcoming&hashTag=HASH_TAG&type=video&order=viewCount,relevance(&pageToken=PAGE_TOKEN)'],
-	             ['videos/list', 'id,status,contentDetails,music,short,impressions,containsMusic,isPaidPromotion,isPremium,isMemberOnly&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
-	// adding some comments may be useful later (not useful if in native documenation I would say) - maybe adding an example could be nice too
+                 ['videos/list', 'id,status,contentDetails,music,short,impressions,containsMusic,isPaidPromotion,isPremium,isMemberOnly&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
+    // adding some comments may be useful later (not useful if in native documenation I would say) - maybe adding an example could be nice too
 
 ?>
 
@@ -48,12 +48,13 @@
 <h2>Current implemented features:</h2>
 <?php
 
-	foreach($features as $feature)
-		feature($feature);
+    foreach ($features as $feature) {
+        feature($feature);
+    }
 
-	echo '<br/>';
-	echo url(WEBSITE_URL . 'lives' . '?part=' . 'donations&id=VIDEO_ID') . '<br/>';
-	echo url(WEBSITE_URL . 'liveChats' . '?part=' . 'snippet&id=VIDEO_ID&time=TIME_MS') . '<br/>';
+    echo '<br/>';
+    echo url(WEBSITE_URL . 'lives' . '?part=' . 'donations&id=VIDEO_ID') . '<br/>';
+    echo url(WEBSITE_URL . 'liveChats' . '?part=' . 'snippet&id=VIDEO_ID&time=TIME_MS') . '<br/>';
 
 ?>
 
@@ -72,9 +73,9 @@ For instance you can use: <?php $example = 'videos?part=snippet&id=VIDEO_ID'; ec
 I may add in the future limitation per IP etc if the quota need to be better shared among the persons using this API.<br/>
 <?php
 
-	// could use supervariable or something like that instead ?
-	$keysCountFile = '/var/www/ytPrivate/keysCount.txt';
-	$keysCount = file_get_contents($keysCountFile);
+    // could use supervariable or something like that instead ?
+    $keysCountFile = '/var/www/ytPrivate/keysCount.txt';
+    $keysCount = file_get_contents($keysCountFile);
 
 ?>
 Currently this service is <a href="keys.php">powered by <?php echo $keysCount; ?> keys</a>.

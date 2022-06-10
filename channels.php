@@ -5,14 +5,14 @@
 
     include_once 'common.php';
 
-    $realOptions = ['snippet'];
+    $realOptions = ['snippet', 'premieres'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
         $options[$realOption] = false;
     }
 
-    if (isset($_GET['part'], $_GET['forUsername'])) {
+    if (isset($_GET['part']) && (isset($_GET['forUsername']) || isset($_GET['id']))) {
         $part = $_GET['part'];
         $parts = explode(',', $part, count($realOptions));
         foreach ($parts as $part) {
@@ -22,17 +22,12 @@
                 $options[$part] = true;
             }
         }
-        $forUsername = $_GET['forUsername'];
-        if (!isUsername($forUsername)) { // what's minimal length ?
-            die('invalid forUsername');
-        }
-        echo getAPI($forUsername);
-    }
-
-    function getItem($forUsername)
-    {
-        global $options;
-        if ($options['snippet']) {
+        $id = '';
+        if (isset($_GET['forUsername'])) {
+            $forUsername = $_GET['forUsername'];
+            if (!isUsername($forUsername)) { // what's minimal length ?
+                die('invalid forUsername');
+            }
             $opts = [
                 "http" => [
                     "header" => 'Cookie: CONSENT=YES+'
@@ -40,21 +35,47 @@
             ];
             $result = getJSONFromHTML('https://www.youtube.com/c/' . $forUsername . '/about', $opts);
             $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
+        } else {
+            $id = $_GET['id'];
+            if (!isChannelId($id)) {
+                die('invalid id'); // could directly die within the function
+            }
         }
+        echo getAPI($id);
+    }
 
+    function getItem($id)
+    {
+        global $options;
         $item = [
             'kind' => 'youtube#video',
             'etag' => 'NotImplemented',
             'id' => $id
         ];
 
+        if ($options['premieres']) {
+            $premieres = [];
+            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id);
+            $subItems = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['shelfRenderer']['content']['horizontalListRenderer']['items'];
+            foreach ($subItems as $subItem) {
+                $subItem = $subItem['gridVideoRenderer'];
+                if (array_key_exists('upcomingEventData', $subItem)) {
+                    foreach (['navigationEndpoint', 'menu', 'trackingParams', 'thumbnailOverlays'] as $toRemove) {
+                        unset($subItem[$toRemove]);
+                    }
+                    array_push($premieres, $subItem);
+                }
+            }
+            $item['premieres'] = $premieres;
+        }
+
         return $item;
     }
 
-    function getAPI($forUsername)
+    function getAPI($id)
     {
         $items = [];
-        array_push($items, getItem($forUsername));
+        array_push($items, getItem($id));
 
         $answer = [
             'kind' => 'youtube#channelListResponse',
