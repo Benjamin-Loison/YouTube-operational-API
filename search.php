@@ -29,6 +29,10 @@ if (isset($_GET['part']) &&
         }
     }
 
+    if ($options['snippet']) {
+        $options['id'] = true;
+    }
+
     $id = '';
     if (isset($_GET['channelId'])) {
         $id = $_GET['channelId'];
