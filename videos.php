@@ -11,7 +11,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly']; // could load index.php from that
+    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed']; // could load index.php from that
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -166,6 +166,13 @@
             $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $opts);
             $isMemberOnly = array_key_exists('badges', $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']);
             $item['isMemberOnly'] = $isMemberOnly;
+        }
+
+        if ($options['mostReplayed']) {
+            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+            $mostReplayed = $json['playerOverlays']['playerOverlayRenderer']['decoratedPlayerBarRenderer']['decoratedPlayerBarRenderer']['playerBar']['multiMarkersPlayerBarRenderer']['markersMap'][0]['value']['heatmap']['heatmapRenderer'];
+            // What is `Dp` in `maxHeightDp` and `minHeightDp` ? If not relevant could add ['heatMarkers'] to the JSON path above.
+            $item['mostReplayed'] = $mostReplayed;
         }
 
         return $item;
