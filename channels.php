@@ -5,7 +5,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['snippet', 'premieres'];
+    $realOptions = ['snippet', 'premieres', 'about'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -67,6 +67,22 @@
                 }
             }
             $item['premieres'] = $premieres;
+        }
+
+        if ($options['about']) {
+            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/about');
+            $linksCommon = $result['header']['c4TabbedHeaderRenderer']['headerLinks']['channelHeaderLinksRenderer'];
+            $linksObjects = array_merge($linksCommon['primaryLinks'], (array)$linksCommon['secondaryLinks']);
+            $links = [];
+            foreach ($linksObjects as $linkObject) {
+                $link = [];
+                $link['url'] = $linkObject['navigationEndpoint']['urlEndpoint']['url'];
+                $link['thumbnail'] = $linkObject['icon']['thumbnails'][0]['url'];
+                $link['title'] = $linkObject['title']['simpleText'];
+                array_push($links, $link);
+            }
+            $about['links'] = $links;
+            $item['about'] = $about;
         }
 
         return $item;
