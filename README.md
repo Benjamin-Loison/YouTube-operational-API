@@ -12,6 +12,22 @@ YouTube operational API works when [YouTube Data API v3](https://developers.goog
 ```
 apt update
 sudo apt install apache2 php
+sudo a2enmod rewrite
+```
+
+Replace `AllowOverride None` with `AllowOverride All` in `/etc/apache2/apache2.conf`:
+
+```
+<Directory /var/www/>
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+```
+
+Then run:
+
+```
 sudo service apache2 start
 ```
 
@@ -33,6 +49,14 @@ echo '<IfModule php_module>
   </IfModule>
 </IfModule>' >> /opt/homebrew/etc/httpd/extra/httpd-php.conf
 
+sed -i '' 's/#LoadModule rewrite_module/LoadModule rewrite_module/' httpd.conf
+```
+
+Replace `AllowOverride none` with `AllowOverride all` in `<Directory "/opt/homebrew/var/www">`  in `/opt/homebrew/etc/httpd/httpd.conf`.
+
+Then run:
+
+```
 brew services start httpd
 ```
 
