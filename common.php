@@ -20,7 +20,27 @@
     function getRemote($url, $opts = [])
     {
         $context = stream_context_create($opts);
-        return file_get_contents($url, false, $context);
+        $result = file_get_contents($url, false, $context);
+        if ($result === false) {
+            $opts = [
+                'http' => [
+                    'follow_location' => false
+                ]
+            ];
+            $context = stream_context_create($opts);
+            $result = file_get_contents($url, false, $context);
+            if (str_contains($result, 'https://www.google.com/sorry/index?continue=')) {
+                $error = [
+                    'code' => 400,
+                    'message' => 'YouTube has detected unusual traffic from this YouTube operational API instance. Please try your request again later or see alternatives at https://github.com/Benjamin-Loison/YouTube-operational-API/issues/11',
+                ];
+                $result = [
+                    'error' => $error
+                ];
+                die(json_encode($result, JSON_PRETTY_PRINT));
+            }
+        }
+        return $result;
     }
 
     function getJSON($url, $opts)
