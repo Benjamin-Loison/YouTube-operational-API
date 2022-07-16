@@ -98,7 +98,7 @@
 
         if ($options['music']) {
             // music request doesn't provide embeddable info - could not make a request if only music and contentDetails
-            $rawData = '{"videoId":"' . $id . '","context":{"client":{"clientName":"WEB_REMIX","clientVersion":"' . MUSIC_VERSION . '"}}}';
+            $rawData = '{"videoId":"' . $id . '","context":{"client":{"clientName":"WEB_REMIX","clientVersion":"' . CLIENT_VERSION . '"}}}';
             $resultMusic = getJSONFunc($rawData, true);
             $music = [
                 'available' => $resultMusic['playabilityStatus']['status'] === "OK"
