@@ -1,4 +1,4 @@
-# YouTube operational API
+Aa# YouTube operational API
 YouTube operational API works when [YouTube Data API v3](https://developers.google.com/youtube/v3) fails.
 
 [API website](https://yt.lemnoslife.com)
@@ -85,4 +85,3 @@ If you want me to advertise your instance (if you have opened your port, and hav
 
 - [Matrix](https://matrix.to/#/#youtube-operational-api:matrix.org)
 - [Discord](https://discord.gg/pDzafhGWzf)
-`
