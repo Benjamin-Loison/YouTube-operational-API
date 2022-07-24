@@ -31,6 +31,10 @@ Then run:
 sudo service apache2 start
 ```
 
+### On Windows:
+
+Download and run [WampServer 3](https://sourceforge.net/projects/wampserver/files/WampServer%203/).
+
 ### On MacOS (Apple Silicon):
 
 ```
@@ -63,6 +67,7 @@ brew services start httpd
 2. Now that you are hosting a website, get the current working directory of your terminal into the folder that is online.
 
 - On Linux, use `cd /var/www/html/`
+- On Windows, use `cd C:\wamp64\www\`
 - On MacOS, use `cd /opt/homebrew/var/www/`
 
 3. Clone this repository by using `git clone https://github.com/Benjamin-Loison/YouTube-operational-API`
@@ -71,7 +76,7 @@ brew services start httpd
 
 4. Verify that your API instance is reachable by trying to access:
 
-- On Linux: http://localhost/YouTube-operational-API/
+- On Linux and Windows: http://localhost/YouTube-operational-API/
 - On MacOS: http://localhost:8080/YouTube-operational-API/
 
 If you want me to advertise your instance (if you have opened your port, and have a fixed IP address or a domain name), please use below contacts.
