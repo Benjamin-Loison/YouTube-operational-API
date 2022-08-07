@@ -12,6 +12,7 @@
     $options = ['http' => ['ignore_errors' => true]];
     $context = stream_context_create($options);
     /// is there any way someone may get the keys out ? could restrict syntax with the one of the official API but that's not that much clean
+    // Tries to proceed to the request with an API key and if running out of quota, then use for this and following requests the API key used the longest time ago.
     for ($keysIndex = 0; $keysIndex < $keysCount; $keysIndex++) {
         $key = $keys[$keysIndex];
         $realUrl = $url . $key;
@@ -22,12 +23,28 @@
 
         if (array_key_exists('kind', $json)) {
             if ($keysIndex !== 0) {
-                $newKeys = array_merge(array_slice($keys, $keysIndex, $keysCount - $keysIndex), array_slice($keys, 0, $keysIndex));
+                // As the request is successful with this API key, prioritize this key and all the following ones over the first ones.
+                $newKeys = array_merge(array_slice($keys, $keysIndex), array_slice($keys, 0, $keysIndex));
                 $toWrite = implode("\n", $newKeys);
                 file_put_contents($keysFile, $toWrite);
             }
+            // Returns the proceeded response to the end-user.
             die($response);
         } elseif (array_key_exists('error', $json) && $json['error']['errors'][0]['domain'] !== 'youtube.quota') {
+            if ($json['error']['message'] === 'API key expired. Please renew the API key.') {
+                // Removes this API key as it won't be useful anymore.
+                $newKeys = array_merge(array_slice($keys, $keysIndex + 1), array_slice($keys, 0, $keysIndex));
+                $toWrite = implode("\n", $newKeys);
+                file_put_contents($keysFile, $toWrite);
+                // Skips to next API key.
+                // Decrements `keysIndex` as it will be incremented due to `continue`.
+                $keysIndex -= 1;
+                $keysCount -= 1;
+                $keys = $newKeys;
+                continue;
+            }
+            // If such an error occur, returns it to the end-user, as made exceptions for out of quota and expired keys, should also consider transient, backend and suspension errors.
+            // As managed in YouTube-comments-graph: https://github.com/Benjamin-Loison/YouTube-comments-graph/blob/993429770417bdfa4fdf176c473ff1bfe7ed21ae/CPP/main.cpp#L55-L60
             die($response);
         }
     }
