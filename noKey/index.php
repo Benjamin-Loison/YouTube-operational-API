@@ -1,5 +1,7 @@
 <?php
 
+    include_once '../common.php';
+
     $requestUri = $_SERVER['REQUEST_URI'];
     if (strpos($requestUri, '.') !== false) { // the ../index.php "issue" seem just normal and can't get file outside online folder
         die('uri forbidden');
@@ -31,7 +33,8 @@
             // Returns the proceeded response to the end-user.
             die($response);
         } elseif (array_key_exists('error', $json) && $json['error']['errors'][0]['domain'] !== 'youtube.quota') {
-            if ($json['error']['message'] === 'API key expired. Please renew the API key.') {
+            $message = $json['error']['message'];
+            if ($message === 'API key expired. Please renew the API key.' or str_ends_with($message, 'has been suspended.')) {
                 // Removes this API key as it won't be useful anymore.
                 $newKeys = array_merge(array_slice($keys, $keysIndex + 1), array_slice($keys, 0, $keysIndex));
                 $toWrite = implode("\n", $newKeys);

@@ -160,3 +160,9 @@
     {
         return strpos($haystack, $needle) === 0;
     }
+
+    function str_ends_with($haystack, $needle)
+    {
+        $length = strlen($needle);
+        return $length > 0 ? substr($haystack, -$length) === $needle : true;
+    }
