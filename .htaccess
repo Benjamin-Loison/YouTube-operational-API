@@ -10,3 +10,7 @@ RewriteRule ^webhooks$ webhooks.php
 RewriteRule ^commentThreads$ commentThreads.php
 RewriteRule ^lives$ lives.php
 RewriteRule ^liveChats$ liveChats.php
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+</IfModule>
