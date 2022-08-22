@@ -12,9 +12,12 @@
 
     include_once 'common.php';
 
-    function url($url)
+    function url($url, $name = '')
     {
-        return '<a href="' . $url . '">' . $url . '</a>';
+        if ($name === '') {
+            $name = $url;
+        }
+        return '<a href="' . $url . '">' . $name . '</a>';
     }
 
     function yt()
@@ -74,8 +77,11 @@ I may add in the future limitation per IP etc if the quota need to be better sha
 <?php
 
     // could use supervariable or something like that instead ?
-    $keysCountFile = '/var/www/ytPrivate/keysCount.txt';
-    $keysCount = file_get_contents($keysCountFile);
+    //$keysCountFile = '/var/www/ytPrivate/keysCount.txt';
+    //$keysCount = file_get_contents($keysCountFile);
+
+    $keysFile = '/var/www/ytPrivate/keys.txt';
+    $keysCount = substr_count(file_get_contents($keysFile), "\n") + 1;
 
 ?>
 Currently this service is <a href="keys.php">powered by <?php echo $keysCount; ?> keys</a>.
@@ -88,4 +94,5 @@ The source code is available on GitHub: <?php echo url('https://github.com/Benja
 
 <h2>Contact:</h2>
 If a feature you are looking for which isn't working on <?php yt(); ?>, ask kindly with the below contact:<br/>
-Don't hesitate to contact me on Discord: <?php echo url('https://discord.gg/pDzafhGWzf'); ?>
+- <?php echo url('https://matrix.to/#/#youtube-operational-api:matrix.org', 'Matrix'); ?><br/>
+- <?php echo url('https://discord.gg/pDzafhGWzf', 'Discord'); ?>
