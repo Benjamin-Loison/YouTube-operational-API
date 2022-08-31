@@ -2,7 +2,7 @@
 
     // StackOverflow contentDetails source: https://stackoverflow.com/a/70908689/7123660
     // StackOverflow status source: https://stackoverflow.com/a/70894799/7123660
-    // StackOveflow music source: https://stackoverflow.com/a/71012426/7123660
+    // StackOverflow music source: https://stackoverflow.com/a/71012426/7123660
     $videosTests = [['contentDetails&id=g5xNzUA5Qf8', 'items/0/contentDetails/duration', '213'],
                     ['status&id=J8ZVxDK11Jo', 'items/0/status/embeddable', false],
                     ['status&id=g5xNzUA5Qf8', 'items/0/status/embeddable', true], // could allow subarray for JSON check in response likewise in a single request can check several features

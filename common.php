@@ -102,7 +102,7 @@
 
     function isHashTag($hashTag)
     {
-        return true;//checkRegex('[a-zA-Z0-9_]+', $hashTag); // 'é'is a valid hashtag for instance
+        return true; // checkRegex('[a-zA-Z0-9_]+', $hashTag); // 'é' is a valid hashtag for instance
     }
 
     function isSAPISIDHASH($SAPISIDHASH)

@@ -4,7 +4,7 @@
 
     $requestUri = $_SERVER['REQUEST_URI'];
     if (strpos($requestUri, '.') !== false) { // the ../index.php "issue" seem just normal and can't get file outside online folder
-        die('uri forbidden');
+        die('URI forbidden');
     }
     $keysFile = '/var/www/ytPrivate/keys.txt';
     $content = file_get_contents($keysFile);
