@@ -1,5 +1,6 @@
 <?php
 
+    // should make the unit tests not based on my personal channels
     // StackOverflow source: https://stackoverflow.com/a/70961128/7123660
     $playlistItemsTests = [['snippet&playlistId=PLKAl8tt2R8OfMnDRnEABZ2M-tI7yJYvl1', 'items/0/snippet/publishedAt', '1520963713']]; // not precise :S
 
@@ -37,7 +38,7 @@ function getAPI($playlistId, $continuationToken)
         $http['content'] = $rawData;
     } else {
         $url = 'https://www.youtube.com/playlist?list=' . $playlistId;
-        $http['header'] = 'Cookie: CONSENT=YES+';
+        $http['header'] = ['Cookie: CONSENT=YES+', 'Accept-Language: en'];
     }
 
     $options = [
@@ -50,7 +51,7 @@ function getAPI($playlistId, $continuationToken)
         $res = getJSONStringFromHTML($res);
     }
 
-    // mr https://stackoverflow.com/users/7838847/hypnotizd ne veut pas dépenser plus de quota...
+    // Sir https://stackoverflow.com/users/7838847/hypnotizd doesn't want to spend more quota...
 
     $result = json_decode($res, true);
     $answerItems = [];
@@ -64,43 +65,34 @@ function getAPI($playlistId, $continuationToken)
         $title = $titleObject['runs'][0]['text'];
         $publishedAtRaw = $titleObject['accessibility']['accessibilityData']['label'];
 
-        if ($continuationTokenProvided) {
-            $publishedAtStr = str_replace('ago', '', $publishedAtRaw);
-        } else {
-            $publishedAtParts = explode(' il y a ', $publishedAtRaw);
-            $publishedAtStr = $publishedAtParts[count($publishedAtParts) - 1]/*just taking 1 could allow remote code execution*/; // why french :O ?
-        }
-        $publishedAtStrSource = $publishedAtStr;
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'seconds' : 'secondes', '* 1 +', $publishedAtStr);
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'second' : 'seconde', '* 1 +', $publishedAtStr);
+        $publishedAtStr = str_replace('ago', '', $publishedAtRaw);
+        $publishedAtStr = str_replace('seconds', '* 1 +', $publishedAtStr);
+        $publishedAtStr = str_replace('second', '* 1 +', $publishedAtStr);
         $publishedAtStr = str_replace('minutes', '* 60 +', $publishedAtStr);
         $publishedAtStr = str_replace('minute', '* 60 +', $publishedAtStr);
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'hours' : 'heures', '* 3600 +', $publishedAtStr);
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'hour' : 'heure', '* 3600 +', $publishedAtStr);
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'days' : 'jours', '* 86400 +', $publishedAtStr);
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'day' : 'jour', '* 86400 +', $publishedAtStr);
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'weeks' : 'semaines', '* 604800 +', $publishedAtStr);
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'week' : 'semaine', '* 604800 +', $publishedAtStr);
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'months' : 'mois', '* 2592000 +', $publishedAtStr); // not sure
-        if ($continuationTokenProvided) {
-            $publishedAtStr = str_replace('month', '* 2592000 +', $publishedAtStr);
-        } // not sure
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'years' : 'ans', '* 31104000 +', $publishedAtStr); // not sure
-        $publishedAtStr = str_replace($continuationTokenProvided ? 'year' : 'an', '* 31104000 +', $publishedAtStr);
+        $publishedAtStr = str_replace('hours', '* 3600 +', $publishedAtStr);
+        $publishedAtStr = str_replace('hour', '* 3600 +', $publishedAtStr);
+        $publishedAtStr = str_replace('days', '* 86400 +', $publishedAtStr);
+        $publishedAtStr = str_replace('day', '* 86400 +', $publishedAtStr);
+        $publishedAtStr = str_replace('weeks', '* 604800 +', $publishedAtStr);
+        $publishedAtStr = str_replace('week', '* 604800 +', $publishedAtStr);
+        $publishedAtStr = str_replace('months', '* 2592000 +', $publishedAtStr); // not sure
+        $publishedAtStr = str_replace('month', '* 2592000 +', $publishedAtStr);
+        $publishedAtStr = str_replace('years', '* 31104000 +', $publishedAtStr); // not sure
+        $publishedAtStr = str_replace('year', '* 31104000 +', $publishedAtStr);
         $publishedAtStr = substr($publishedAtStr, 0, strlen($publishedAtStr) - 2);
         $publishedAtStr = str_replace(' ', '', $publishedAtStr); // "security"
+        $publishedAtStr = str_replace(',', '', $publishedAtStr);
         $publishedAtStr = preg_replace('/[[:^print:]]/', '', $publishedAtStr);
-        if ($continuationTokenProvided) {
-            $publishedAtStrLen = strlen($publishedAtStr);
-            for ($publishedAtStrIndex = $publishedAtStrLen - 1; $publishedAtStrIndex >= 0; $publishedAtStrIndex--) {
-                $publishedAtChar = $publishedAtStr[$publishedAtStrIndex];
-                if (!(strpos('+*0123456789', $publishedAtChar) !== false)) {
-                    $publishedAtStr = substr($publishedAtStr, $publishedAtStrIndex + 1, $publishedAtStrLen - $publishedAtStrIndex - 1);
-                    break;
-                }
+        $publishedAtStrLen = strlen($publishedAtStr);
+        for ($publishedAtStrIndex = $publishedAtStrLen - 1; $publishedAtStrIndex >= 0; $publishedAtStrIndex--) {
+            $publishedAtChar = $publishedAtStr[$publishedAtStrIndex];
+            if (!(strpos('+*0123456789', $publishedAtChar) !== false)) {
+                $publishedAtStr = substr($publishedAtStr, $publishedAtStrIndex + 1, $publishedAtStrLen - $publishedAtStrIndex - 1);
+                break;
             }
         }
-        $publishedAt = time() - eval('return ' . $publishedAtStr . ';'); // could check if only +,*,digits // $publishedAtStrSource
+        $publishedAt = time() - eval('return ' . $publishedAtStr . ';');
         // the time is not perfectly accurate this way
         // warning releasing source code may show security breaches
         $answerItem = [
@@ -119,7 +111,7 @@ function getAPI($playlistId, $continuationToken)
     }
     $nextContinuationToken = str_replace('%3D', '=', $items[100]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']); // it doesn't seem random but hard to reverse-engineer
     $answer = [
-        'kind' => 'youtube#searchListResponse',
+        'kind' => 'youtube#playlistItemListResponse',
         'etag' => 'NotImplemented'
     ];
     // order matter or could afterwards sort by an (official YT API) arbitrary order (not alphabetical)
