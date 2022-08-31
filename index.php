@@ -28,7 +28,7 @@
     function feature($feature)
     {
         $suburl = $feature[0];
-        $webpage = explode('/', $suburl)[0];
+        $webpage = explode('/', $suburl, 2)[0];
         $url = $feature[1];
         $name = ucfirst(str_replace('/', ': ', $suburl));
         echo 'Based on <a href="https://developers.google.com/youtube/v3/docs/' . $suburl . '">' . $name . '</a>: ' . url(WEBSITE_URL . $webpage . '?part=' . $url) . '<br/>';

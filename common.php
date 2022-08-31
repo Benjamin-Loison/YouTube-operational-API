@@ -50,7 +50,7 @@
 
     function getJSONFromHTMLScriptPrefix($html, $scriptPrefix)
     {
-        $html = explode(';</script>', explode('">' . $scriptPrefix, $html)[1])[0];
+        $html = explode(';</script>', explode('">' . $scriptPrefix, $html, 3)[1], 2)[0];
         return json_decode($html, true);
     }
 
@@ -60,7 +60,7 @@
         if ($scriptVariable === '') {
             $scriptVariable = 'ytInitialData';
         }
-        return explode(';</script>', explode('">var ' . $scriptVariable . ' = ', $html)[1])[0]; // otherwise having troubles with people using ';' in their channel description
+        return explode(';</script>', explode('">var ' . $scriptVariable . ' = ', $html, 3)[1], 2)[0]; // otherwise having troubles with people using ';' in their channel description
     }
 
     function getJSONFromHTML($url, $opts = [], $scriptVariable = '')
