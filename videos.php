@@ -134,13 +134,8 @@
         }
 
         if ($options['containsMusic']) {
-            $opts = [
-                "http" => [
-                    "header" => 'Accept-Language: en'
-                ]
-            ];
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $opts);
-            $containsMusic = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][1]['videoSecondaryInfoRenderer']['metadataRowContainer']['metadataRowContainerRenderer']['rows'] !== null;
+            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+            $containsMusic = doesPathExist($json, 'engagementPanels/1/engagementPanelSectionListRenderer/content/structuredDescriptionContentRenderer/items/1/videoDescriptionMusicSectionRenderer');
             $item['containsMusic'] = $containsMusic;
         }
 
