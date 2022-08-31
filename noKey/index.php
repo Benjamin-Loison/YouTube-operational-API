@@ -3,9 +3,6 @@
     include_once '../common.php';
 
     $requestUri = $_SERVER['REQUEST_URI'];
-    if (strpos($requestUri, '.') !== false) { // the ../index.php "issue" seem just normal and can't get file outside online folder
-        die('URI forbidden');
-    }
     $keysFile = '/var/www/ytPrivate/keys.txt';
     $content = file_get_contents($keysFile);
     $keys = explode("\n", $content);
