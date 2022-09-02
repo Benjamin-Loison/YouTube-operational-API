@@ -32,7 +32,7 @@ function getAPI($playlistId, $continuationToken)
     $url = '';
     if ($continuationTokenProvided) {
         $url = 'https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY;
-        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
         $http['method'] = 'POST';
         $http['header'] = 'Content-Type: application/json';
         $http['content'] = $rawData;
@@ -57,7 +57,7 @@ function getAPI($playlistId, $continuationToken)
     $answerItems = [];
     $items = $continuationTokenProvided ? $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'] : $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['playlistVideoListRenderer']['contents'];
     $itemsCount = count($items);
-    for ($itemsIndex = 0; $itemsIndex < $itemsCount - ($continuationTokenProvided ? 1 : 0); $itemsIndex++) {
+    for ($itemsIndex = 0; $itemsIndex < $itemsCount - 1; $itemsIndex++) {
         $item = $items[$itemsIndex];
         $gridVideoRenderer = $item['playlistVideoRenderer'];
         $videoId = $gridVideoRenderer['videoId'];
