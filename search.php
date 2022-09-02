@@ -114,7 +114,7 @@ function getAPI($id, $order, $continuationToken)
         ];
         $json = getJSON('https://www.youtube.com/youtubei/v1/search?key=' . UI_KEY, $opts);
         $items = $continuationTokenProvided ? $json['continuationContents']['sectionListContinuation']['contents'][0]['itemSectionRenderer']['contents'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'];
-    } else {
+    } else { // should precise case to make it more readable
         $orderBase64 = 'EgZ2aWRlb3MYASAAMAE=';
         $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"' . ($continuationTokenProvided ? 'continuation":"' . $continuationToken : 'browseId":"' . $channelId . '","params":"' . $orderBase64) . '"}';
         $opts = [
