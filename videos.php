@@ -11,7 +11,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed']; // could load index.php from that
+    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities']; // could load index.php from that
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -168,6 +168,20 @@
             $mostReplayed = $json['playerOverlays']['playerOverlayRenderer']['decoratedPlayerBarRenderer']['decoratedPlayerBarRenderer']['playerBar']['multiMarkersPlayerBarRenderer']['markersMap'][0]['value']['heatmap']['heatmapRenderer'];
             // What is `Dp` in `maxHeightDp` and `minHeightDp` ? If not relevant could add ['heatMarkers'] to the JSON path above.
             $item['mostReplayed'] = $mostReplayed;
+        }
+
+        if ($options['qualities']) {
+            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, [], 'ytInitialPlayerResponse');
+            $qualities = [];
+            foreach ($json['streamingData']['adaptiveFormats'] as $quality) {
+                if (array_key_exists('qualityLabel', $quality)) {
+                    $quality = $quality['qualityLabel'];
+                    if (!in_array($quality, $qualities)) {
+                        array_push($qualities, $quality);
+                    }
+                }
+            }
+            $item['qualities'] = $qualities;
         }
 
         return $item;
