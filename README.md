@@ -72,8 +72,6 @@ brew services start httpd
 
 3. Clone this repository by using `git clone https://github.com/Benjamin-Loison/YouTube-operational-API`
 
-    Note: If you are running a PHP version >= 8, remove `str_contains` and `str_starts_with` from `common.php`
-
 4. Verify that your API instance is reachable by trying to access:
 
 - On Linux and Windows: http://localhost/YouTube-operational-API/
