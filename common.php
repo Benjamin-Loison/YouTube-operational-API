@@ -61,7 +61,7 @@
         if ($scriptVariable === '') {
             $scriptVariable = 'ytInitialData';
         }
-        return explode(';</script>', explode('">var ' . $scriptVariable . ' = ', $html, 3)[1], 2)[0]; // otherwise having troubles with people using ';' in their channel description
+        return explode(';</script>', explode('">var ' . $scriptVariable . ' = ', $html, 3)[1], 2)[0];
     }
 
     function getJSONFromHTML($url, $opts = [], $scriptVariable = '')

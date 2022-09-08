@@ -51,8 +51,6 @@ function getAPI($playlistId, $continuationToken)
         $res = getJSONStringFromHTML($res);
     }
 
-    // Sir https://stackoverflow.com/users/7838847/hypnotizd doesn't want to spend more quota...
-
     $result = json_decode($res, true);
     $answerItems = [];
     $items = $continuationTokenProvided ? $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'] : $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['playlistVideoListRenderer']['contents'];
@@ -94,7 +92,6 @@ function getAPI($playlistId, $continuationToken)
         }
         $publishedAt = time() - eval('return ' . $publishedAtStr . ';');
         // the time is not perfectly accurate this way
-        // warning releasing source code may show security breaches
         $answerItem = [
             'kind' => 'youtube#playlistItem',
             'etag' => 'NotImplemented',
