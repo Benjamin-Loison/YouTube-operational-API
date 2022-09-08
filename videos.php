@@ -91,7 +91,7 @@
 
         if ($options['contentDetails']) {
             $contentDetails = [
-                'duration' => $result['videoDetails']['lengthSeconds']
+                'duration' => intval($result['videoDetails']['lengthSeconds'])
             ];
             $item['contentDetails'] = $contentDetails;
         }
