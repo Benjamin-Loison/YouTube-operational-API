@@ -1,7 +1,8 @@
 <?php
 
-    define('DOMAIN_NAME', 'yt.lemnoslife.com');
-    define('WEBSITE_URL', 'https://' . DOMAIN_NAME . '/');
+    define('DOMAIN_NAME', $_SERVER['SERVER_NAME']);
+    $protocol = (!empty($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on')) ? 'https' : 'http';
+    define('WEBSITE_URL', $protocol . '://' . $_SERVER['HTTP_HOST'] . '/');
     define('SUB_VERSION_STR', '1.9999099');
 
     define('MUSIC_VERSION', '2.9999099');//SUB_VERSION_STR);
