@@ -15,6 +15,9 @@
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($code == 302) {
+            detectedAsSendingUnusualTraffic();
+        }
         return $code == 303;
     }
 
@@ -31,17 +34,22 @@
             $context = stream_context_create($opts);
             $result = file_get_contents($url, false, $context);
             if (str_contains($result, 'https://www.google.com/sorry/index?continue=')) {
-                $error = [
-                    'code' => 400,
-                    'message' => 'YouTube has detected unusual traffic from this YouTube operational API instance. Please try your request again later or see alternatives at https://github.com/Benjamin-Loison/YouTube-operational-API/issues/11',
-                ];
-                $result = [
-                    'error' => $error
-                ];
-                die(json_encode($result, JSON_PRETTY_PRINT));
+                detectedAsSendingUnusualTraffic();
             }
         }
         return $result;
+    }
+
+    function detectedAsSendingUnusualTraffic()
+    {
+        $error = [
+            'code' => 400,
+            'message' => 'YouTube has detected unusual traffic from this YouTube operational API instance. Please try your request again later or see alternatives at https://github.com/Benjamin-Loison/YouTube-operational-API/issues/11',
+        ];
+        $result = [
+            'error' => $error
+        ];
+        die(json_encode($result, JSON_PRETTY_PRINT));
     }
 
     function getJSON($url, $opts)
