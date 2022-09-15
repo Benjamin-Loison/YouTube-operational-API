@@ -11,7 +11,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities']; // could load index.php from that
+    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location']; // could load index.php from that
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -182,6 +182,12 @@
                 }
             }
             $item['qualities'] = $qualities;
+        }
+
+        if ($options['location']) {
+            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+            $location = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']['superTitleLink']['runs'][0]['text'];
+            $item['location'] = $location;
         }
 
         return $item;
