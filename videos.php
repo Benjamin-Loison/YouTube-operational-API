@@ -195,9 +195,19 @@
             $chapters = [];
             foreach ($json['engagementPanels'][1]['engagementPanelSectionListRenderer']['content']['macroMarkersListRenderer']['contents'] as $chapter) {
                 $chapter = $chapter['macroMarkersListItemRenderer'];
+                $timeStr = $chapter['timeDescription']['simpleText'];
+                $format = '%d:%H:%M:%S';
+                while (strptime($timeStr, $format) === false) {
+                    $format = substr($format, 3);
+                }
+                $timeComponents = strptime($timeStr, $format);
+                $timeInt = $timeComponents['tm_mday'] * (3600 * 24) +
+                           $timeComponents['tm_hour'] * 3600 +
+                           $timeComponents['tm_min'] * 60 +
+                           $timeComponents['tm_sec'];
                 array_push($chapters, [
                     'title' => $chapter['title']['simpleText'],
-                    'timeDescription' => $chapter['timeDescription']['simpleText']
+                    'time' => $timeInt
                 ]);
             }
             $item['chapters'] = $chapters;
