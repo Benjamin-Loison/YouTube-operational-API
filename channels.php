@@ -70,9 +70,37 @@
         }
 
         if ($options['about']) {
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/about');
-            $linksCommon = $result['header']['c4TabbedHeaderRenderer']['headerLinks']['channelHeaderLinksRenderer'];
-            $linksObjects = array_merge($linksCommon['primaryLinks'], (array)$linksCommon['secondaryLinks']);
+            $http = [
+                'header' => ['Accept-Language: en']
+            ];
+
+            $options = [
+                'http' => $http
+            ];
+
+            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/about', $options);
+
+            $resultCommon = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][5]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
+
+            $stats = [];
+
+            $stats['joinedDate'] = strtotime($resultCommon['joinedDateText']['runs'][1]['text']);
+
+            $viewCount = $resultCommon['viewCountText']['simpleText'];
+            // Could try to find a YouTube channel with a single view to make sure it displays "view" and not "views".
+            $viewCount = str_replace(' view', '', str_replace(' views', '', str_replace(',', '', $viewCount)));
+            $stats['viewCount'] = $viewCount;
+
+            $about['stats'] = $stats;
+
+            $description = $resultCommon['description']['simpleText'];
+            $about['description'] = $description;
+
+            $details = [];
+            $details['location'] = $resultCommon['country']['simpleText'];
+            $about['details'] = $details;
+
+            $linksObjects = $resultCommon['primaryLinks'];
             $links = [];
             foreach ($linksObjects as $linkObject) {
                 $link = [];
@@ -84,6 +112,7 @@
                 array_push($links, $link);
             }
             $about['links'] = $links;
+
             $item['about'] = $about;
         }
 
