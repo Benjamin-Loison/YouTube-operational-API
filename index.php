@@ -40,7 +40,7 @@
                  ['playlists/list', 'statistics&id=PLAYLIST_ID'],
                  ['playlistItems/list', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
                  ['search/list', 'id,snippet&q=QUERY&channelId=CHANNEL_ID&eventType=upcoming&hashTag=HASH_TAG&type=video&order=viewCount,relevance(&pageToken=PAGE_TOKEN)'],
-                 ['videos/list', 'id,status,contentDetails,music,short,impressions,containsMusic,isPaidPromotion,isPremium,isMemberOnly,mostReplayed,qualities&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
+                 ['videos/list', 'id,status,contentDetails,music,short,impressions,containsMusic,isPaidPromotion,isPremium,isMemberOnly,mostReplayed,qualities,chapters&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
     // adding some comments may be useful later (not useful if in native documenation I would say) - maybe adding an example could be nice too
 
 ?>

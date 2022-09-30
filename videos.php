@@ -11,7 +11,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location']; // could load index.php from that
+    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters']; // could load index.php from that
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -188,6 +188,19 @@
             $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
             $location = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']['superTitleLink']['runs'][0]['text'];
             $item['location'] = $location;
+        }
+
+        if ($options['chapters']) {
+            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+            $chapters = [];
+            foreach ($json['engagementPanels'][1]['engagementPanelSectionListRenderer']['content']['macroMarkersListRenderer']['contents'] as $chapter) {
+                $chapter = $chapter['macroMarkersListItemRenderer'];
+                array_push($chapters, [
+                    'title' => $chapter['title']['simpleText'],
+                    'timeDescription' => $chapter['timeDescription']['simpleText']
+                ]);
+            }
+            $item['chapters'] = $chapters;
         }
 
         return $item;
