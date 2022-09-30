@@ -76,7 +76,9 @@
             $links = [];
             foreach ($linksObjects as $linkObject) {
                 $link = [];
-                $link['url'] = $linkObject['navigationEndpoint']['urlEndpoint']['url'];
+                $urlComponents = parse_url($linkObject['navigationEndpoint']['urlEndpoint']['url']);
+                parse_str($urlComponents['query'], $params);
+                $link['url'] = $params['q'];
                 $link['thumbnail'] = $linkObject['icon']['thumbnails'][0]['url'];
                 $link['title'] = $linkObject['title']['simpleText'];
                 array_push($links, $link);
