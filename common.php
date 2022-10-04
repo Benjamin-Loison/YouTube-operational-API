@@ -8,6 +8,7 @@
     define('MUSIC_VERSION', '2' . SUB_VERSION_STR);
     define('CLIENT_VERSION', '1' . SUB_VERSION_STR);
     define('UI_KEY', 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'); // this isn't a YouTube Data API v3 key
+    define('USER_AGENT', 'Firefox/100');
 
     function isRedirection($url)
     {
@@ -63,19 +64,19 @@
         return json_decode($html, true);
     }
 
-    function getJSONStringFromHTML($html, $scriptVariable = '')
+    function getJSONStringFromHTML($html, $scriptVariable = '', $prefix = 'var ')
     {
         // don't use as default variable because getJSONFromHTML call this function with empty string
         if ($scriptVariable === '') {
             $scriptVariable = 'ytInitialData';
         }
-        return explode(';</script>', explode('">var ' . $scriptVariable . ' = ', $html, 3)[1], 2)[0];
+        return explode(';</script>', explode('">' . $prefix . $scriptVariable . ' = ', $html, 3)[1], 2)[0];
     }
 
-    function getJSONFromHTML($url, $opts = [], $scriptVariable = '')
+    function getJSONFromHTML($url, $opts = [], $scriptVariable = '', $prefix = 'var ')
     {
         $res = getRemote($url, $opts);
-        $res = getJSONStringFromHTML($res, $scriptVariable);
+        $res = getJSONStringFromHTML($res, $scriptVariable, $prefix);
         return json_decode($res, true);
     }
 

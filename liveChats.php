@@ -4,13 +4,13 @@
 
     include_once 'common.php';
 
-    $realOptions = ['snippet'];
+    $realOptions = ['snippet', 'participants'];
 
     foreach ($realOptions as $realOption) {
         $options[$realOption] = false;
     }
 
-    if (isset($_GET['part']) && isset($_GET['id']) && isset($_GET['time'])) {
+    if (isset($_GET['part']) && isset($_GET['id']) && ($_GET['part'] != 'snippet' || isset($_GET['time']))) {
         $part = $_GET['part'];
         $parts = explode(',', $part, count($realOptions));
         foreach ($parts as $part) {
@@ -21,7 +21,7 @@
             }
         }
 
-        if (!isPositiveInteger($_GET['time'])) {
+        if ($part == 'snippet' && !isPositiveInteger($_GET['time'])) {
             die('invalid time');
         }
 
@@ -73,6 +73,19 @@
                 }
             }
             $item['snippet'] = $snippet;
+        }
+
+        if ($options['participants']) {
+            $participants = [];
+            $opts = [
+                'http' => [
+                    'header' => 'User-Agent: ' . USER_AGENT,
+                ]
+            ];
+
+            $result = getJSONFromHTML('https://www.youtube.com/live_chat?continuation=' . $continuation, $opts, 'window["ytInitialData"]', '');
+            $participants = array_slice($result['continuationContents']['liveChatContinuation']['actions'], 1);
+            $item['participants'] = $participants;
         }
 
         return $item;

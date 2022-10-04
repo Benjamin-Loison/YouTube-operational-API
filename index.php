@@ -57,7 +57,7 @@
 
     echo '<br/>';
     echo url(WEBSITE_URL . 'lives' . '?part=' . 'donations&id=VIDEO_ID') . '<br/>';
-    echo url(WEBSITE_URL . 'liveChats' . '?part=' . 'snippet&id=VIDEO_ID&time=TIME_MS') . '<br/>';
+    echo url(WEBSITE_URL . 'liveChats' . '?part=' . 'snippet,participants&id=VIDEO_ID&time=TIME_MS') . '<br/>';
 
 ?>
 

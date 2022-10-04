@@ -44,11 +44,10 @@
 
         $opts = [
             "http" => [
-                "user_agent" => "Firefox/100"
+                "user_agent" => USER_AGENT,
             ]
         ];
-        $html = getRemote('https://www.youtube.com/live_chat?continuation=' . $continuation, $opts);
-        $result = getJSONFromHTMLScriptPrefix($html, 'window["ytInitialData"] = ');
+        $html = getJSONFromHTML('https://www.youtube.com/live_chat?continuation=' . $continuation, $opts, 'window["ytInitialData"]', '');
 
         $item = [
             'kind' => 'youtube#video',
