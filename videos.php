@@ -201,16 +201,24 @@
             foreach ($json['engagementPanels'][1]['engagementPanelSectionListRenderer']['content']['macroMarkersListRenderer']['contents'] as $chapter) {
                 $chapter = $chapter['macroMarkersListItemRenderer'];
                 $timeStr = $chapter['timeDescription']['simpleText'];
-                $format = '%d:%H:%M:%S';
-                while (strptime($timeStr, $format) === false) {
-                    $format = substr($format, 3);
+                $format = 'j:H:i:s';
+                $timeParts = explode(':', $timeStr);
+                $timePartsCount = count($timeParts);
+                $minutes = $timeParts[$timePartsCount - 2];
+                $timeParts[$timePartsCount - 2] = strlen($minutes) == 1 ? '0' . $minutes : $minutes;
+                $timeStr = implode(':', $timeParts);
+                for ($timePartsIndex = 0; $timePartsIndex < 4 - $timePartsCount; $timePartsIndex++) {
+                    $timeStr = '00:' . $timeStr;
                 }
-                $timeComponents = strptime($timeStr, $format);
-                $timeInt = $timeComponents['tm_mday'] * (3600 * 24) +
-                           $timeComponents['tm_hour'] * 3600 +
-                           $timeComponents['tm_min'] * 60 +
-                           $timeComponents['tm_sec'];
-                array_push($chapters, [
+                while (date_parse_from_format($format, $timeStr) === false) {
+                    $format = substr($format, 2);
+                }
+                $timeComponents = date_parse_from_format($format, $timeStr);
+                $timeInt = $timeComponents['day'] * (3600 * 24) +
+                           $timeComponents['hour'] * 3600 +
+                           $timeComponents['minute'] * 60 +
+						   $timeComponents['second'];
+				array_push($chapters, [
                     'title' => $chapter['title']['simpleText'],
                     'time' => $timeInt
                 ]);
