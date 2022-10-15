@@ -52,6 +52,9 @@ f = open(filePath)
 data = json.load(f)
 f.close()
 
+with open(filePath, 'w', encoding='utf-8') as f:
+    json.dump(data, f, ensure_ascii = False, indent = 4)
+
 pathValues = _finditem(data, key)
 for path, value in pathValues:
 	print(path, value)
