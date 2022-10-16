@@ -217,8 +217,8 @@
                 $timeInt = $timeComponents['day'] * (3600 * 24) +
                            $timeComponents['hour'] * 3600 +
                            $timeComponents['minute'] * 60 +
-						   $timeComponents['second'];
-				array_push($chapters, [
+                           $timeComponents['second'];
+                array_push($chapters, [
                     'title' => $chapter['title']['simpleText'],
                     'time' => $timeInt
                 ]);

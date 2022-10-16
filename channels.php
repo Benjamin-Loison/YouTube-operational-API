@@ -5,7 +5,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['snippet', 'premieres', 'about'];
+    $realOptions = ['snippet', 'premieres', 'about', 'community'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -41,17 +41,25 @@
                 die('invalid id'); // could directly die within the function
             }
         }
-        echo getAPI($id);
+        $continuationToken = '';
+        if (isset($_GET['pageToken'])) {
+            $continuationToken = $_GET['pageToken'];
+            if (!isContinuationToken($continuationToken)) {
+                die('invalid continuationToken');
+            }
+        }
+        echo getAPI($id, $continuationToken);
     }
 
-    function getItem($id)
+    function getItem($id, $continuationToken)
     {
         global $options;
         $item = [
-            'kind' => 'youtube#video',
+            'kind' => 'youtube#channel',
             'etag' => 'NotImplemented',
             'id' => $id
         ];
+        $continuationTokenProvided = $continuationToken != '';
 
         if ($options['premieres']) {
             $premieres = [];
@@ -116,13 +124,119 @@
             $item['about'] = $about;
         }
 
+        if ($options['community']) {
+            if (!$continuationTokenProvided) {
+                $http = [
+                    'header' => ['Accept-Language: en']
+                ];
+
+                $options = [
+                    'http' => $http
+                ];
+
+                $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/community', $options);
+            } else {
+                $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+                $http = [
+                    'header' => ['Content-Type: application/json'],
+                    'method' => 'POST',
+                    'content' => $rawData
+                ];
+
+                $options = [
+                    'http' => $http
+                ];
+
+                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $options);
+            }
+            $community = [];
+            $contents = !$continuationTokenProvided ? $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][3]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'] : $result['onResponseReceivedEndpoints'][0]['appendContinuationItemsAction']['continuationItems'];
+            foreach ($contents as $content) {
+                if (!array_key_exists('backstagePostThreadRenderer', $content)) {
+                    continue;
+                }
+                $common = $content['backstagePostThreadRenderer']['post']['backstagePostRenderer'];
+                $backstageAttachment = $common['backstageAttachment'];
+
+                $id = $common['postId'];
+
+                // I haven't seen any post without any text. Note that I prefer to cover such edge case instead of spending time to find them in the wild.
+                $contentText = [];
+                foreach ($common['contentText']['runs'] as $textCommon) {
+                    $contentTextItem = ['text' => $textCommon['text']];
+                    if (array_key_exists('navigationEndpoint', $textCommon)) {
+                        $navigationEndpoint = $textCommon['navigationEndpoint'];
+                        if (array_key_exists('commandMetadata', $navigationEndpoint)) {
+                            $url = $navigationEndpoint['commandMetadata']['webCommandMetadata']['url'];
+                        } else {
+                            $url = $navigationEndpoint['browseEndpoint']['canonicalBaseUrl'];
+                        }
+                        $contentTextItem['url'] = 'https://www.youtube.com' . $url;
+                    }
+                    array_push($contentText, $contentTextItem);
+                }
+
+                $image = null;
+                if (array_key_exists('backstageImageRenderer', $backstageAttachment)) {
+                    $image = $backstageAttachment['backstageImageRenderer']['image'];
+                }
+
+                $videoId = null;
+                if (array_key_exists('videoRenderer', $backstageAttachment)) {
+                    $videoRenderer = $backstageAttachment['videoRenderer'];
+                    $videoId = $videoRenderer['videoId'];
+                    $date = $videoRenderer['publishedTimeText']['simpleText'];
+                } else {
+                    $date = $common['publishedTimeText']['runs'][0]['text'];
+                }
+                $edited = str_contains($date, 'edited');
+                $date = str_replace(' (edited)', '', $date);
+
+                $poll = null;
+                if (array_key_exists('pollRenderer', $backstageAttachment)) {
+                    $pollRenderer = $backstageAttachment['pollRenderer'];
+                    $choices = [];
+                    foreach ($pollRenderer['choices'] as $choice) {
+                        array_push($choices, $choice['text']['runs'][0]);
+                    }
+                    $totalVotesStr = $pollRenderer['totalVotes']['simpleText'];
+                    // What if no vote? Note that haven't seen a poll with a single vote.
+                    $totalVotes = intval(str_replace(' vote', '', str_replace(' votes', '', $totalVotesStr)));
+                    $poll = [
+                        'choices' => $choices,
+                        'totalVotes' => $totalVotes
+                    ];
+                }
+
+                $likes = intval($common['voteCount']['simpleText']);
+
+                $commentsCommon = $common['actionButtons']['commentActionButtonsRenderer']['replyButton']['buttonRenderer'];
+                $comments = array_key_exists('text', $commentsCommon) ? intval($commentsCommon['text']['simpleText']) : 0;
+
+                $post = [
+                    'id' => $id,
+                    'date' => $date,
+                    'contentText' => $contentText,
+                    'likes' => $likes,
+                    'comments' => $comments,
+                    'videoId' => $videoId,
+                    'image' => $image,
+                    'poll' => $poll,
+                    'edited' => $edited
+                ];
+                array_push($community, $post);
+            }
+            $item['community'] = $community;
+            $item['nextPageToken'] = str_replace('%3D', '=', $contents[10]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
+        }
+
         return $item;
     }
 
-    function getAPI($id)
+    function getAPI($id, $continuationToken)
     {
         $items = [];
-        array_push($items, getItem($id));
+        array_push($items, getItem($id, $continuationToken));
 
         $answer = [
             'kind' => 'youtube#channelListResponse',
