@@ -4,6 +4,7 @@
     $protocol = (!empty($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on')) ? 'https' : 'http';
     define('WEBSITE_URL', $protocol . '://' . $_SERVER['HTTP_HOST'] . '/');
     define('SUB_VERSION_STR', '.9999099');
+    define('KEYS_FILE', '/var/www/ytPrivate/keys.txt');
 
     define('MUSIC_VERSION', '2' . SUB_VERSION_STR);
     define('CLIENT_VERSION', '1' . SUB_VERSION_STR);
@@ -53,7 +54,7 @@
         die(json_encode($result, JSON_PRETTY_PRINT));
     }
 
-    function getJSON($url, $opts)
+    function getJSON($url, $opts = [])
     {
         return json_decode(getRemote($url, $opts), true);
     }
@@ -138,6 +139,11 @@
     function isPositiveInteger($s)
     {
         return preg_match("/^\d+$/", $s);
+    }
+
+    function isYouTubeDataAPIV3Key($youtubeDataAPIV3Key)
+    {
+        return checkRegex('AIzaSy[A-D][a-zA-Z0-9-_]{32}', $youtubeDataAPIV3Key);
     }
 
     function doesPathExist($json, $path)

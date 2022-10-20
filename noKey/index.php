@@ -3,8 +3,7 @@
     include_once '../common.php';
 
     $requestUri = $_SERVER['REQUEST_URI'];
-    $keysFile = '/var/www/ytPrivate/keys.txt';
-    $content = file_get_contents($keysFile);
+    $content = file_get_contents(KEYS_FILE);
     $keys = explode("\n", $content);
     $keysCount = count($keys);
     $url = 'https://www.googleapis.com/youtube/v3/' . str_replace('/noKey/', '', $requestUri) . '&key=';
@@ -25,7 +24,7 @@
                 // As the request is successful with this API key, prioritize this key and all the following ones over the first ones.
                 $newKeys = array_merge(array_slice($keys, $keysIndex), array_slice($keys, 0, $keysIndex));
                 $toWrite = implode("\n", $newKeys);
-                file_put_contents($keysFile, $toWrite);
+                file_put_contents(KEYS_FILE, $toWrite);
             }
             // Returns the proceeded response to the end-user.
             die($response);
@@ -35,7 +34,7 @@
                 // Removes this API key as it won't be useful anymore.
                 $newKeys = array_merge(array_slice($keys, $keysIndex + 1), array_slice($keys, 0, $keysIndex));
                 $toWrite = implode("\n", $newKeys);
-                file_put_contents($keysFile, $toWrite);
+                file_put_contents(KEYS_FILE, $toWrite);
                 // Skips to next API key.
                 // Decrements `keysIndex` as it will be incremented due to `continue`.
                 $keysIndex -= 1;

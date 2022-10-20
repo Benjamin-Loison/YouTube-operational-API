@@ -84,10 +84,29 @@ I may add in the future limitation per IP etc if the quota need to be better sha
     $keysCount = substr_count(file_get_contents($keysFile), "\n") + 1;
 
 ?>
-Currently this service is <a href="keys.php">powered by <?php echo $keysCount; ?> keys</a>.
+Currently this service is <a href="keys.php">powered by <?php echo $keysCount; ?> keys</a>.<br/>
 <!-- given a YT Data API v3 key let's allow any request likewise nothing to code for each feature (likewise people can't steal the API key and there isn't any private data access, let's make a form allowing people to add their keys if they want to share it) -->
-<!-- add possibility to share/remove any key -->
 <!-- could add an email linked (not Google mean) to the key if need to contact for future modification -->
+<script>
+
+function share() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            alert(xhttp.responseText);
+            youtubeDataAPIV3KeyInput.value = "";
+        }
+    };
+    var youtubeDataAPIV3KeyInput = document.getElementById("youtubeDataAPIV3Key");
+    const key = youtubeDataAPIV3KeyInput.value;
+    xhttp.open("GET", "addKey.php?key=" + key);
+    xhttp.send();
+}
+
+</script>
+
+<?php $YOUTUBE_DATA_API_V3_KEY_LENGTH = 39; ?>
+Share your YouTube Data API v3 key to power the no-key service: <input type="text" id="youtubeDataAPIV3Key" placeholder="AIzaSy..." <?php printf('minlength="%s" maxlength="%s" size="%s"', $YOUTUBE_DATA_API_V3_KEY_LENGTH, $YOUTUBE_DATA_API_V3_KEY_LENGTH, $YOUTUBE_DATA_API_V3_KEY_LENGTH) ?>><button type="button" onClick="share()">share</button>
 
 <h2>Open-source:</h2>
 The source code is available on GitHub: <?php echo url('https://github.com/Benjamin-Loison/YouTube-operational-API'); ?>
