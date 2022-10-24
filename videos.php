@@ -51,7 +51,8 @@
     function getJSONFunc($rawData, $music = false)
     {
         $headers = [
-            "Content-Type: application/json"
+            "Content-Type: application/json",
+            'Accept-Language: en'
         ];
         if ($music) {
             array_push($headers, 'Referer: https://music.youtube.com');
@@ -84,7 +85,8 @@
 
         if ($options['status']) {
             $status = [
-                'embeddable' => $result['playabilityStatus']['status'] === 'OK'
+                'embeddable' => $result['playabilityStatus']['status'] === 'OK',
+                'removedByTheUploader' => $result['playabilityStatus']['errorScreen']['playerErrorMessageRenderer']['subreason']['runs'][0]['text'] === 'This video has been removed by the uploader'
             ];
             $item['status'] = $status;
         }
