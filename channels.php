@@ -5,7 +5,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['snippet', 'premieres', 'community', 'about'];
+    $realOptions = ['snippet', 'premieres', 'community', 'channels', 'about'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -181,6 +181,51 @@
             }
             $item['community'] = $community;
             $item['nextPageToken'] = str_replace('%3D', '=', $contents[10]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
+        }
+
+        if ($options['channels']) {
+            $http = [
+                'header' => ['Accept-Language: en']
+            ];
+
+            $options = [
+                'http' => $http
+            ];
+
+            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/channels', $options);
+            $sectionListRenderer = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -3)[0]['tabRenderer']['content']['sectionListRenderer'];
+            $channels = [];
+            $channelsItems = $sectionListRenderer['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
+            foreach($channelsItems as $channelItem) {
+                $gridChannelRenderer = $channelItem['gridChannelRenderer'];
+                $thumbnails = [];
+                foreach($gridChannelRenderer['thumbnail']['thumbnails'] as $thumbnail) {
+                    $thumbnail['url'] = 'https://' . substr($thumbnail['url'], 2);
+                    array_push($thumbnails, $thumbnail);
+                }
+                $subscriberCount = $gridChannelRenderer['subscriberCountText']['simpleText'];
+                $subscriberCount = str_replace(' subscribers', '', $subscriberCount);
+                // Have observed this case for the channel: https://www.youtube.com/channel/UCbOoDorgVGd-4vZdIrU4C1A
+                $subscriberCount = str_replace(' subscriber', '', $subscriberCount);
+                $subscriberCount = str_replace('K', '*1000', $subscriberCount);
+                $subscriberCount = str_replace('M', '*1000000', $subscriberCount);
+                if(checkRegex('[0-9.*KM]+', $subscriberCount)) {
+                    $subscriberCount = eval('return ' . $subscriberCount . ';');
+                }
+                $channel = [
+                    'channelId' => $gridChannelRenderer['channelId'],
+                    'title' => $gridChannelRenderer['title']['simpleText'],
+                    'thumbnails' => $thumbnails,
+                    'videoCount' => intval(str_replace(',', '', $gridChannelRenderer['videoCountText']['runs'][0]['text'])),
+                    'subscriberCount' => $subscriberCount
+                ];
+                array_push($channels, $channel);
+            }
+            $channels = [
+                'paratext' => $sectionListRenderer['subMenu']['channelSubMenuRenderer']['contentTypeSubMenuItems'][0]['title'],
+                'channels' => $channels
+            ];
+            $item['channels'] = $channels;
         }
 
         if ($options['about']) {
