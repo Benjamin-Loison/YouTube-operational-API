@@ -35,7 +35,8 @@
     }
 
     // don't know if already written but making a table may be nice
-    $features = [['channels/list', 'snippet,premieres,about,community&forUsername=USERNAME&id=CHANNEL_ID'], // could use ',' instead of '&' to describe that `forUsername` and `id` have the same aim
+    $features = [['channels/list', 'snippet,premieres,community,about&forUsername=USERNAME&id=CHANNEL_ID'], // could use ',' instead of '&' to describe that `forUsername` and `id` have the same aim
+def
                  ['commentThreads/list', 'snippet,replies&videoId=VIDEO_ID(&pageToken=PAGE_TOKEN)'],
                  ['playlists/list', 'statistics&id=PLAYLIST_ID'],
                  ['playlistItems/list', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],

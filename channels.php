@@ -5,7 +5,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['snippet', 'premieres', 'about', 'community'];
+    $realOptions = ['snippet', 'premieres', 'community', 'about'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -75,53 +75,6 @@
                 }
             }
             $item['premieres'] = $premieres;
-        }
-
-        if ($options['about']) {
-            $http = [
-                'header' => ['Accept-Language: en']
-            ];
-
-            $options = [
-                'http' => $http
-            ];
-
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/about', $options);
-
-            $resultCommon = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -2)[0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
-
-            $stats = [];
-
-            $stats['joinedDate'] = strtotime($resultCommon['joinedDateText']['runs'][1]['text']);
-
-            $viewCount = $resultCommon['viewCountText']['simpleText'];
-            // Could try to find a YouTube channel with a single view to make sure it displays "view" and not "views".
-            $viewCount = str_replace(' view', '', str_replace(' views', '', str_replace(',', '', $viewCount)));
-            $stats['viewCount'] = $viewCount;
-
-            $about['stats'] = $stats;
-
-            $description = $resultCommon['description']['simpleText'];
-            $about['description'] = $description;
-
-            $details = [];
-            $details['location'] = $resultCommon['country']['simpleText'];
-            $about['details'] = $details;
-
-            $linksObjects = $resultCommon['primaryLinks'];
-            $links = [];
-            foreach ($linksObjects as $linkObject) {
-                $link = [];
-                $urlComponents = parse_url($linkObject['navigationEndpoint']['urlEndpoint']['url']);
-                parse_str($urlComponents['query'], $params);
-                $link['url'] = $params['q'];
-                $link['thumbnail'] = $linkObject['icon']['thumbnails'][0]['url'];
-                $link['title'] = $linkObject['title']['simpleText'];
-                array_push($links, $link);
-            }
-            $about['links'] = $links;
-
-            $item['about'] = $about;
         }
 
         if ($options['community']) {
@@ -228,6 +181,53 @@
             }
             $item['community'] = $community;
             $item['nextPageToken'] = str_replace('%3D', '=', $contents[10]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
+        }
+
+        if ($options['about']) {
+            $http = [
+                'header' => ['Accept-Language: en']
+            ];
+
+            $options = [
+                'http' => $http
+            ];
+
+            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/about', $options);
+
+            $resultCommon = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -2)[0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
+
+            $stats = [];
+
+            $stats['joinedDate'] = strtotime($resultCommon['joinedDateText']['runs'][1]['text']);
+
+            $viewCount = $resultCommon['viewCountText']['simpleText'];
+            // Could try to find a YouTube channel with a single view to make sure it displays "view" and not "views".
+            $viewCount = str_replace(' view', '', str_replace(' views', '', str_replace(',', '', $viewCount)));
+            $stats['viewCount'] = $viewCount;
+
+            $about['stats'] = $stats;
+
+            $description = $resultCommon['description']['simpleText'];
+            $about['description'] = $description;
+
+            $details = [];
+            $details['location'] = $resultCommon['country']['simpleText'];
+            $about['details'] = $details;
+
+            $linksObjects = $resultCommon['primaryLinks'];
+            $links = [];
+            foreach ($linksObjects as $linkObject) {
+                $link = [];
+                $urlComponents = parse_url($linkObject['navigationEndpoint']['urlEndpoint']['url']);
+                parse_str($urlComponents['query'], $params);
+                $link['url'] = $params['q'];
+                $link['thumbnail'] = $linkObject['icon']['thumbnails'][0]['url'];
+                $link['title'] = $linkObject['title']['simpleText'];
+                array_push($links, $link);
+            }
+            $about['links'] = $links;
+
+            $item['about'] = $about;
         }
 
         return $item;
