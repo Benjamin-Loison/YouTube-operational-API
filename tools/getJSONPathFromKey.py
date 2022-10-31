@@ -31,42 +31,38 @@ key = sys.argv[2]
 # if not found from key could search by value
 # that way could find easily shortest path to get the value as sometimes the value is repeated multiple times
 
-f = open(filePath)
-isJSON = f.read(1) == '{'
-f.close()
+with open(filePath) as f:
+    isJSON = f.read(1) == '{'
 
 if not isJSON:
-    f = open(filePath)
-    content = f.read()
-    f.close()
+    with open(filePath) as f:
+        content = f.read()
     # todo: more adaptative to JS variable name
     #var ytInitialData
     # ytInitialPlayerResponse
     # </script>
-    newContent = '{' + content.split(' = {')[1].split('};')[0] + '}'
-    f = open(filePath, 'w')
-    f.write(newContent)
-    f.close()
+    newContent = '{' + content.split('ytInitialData = {')[1].split('};')[0] + '}'
+    with open(filePath, 'w') as f:
+        f.write(newContent)
 
-f = open(filePath)
-data = json.load(f)
-f.close()
+with open(filePath) as f:
+    data = json.load(f)
 
 with open(filePath, 'w', encoding='utf-8') as f:
     json.dump(data, f, ensure_ascii = False, indent = 4)
 
 pathValues = _finditem(data, key)
 for path, value in pathValues:
-	print(path, value)
-	path = path[1:]
-	path = path.replace('/', "']['")
-	pathParts = path.split("][")
-	pathPartsLen = len(pathParts)
-	for pathPartsIndex in range(pathPartsLen):
-		pathPart = pathParts[pathPartsIndex][1:-1]
-		if pathPart.isdigit():
-			pathParts[pathPartsIndex] = pathPart
-	path = "][".join(pathParts)
-	newPath = "['" + path + "']"
-	print(newPath, value)
+    print(path, value)
+    path = path[1:]
+    path = path.replace('/', "']['")
+    pathParts = path.split("][")
+    pathPartsLen = len(pathParts)
+    for pathPartsIndex in range(pathPartsLen):
+        pathPart = pathParts[pathPartsIndex][1:-1]
+        if pathPart.isdigit():
+            pathParts[pathPartsIndex] = pathPart
+    path = "][".join(pathParts)
+    newPath = "['" + path + "']"
+    print(newPath, value)
 

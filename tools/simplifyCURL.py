@@ -16,9 +16,8 @@ os.chdir(path)
 def exec(cmd):
     return subprocess.check_output(cmd, shell=True)
 
-f = open('curlCommand.txt')
-line = f.readline()
-f.close()
+with open('curlCommand.txt') as f:
+    line = f.readline()
 
 needle = 'isHearted'
 
