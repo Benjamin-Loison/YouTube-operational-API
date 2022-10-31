@@ -91,6 +91,11 @@
         return checkRegex('[A-Za-z0-9=]+', $continuationToken);
     }
 
+    function isContinuationTokenAndVisitorData($continuationTokenAndVisitorData)
+    {
+        return checkRegex('[A-Za-z0-9=]+,[A-Za-z0-9=\-_]+', $continuationTokenAndVisitorData);
+    }
+
     function isPlaylistId($playlistId)
     {
         return checkRegex('[a-zA-Z0-9-_]+', $playlistId);
@@ -165,6 +170,18 @@
             return $json[$path];
         }
         return getValue($json[$parts[0]], join('/', array_slice($parts, 1, $partsCount - 1)));
+    }
+
+    function getIntValue($unitCount, $unit)
+    {
+        $unitCount = str_replace(' ' . $unit . 's', '', $unitCount);
+        $unitCount = str_replace(' ' . $unit, '', $unitCount);
+        $unitCount = str_replace('K', '*1000', $unitCount);
+        $unitCount = str_replace('M', '*1000000', $unitCount);
+        if(checkRegex('[0-9.*KM]+', $unitCount)) {
+            $unitCount = eval('return ' . $unitCount . ';');
+        }
+        return $unitCount;
     }
 
     if (!function_exists('str_contains')) {

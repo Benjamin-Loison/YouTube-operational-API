@@ -5,7 +5,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['snippet', 'premieres', 'community', 'channels', 'about'];
+    $realOptions = ['snippet', 'premieres', 'shorts', 'community', 'channels', 'about'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -44,7 +44,7 @@
         $continuationToken = '';
         if (isset($_GET['pageToken'])) {
             $continuationToken = $_GET['pageToken'];
-            if (!isContinuationToken($continuationToken)) {
+            if (($options['shorts'] && !isContinuationTokenAndVisitorData($continuationToken)) || (!$options['shorts'] && !isContinuationToken($continuationToken))) {
                 die('invalid continuationToken');
             }
         }
@@ -75,6 +75,63 @@
                 }
             }
             $item['premieres'] = $premieres;
+        }
+
+        if ($options['shorts']) {
+            // Note that sometimes the `SHORT` tab doesn't work (for instance with https://www.youtube.com/c/unitednations/shorts).
+            // If we are unlucky, we are redirected to the `HOME` tab.
+            if (!$continuationTokenProvided) {
+                $http = [
+                    'header' => [
+                        'Accept-Language: en',
+                        'Cookie: __Secure-YEC=CgtuNjFmZlJlR0Qxcyjp3P-aBg==' // This magic value removes the bad luck as explained above.
+                    ]
+                ];
+
+                $options = [
+                    'http' => $http
+                ];
+                $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/shorts', $options);
+                $visitorData = $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
+            } else {
+                $continuationParts = explode(',', $continuationToken);
+                $continuationToken = $continuationParts[0];
+                $visitorData = $continuationParts[1];
+                $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+                $http = [
+                    'header' => [
+                        'Content-Type: application/json',
+                        'X-Goog-EOM-Visitor-Id: ' . $visitorData
+                    ],
+                    'method' => 'POST',
+                    'content' => $rawData
+                ];
+
+                $options = [
+                    'http' => $http
+                ];
+
+                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $options);
+            }
+            $shorts = [];
+            $reelShelfRendererItems = !$continuationTokenProvided ? $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][2]['tabRenderer']['content']['richGridRenderer']['contents'] : $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+            foreach($reelShelfRendererItems as $reelShelfRendererItem) {
+                if(!array_key_exists('richItemRenderer', $reelShelfRendererItem))
+                    continue;
+                $reelShelfRendererItem = $reelShelfRendererItem['richItemRenderer']['content'];
+                $reelItemRenderer = $reelShelfRendererItem['reelItemRenderer'];
+                $viewCount = getIntValue($reelItemRenderer['viewCountText']['simpleText'], 'view');
+                $short = [
+                    'videoId' => $reelItemRenderer['videoId'],
+                    'title' => $reelItemRenderer['headline']['simpleText'],
+                    'thumbnails' => $reelItemRenderer['thumbnail']['thumbnails'],
+                    'viewCount' => $viewCount,
+                ];
+                array_push($shorts, $short);
+            }
+            $item['shorts'] = $shorts;
+            if($reelShelfRendererItems != null && count($reelShelfRendererItems) > 48)
+                $item['nextPageToken'] = str_replace('%3D', '=', $reelShelfRendererItems[48]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ',' . $visitorData);
         }
 
         if ($options['community']) {
@@ -203,15 +260,8 @@
                     $thumbnail['url'] = 'https://' . substr($thumbnail['url'], 2);
                     array_push($thumbnails, $thumbnail);
                 }
-                $subscriberCount = $gridChannelRenderer['subscriberCountText']['simpleText'];
-                $subscriberCount = str_replace(' subscribers', '', $subscriberCount);
-                // Have observed this case for the channel: https://www.youtube.com/channel/UCbOoDorgVGd-4vZdIrU4C1A
-                $subscriberCount = str_replace(' subscriber', '', $subscriberCount);
-                $subscriberCount = str_replace('K', '*1000', $subscriberCount);
-                $subscriberCount = str_replace('M', '*1000000', $subscriberCount);
-                if(checkRegex('[0-9.*KM]+', $subscriberCount)) {
-                    $subscriberCount = eval('return ' . $subscriberCount . ';');
-                }
+                $subscriberCount = getIntValue($gridChannelRenderer['subscriberCountText']['simpleText'], 'subscriber');
+                // Have observed the singular case for the channel: https://www.youtube.com/channel/UCbOoDorgVGd-4vZdIrU4C1A
                 $channel = [
                     'channelId' => $gridChannelRenderer['channelId'],
                     'title' => $gridChannelRenderer['title']['simpleText'],
