@@ -151,6 +151,11 @@
         return checkRegex('AIzaSy[A-D][a-zA-Z0-9-_]{32}', $youtubeDataAPIV3Key);
     }
 
+    function isHandle($handle)
+    {
+        return checkRegex('[a-zA-Z0-9-_]+', $handle); // may be more precise
+    }
+
     function doesPathExist($json, $path)
     {
         $parts = explode('/', $path);

@@ -12,7 +12,7 @@
         $options[$realOption] = false;
     }
 
-    if (isset($_GET['part']) && (isset($_GET['forUsername']) || isset($_GET['id']))) {
+    if (isset($_GET['part']) && (isset($_GET['forUsername']) || isset($_GET['id']) || isset($_GET['handle']))) {
         $part = $_GET['part'];
         $parts = explode(',', $part, count($realOptions));
         foreach ($parts as $part) {
@@ -35,11 +35,18 @@
             ];
             $result = getJSONFromHTML('https://www.youtube.com/c/' . $forUsername . '/about', $opts);
             $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
-        } else {
+        } else if (isset($_GET['id'])) {
             $id = $_GET['id'];
             if (!isChannelId($id)) {
                 die('invalid id'); // could directly die within the function
             }
+        } else { // if (isset($_GET['handle']))
+            $handle = $_GET['handle'];
+            if (!isHandle($handle)) {
+                die('invalid handle');
+            }
+            $result = getJSONFromHTML('https://www.youtube.com/@' . $handle);
+            $id = $result['responseContext']['serviceTrackingParams'][0]['params'][6]['value'];
         }
         $continuationToken = '';
         if (isset($_GET['pageToken'])) {
