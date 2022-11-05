@@ -1,25 +1,28 @@
 <?php
 
     // StackOverflow source: https://stackoverflow.com/a/71067222/7123660
-    $channelsTests = [['snippet&forUsername=FolkartTr', 'items/0/id', 'UCnS--2e1yzQCm5r4ClrMJBg']];
+    $channelsTests = [['forUsername=FolkartTr', 'items/0/id', 'UCnS--2e1yzQCm5r4ClrMJBg']];
 
     include_once 'common.php';
 
-    $realOptions = ['snippet', 'premieres', 'shorts', 'community', 'channels', 'about'];
+    $realOptions = ['premieres', 'shorts', 'community', 'channels', 'about'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
         $options[$realOption] = false;
     }
 
-    if (isset($_GET['part']) && (isset($_GET['forUsername']) || isset($_GET['id']) || isset($_GET['handle']))) {
-        $part = $_GET['part'];
-        $parts = explode(',', $part, count($realOptions));
-        foreach ($parts as $part) {
-            if (!in_array($part, $realOptions)) {
-                die('invalid part ' . $part);
-            } else {
-                $options[$part] = true;
+    // Forbidding URL with no `part` and using `id` filter is debatable.
+    if (isset($_GET['forUsername']) || isset($_GET['id']) || isset($_GET['handle'])) {
+        if(isset($_GET['part'])) {
+            $part = $_GET['part'];
+            $parts = explode(',', $part, count($realOptions));
+            foreach ($parts as $part) {
+                if (!in_array($part, $realOptions)) {
+                    die('invalid part ' . $part);
+                } else {
+                    $options[$part] = true;
+                }
             }
         }
         $id = '';
