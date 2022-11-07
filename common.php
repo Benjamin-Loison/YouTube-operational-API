@@ -153,7 +153,7 @@
 
     function isHandle($handle)
     {
-        return checkRegex('[a-zA-Z0-9-_]+', $handle); // may be more precise
+        return checkRegex('[a-zA-Z0-9-_.]{3,}', $handle);
     }
 
     function doesPathExist($json, $path)
