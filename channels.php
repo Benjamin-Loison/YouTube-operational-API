@@ -5,7 +5,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['premieres', 'shorts', 'community', 'channels', 'about'];
+    $realOptions = ['status', 'premieres', 'shorts', 'community', 'channels', 'about'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -70,6 +70,20 @@
             'id' => $id
         ];
         $continuationTokenProvided = $continuationToken != '';
+
+        if ($options['status']) {
+            $http = [
+                'header' => [
+                    'Accept-Language: en',
+                ]
+            ];
+            $options = [
+                'http' => $http
+            ];
+            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id, $options);
+            $status = $result['alerts'][0]['alertRenderer']['text']['simpleText'];
+            $item['status'] = $status;
+        }
 
         if ($options['premieres']) {
             $premieres = [];
