@@ -115,3 +115,12 @@ The source code is available on GitHub: <?php echo url('https://github.com/Benja
 If a feature you are looking for which isn't working on <?php yt(); ?>, ask kindly with the below contact:<br/>
 - <?php echo url('https://matrix.to/#/#youtube-operational-api:matrix.org', 'Matrix'); ?><br/>
 - <?php echo url('https://discord.gg/pDzafhGWzf', 'Discord'); ?>
+
+<?php
+
+    $hash = file_get_contents('.git/refs/heads/main');
+    if ($hash !== false) {
+        echo '<br/><br/>This instance uses version: <a href="https://github.com/Benjamin-Loison/YouTube-operational-API/commit/' . $hash . '">' . $hash . '</a>';
+    }
+
+?>
