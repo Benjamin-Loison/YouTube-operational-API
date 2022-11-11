@@ -1,6 +1,6 @@
 <?php
 
-    // StackOverflow source: https://stackoverflow.com/questions/71457319
+    // StackOverflow source: https://stackoverflow.com/q/71457319
 
     include_once 'common.php';
 

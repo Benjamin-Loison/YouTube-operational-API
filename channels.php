@@ -1,6 +1,6 @@
 <?php
 
-    // StackOverflow source: https://stackoverflow.com/a/71067222/7123660
+    // StackOverflow source: https://stackoverflow.com/a/71067222
     $channelsTests = [['forUsername=FolkartTr', 'items/0/id', 'UCnS--2e1yzQCm5r4ClrMJBg']];
 
     include_once 'common.php';

@@ -1,6 +1,6 @@
 <?php
 
-    // StackOverflow source: https://stackoverflow.com/questions/71186488/how-do-i-get-the-comments-on-a-video-that-have-been-liked-by-the-video-creator
+    // StackOverflow source: https://stackoverflow.com/q/71186488
     $commentThreadsTests = [['snippet&videoId=UC4QobU6STFB0P71PMvOGN5A&order=viewCount', 'items/0/id/videoId', 'jNQXAC9IVRw']];
     // example: https://youtu.be/mrJachWLjHU
     // example: https://youtu.be/DyDfgMOUjCI
