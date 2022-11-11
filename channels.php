@@ -184,7 +184,18 @@
                 $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $options);
             }
             $community = [];
-            $contents = !$continuationTokenProvided ? $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][3]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'] : $result['onResponseReceivedEndpoints'][0]['appendContinuationItemsAction']['continuationItems'];
+            $contents = null;
+            if (!$continuationTokenProvided) {
+                $tabs = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
+                $path = 'tabRenderer/content/sectionListRenderer/contents/0/itemSectionRenderer/contents';
+                foreach (array_slice($tabs, 3, 3) as $tab) {
+                    if (doesPathExist($tab, $path)) {
+                        $contents = getValue($tab, $path);
+                    }
+                }
+            } else {
+                $contents = $result['onResponseReceivedEndpoints'][0]['appendContinuationItemsAction']['continuationItems'];
+            }
             foreach ($contents as $content) {
                 if (!array_key_exists('backstagePostThreadRenderer', $content)) {
                     continue;
