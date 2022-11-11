@@ -190,7 +190,6 @@
                     continue;
                 }
                 $common = $content['backstagePostThreadRenderer']['post']['backstagePostRenderer'];
-                $backstageAttachment = $common['backstageAttachment'];
 
                 $id = $common['postId'];
 
@@ -208,6 +207,11 @@
                         $contentTextItem['url'] = 'https://www.youtube.com' . $url;
                     }
                     array_push($contentText, $contentTextItem);
+                }
+
+                $backstageAttachment = [];
+                if (array_key_exists('backstageAttachment', $common)) {
+                    $backstageAttachment = $common['backstageAttachment'];
                 }
 
                 $image = null;
