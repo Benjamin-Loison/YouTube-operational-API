@@ -31,7 +31,7 @@
         } elseif (array_key_exists('error', $json) && $json['error']['errors'][0]['domain'] !== 'youtube.quota') {
             $message = $json['error']['message'];
             // As there are many different kind of errors other than the quota one, we could just proceed to a test verifying that the expected result is returned, as when adding a key.
-            if ($message === 'API key expired. Please renew the API key.' or str_ends_with($message, 'has been suspended.') or $message === 'API Key not found. Please pass a valid API key.' or str_starts_with($message, 'YouTube Data API v3 has not been used in project ')) {
+            if ($message === 'API key expired. Please renew the API key.' or str_ends_with($message, 'has been suspended.') or $message === 'API key not valid. Please pass a valid API key.' or $message === 'API Key not found. Please pass a valid API key.' or str_starts_with($message, 'YouTube Data API v3 has not been used in project ')) {
                 // Removes this API key as it won't be useful anymore.
                 $newKeys = array_merge(array_slice($keys, $keysIndex + 1), array_slice($keys, 0, $keysIndex));
                 $toWrite = implode("\n", $newKeys);
