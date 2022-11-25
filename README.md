@@ -75,3 +75,7 @@ If you want me to advertise your instance (if you have opened your port, and hav
 
 - [Matrix](https://matrix.to/#/#youtube-operational-api:matrix.org)
 - [Discord](https://discord.gg/pDzafhGWzf)
+
+## Contributing:
+
+See [`CONTRIBUTING.md`](https://github.com/Benjamin-Loison/YouTube-operational-API/blob/main/CONTRIBUTING.md).
