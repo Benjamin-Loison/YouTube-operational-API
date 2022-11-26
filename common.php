@@ -133,7 +133,7 @@
 
     function isClipId($clipId)
     {
-        return checkRegex('[a-zA-Z0-9-_]{36}', $clipId); // may be more precise
+        return checkRegex('Ug[a-zA-Z0-9-_]{34}', $clipId);
     }
 
     function isEventType($eventType)
