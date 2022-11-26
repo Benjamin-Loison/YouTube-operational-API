@@ -339,7 +339,9 @@
             $about['stats'] = $stats;
 
             $description = $resultCommon['description']['simpleText'];
+            $title = $resultCommon['title']['simpleText'];
             $about['description'] = $description;
+            $about['title'] = $title;
 
             $details = [];
             $details['location'] = $resultCommon['country']['simpleText'];
