@@ -102,13 +102,10 @@
         }
 
         if ($options['shorts']) {
-            // Note that sometimes the `SHORT` tab doesn't work (for instance with https://www.youtube.com/c/unitednations/shorts).
-            // If we are unlucky, we are redirected to the `HOME` tab.
             if (!$continuationTokenProvided) {
                 $http = [
                     'header' => [
                         'Accept-Language: en',
-                        'Cookie: __Secure-YEC=CgtuNjFmZlJlR0Qxcyjp3P-aBg==' // This magic value removes the bad luck as explained above.
                     ]
                 ];
 
