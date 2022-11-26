@@ -141,12 +141,16 @@
                     continue;
                 $reelShelfRendererItem = $reelShelfRendererItem['richItemRenderer']['content'];
                 $reelItemRenderer = $reelShelfRendererItem['reelItemRenderer'];
+                $reelPlayerRenderer = $reelItemRenderer['navigationEndpoint']['reelWatchEndpoint']['overlay']['reelPlayerOverlayRenderer']['reelPlayerHeaderSupportedRenderers']['reelPlayerHeaderRenderer'];
                 $viewCount = getIntValue($reelItemRenderer['viewCountText']['simpleText'], 'view');
                 $short = [
                     'videoId' => $reelItemRenderer['videoId'],
                     'title' => $reelItemRenderer['headline']['simpleText'],
                     'thumbnails' => $reelItemRenderer['thumbnail']['thumbnails'],
                     'viewCount' => $viewCount,
+                    'viewCountText' => $reelItemRenderer['viewCountText']['simpleText'],
+                    'timestamp' => $reelPlayerRenderer['timestampText']['simpleText'],
+                    'channelTitle' => $reelPlayerRenderer['channelTitleText']['runs'][0]['text'],
                 ];
                 array_push($shorts, $short);
             }
