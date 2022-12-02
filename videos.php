@@ -11,7 +11,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters']; // could load index.php from that
+    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal']; // could load index.php from that
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -222,6 +222,16 @@
                 ]);
             }
             $item['chapters'] = $chapters;
+        }
+
+        if ($options['isOriginal']) {
+            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+            $isOriginal = doesPathExist($json, 'contents/twoColumnWatchNextResults/results/results/contents/1/videoSecondaryInfoRenderer/metadataRowContainer/metadataRowContainerRenderer/rows/2/metadataRowRenderer/contents/0/simpleText');
+            if (!$isOriginal) {
+                $html = getRemote('https://www.youtube.com/watch?v=' . $id);
+                $isOriginal = str_contains($html, 'xtags=acont%3Doriginal');
+            }
+            $item['isOriginal'] = $isOriginal;
         }
 
         return $item;
