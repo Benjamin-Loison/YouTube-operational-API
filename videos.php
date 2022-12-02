@@ -11,7 +11,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'containsMusic', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal']; // could load index.php from that
+    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'musics', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal']; // could load index.php from that
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -135,10 +135,38 @@
             $item['impressions'] = $impressions;
         }
 
-        if ($options['containsMusic']) {
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
-            $containsMusic = doesPathExist($json, 'engagementPanels/1/engagementPanelSectionListRenderer/content/structuredDescriptionContentRenderer/items/1/videoDescriptionMusicSectionRenderer');
-            $item['containsMusic'] = $containsMusic;
+        if ($options['musics']) {
+            $http = [
+                'header' => [
+                    'Accept-Language: en',
+                ]
+            ];
+
+            $options = [
+                'http' => $http
+            ];
+            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $options);
+            $musics = [];
+
+            $engagementPanels = $json['engagementPanels'];
+            $multipleMusics = $engagementPanels[1]['engagementPanelSectionListRenderer']['panelIdentifier'] === 'engagement-panel-structured-description';
+            $carouselLockups = ($multipleMusics ? $engagementPanels[1] : $engagementPanels[2])['engagementPanelSectionListRenderer']['content']['structuredDescriptionContentRenderer']['items'][2]['videoDescriptionMusicSectionRenderer']['carouselLockups'];
+
+            foreach ($carouselLockups as $carouselLockup) {
+                $carouselLockupRenderer = $carouselLockup['carouselLockupRenderer'];
+                $compactVideoRenderer = $carouselLockupRenderer['videoLockup']['compactVideoRenderer'];
+                $infoRows = $carouselLockupRenderer['infoRows'];
+                $title = $multipleMusics ? $compactVideoRenderer['title']['runs'][0]['text'] : $infoRows[0]['infoRowRenderer']['defaultMetadata']['simpleText'];
+                $music = [
+                    'id' => $compactVideoRenderer['navigationEndpoint']['watchEndpoint']['videoId'],
+                    'title' => $title,
+                    'artist' => $infoRows[0]['infoRowRenderer']['defaultMetadata']['runs'][0]['text'],
+                    'writers' => $infoRows[1]['infoRowRenderer']['expandedMetadata']['runs'],
+                    'licenses' => end($infoRows)['infoRowRenderer']['expandedMetadata']['simpleText']
+                ];
+                array_push($musics, $music);
+            }
+            $item['musics'] = $musics;
         }
 
         if ($options['id'] && isset($_GET['clipId'])) {
