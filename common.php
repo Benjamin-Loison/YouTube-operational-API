@@ -76,9 +76,9 @@
 
     function getJSONFromHTML($url, $opts = [], $scriptVariable = '', $prefix = 'var ')
     {
-        $res = getRemote($url, $opts);
-        $res = getJSONStringFromHTML($res, $scriptVariable, $prefix);
-        return json_decode($res, true);
+        $html = getRemote($url, $opts);
+        $jsonStr = getJSONStringFromHTML($html, $scriptVariable, $prefix);
+        return json_decode($jsonStr, true);
     }
 
     function checkRegex($regex, $str)
