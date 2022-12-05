@@ -8,7 +8,9 @@ def _finditem(obj, key, path = ''):
     if objType is dict:
         keys = obj.keys()
         if key in keys:
-            value = obj[key] if type(obj[key]) is str else ''
+            objKey = obj[key]
+            objKeyType = type(objKey)
+            value = objKey if (not objKeyType is dict and not objKeyType is list) else ''
             # used to be a print
             results += [(path + '/' + key, value)]
         for keyTmp in keys:
