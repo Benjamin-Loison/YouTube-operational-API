@@ -29,6 +29,8 @@ def _finditem(obj, key, path = ''):
 
 filePath = sys.argv[1]
 key = sys.argv[2]
+# `ytVariableName` could be for instance 'ytInitialPlayerResponse'
+ytVariableName = sys.argv[3] if len(sys.argv) >= 4 else 'ytInitialData'
 
 # if not found from key could search by value
 # that way could find easily shortest path to get the value as sometimes the value is repeated multiple times
@@ -39,11 +41,7 @@ with open(filePath) as f:
 if not isJSON:
     with open(filePath) as f:
         content = f.read()
-    # todo: more adaptative to JS variable name
-    #var ytInitialData
-    # ytInitialPlayerResponse
-    # </script>
-    newContent = '{' + content.split('ytInitialData = {')[1].split('};')[0] + '}'
+    newContent = '{' + content.split(ytVariableName + ' = {')[1].split('};')[0] + '}'
     with open(filePath, 'w') as f:
         f.write(newContent)
 
