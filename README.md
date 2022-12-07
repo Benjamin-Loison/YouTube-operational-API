@@ -29,7 +29,7 @@ Download and run [WampServer 3](https://sourceforge.net/projects/wampserver/file
 
 ### On MacOS (Apple Silicon):
 
-```
+```zsh
 brew install apache2 php
 
 echo 'LoadModule php_module /opt/homebrew/opt/php/lib/httpd/modules/libphp.so
@@ -45,7 +45,7 @@ echo '<IfModule php_module>
   </IfModule>
 </IfModule>' >> /opt/homebrew/etc/httpd/extra/httpd-php.conf
 
-sed -i '' 's/#LoadModule rewrite_module/LoadModule rewrite_module/' httpd.conf
+sed -i '' 's/#LoadModule rewrite_module/LoadModule rewrite_module/' /opt/homebrew/etc/httpd/httpd.conf
 ```
 
 Replace `AllowOverride none` with `AllowOverride all` in `<Directory "/opt/homebrew/var/www">` in `/opt/homebrew/etc/httpd/httpd.conf`.
