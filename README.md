@@ -27,7 +27,9 @@ sudo service apache2 start
 
 Download and run [WampServer 3](https://sourceforge.net/projects/wampserver/files/WampServer%203/).
 
-### On MacOS (Apple Silicon):
+### On MacOS:
+
+On MacOS (Intel) use `/usr/local/` instead of `/opt/homebrew/`.
 
 ```zsh
 brew install apache2 php
