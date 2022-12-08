@@ -273,7 +273,7 @@
                 array_push($community, $post);
             }
             $item['community'] = $community;
-            $item['nextPageToken'] = str_replace('%3D', '=', $contents[10]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
+            $item['nextPageToken'] = str_replace('%3D', '=', end($contents)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
         }
 
         if ($options['channels']) {
