@@ -197,7 +197,7 @@
                 if (!array_key_exists('backstagePostThreadRenderer', $content)) {
                     continue;
                 }
-                $backstagePost = $content['backstagePostThreadRenderer']['post'] // for posts that are shared from other channels
+                $backstagePost = $content['backstagePostThreadRenderer']['post']; // for posts that are shared from other channels
                 $common = array_key_exists('backstagePostRenderer', $backstagePost) ? $backstagePost['backstagePostRenderer'] : $backstagePost['sharedPostRenderer'];
 
                 $id = $common['postId'];
@@ -239,6 +239,8 @@
                 }
                 $edited = str_contains($date, 'edited');
                 $date = str_replace(' (edited)', '', $date);
+                $date = str_replace('shared ', '', $date);
+                $sharedPostId = $common['originalPost']['backstagePostRenderer']['postId'];
 
                 $poll = null;
                 if (array_key_exists('pollRenderer', $backstageAttachment)) {
@@ -271,7 +273,8 @@
                     'videoId' => $videoId,
                     'image' => $image,
                     'poll' => $poll,
-                    'edited' => $edited
+                    'edited' => $edited,
+                    'sharedPostId' => $sharedPostId,
                 ];
                 array_push($community, $post);
             }
