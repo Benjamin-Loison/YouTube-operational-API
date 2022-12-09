@@ -224,9 +224,13 @@
                     $backstageAttachment = $common['backstageAttachment'];
                 }
 
-                $image = null;
+                $images = [];
                 if (array_key_exists('backstageImageRenderer', $backstageAttachment)) {
-                    $image = $backstageAttachment['backstageImageRenderer']['image'];
+                    $images = [$backstageAttachment['backstageImageRenderer']['image']];
+                } else if (array_key_exists('postMultiImageRenderer', $backstageAttachment)) {
+                    foreach($backstageAttachment['postMultiImageRenderer']['images'] as $image) {
+                        array_push($images, $image['backstageImageRenderer']['image']);
+                    }
                 }
 
                 $videoId = null;
@@ -271,7 +275,7 @@
                     'likes' => $likes,
                     'comments' => $comments,
                     'videoId' => $videoId,
-                    'image' => $image,
+                    'images' => $images,
                     'poll' => $poll,
                     'edited' => $edited,
                     'sharedPostId' => $sharedPostId,
