@@ -88,7 +88,7 @@
 
     function isContinuationToken($continuationToken)
     {
-        return checkRegex('[A-Za-z0-9=]+', $continuationToken);
+        return checkRegex('[A-Za-z0-9=_]+', $continuationToken);
     }
 
     function isContinuationTokenAndVisitorData($continuationTokenAndVisitorData)
