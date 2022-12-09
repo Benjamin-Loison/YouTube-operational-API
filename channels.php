@@ -197,13 +197,15 @@
                 if (!array_key_exists('backstagePostThreadRenderer', $content)) {
                     continue;
                 }
-                $common = $content['backstagePostThreadRenderer']['post']['backstagePostRenderer'];
+                $backstagePost = $content['backstagePostThreadRenderer']['post'] // for posts that are shared from other channels
+                $common = array_key_exists('backstagePostRenderer', $backstagePost) ? $backstagePost['backstagePostRenderer'] : $backstagePost['sharedPostRenderer'];
 
                 $id = $common['postId'];
 
                 // I haven't seen any post without any text. Note that I prefer to cover such edge case instead of spending time to find them in the wild.
                 $contentText = [];
-                foreach ($common['contentText']['runs'] as $textCommon) {
+                $textContent = array_key_exists('contentText', $common) ? $common['contentText'] : $common['content']; // sharedPosts have the same content just in slightly different positioning
+                foreach ($textContent['runs'] as $textCommon) {
                     $contentTextItem = ['text' => $textCommon['text']];
                     if (array_key_exists('navigationEndpoint', $textCommon)) {
                         $navigationEndpoint = $textCommon['navigationEndpoint'];
@@ -256,7 +258,8 @@
 
                 $likes = intval($common['voteCount']['simpleText']);
 
-                $commentsCommon = $common['actionButtons']['commentActionButtonsRenderer']['replyButton']['buttonRenderer'];
+                // sharedPosts do not have 'actionButtons' so this next line will end up defaulting to 0 $comments
+                $commentsCommon = array_key_exists('actionButtons', $common) ? $common['actionButtons']['commentActionButtonsRenderer']['replyButton']['buttonRenderer'] : $common;
                 $comments = array_key_exists('text', $commentsCommon) ? intval($commentsCommon['text']['simpleText']) : 0;
 
                 $post = [
