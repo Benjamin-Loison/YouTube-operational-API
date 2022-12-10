@@ -194,21 +194,21 @@
         $id = $common['postId'];
         $channelId = $common['publishedTimeText']['runs'][0]['navigationEndpoint']['browseEndpoint']['browseId'];
 
-        // I haven't seen any post without any text. Note that I prefer to cover such edge case instead of spending time to find them in the wild.
+        // Except for `Image`, all other posts require text.
         $contentText = [];
         $textContent = array_key_exists('contentText', $common) ? $common['contentText'] : $common['content']; // sharedPosts have the same content just in slightly different positioning
         foreach ($textContent['runs'] as $textCommon) {
             $contentTextItem = ['text' => $textCommon['text']];
             if (array_key_exists('navigationEndpoint', $textCommon)) {
-                $navigationEndpoint = $textCommon['navigationEndpoint'];
-                if (array_key_exists('commandMetadata', $navigationEndpoint)) {
-                    $url = $navigationEndpoint['commandMetadata']['webCommandMetadata']['url'];
-                } else {
-                    $url = $navigationEndpoint['browseEndpoint']['canonicalBaseUrl'];
-                }
                 if (str_starts_with($url, 'https://www.youtube.com/redirect?')) {
                     $contentTextItem['url'] = $text;
                 } else {
+                    $navigationEndpoint = $textCommon['navigationEndpoint'];
+                    if (array_key_exists('commandMetadata', $navigationEndpoint)) {
+                        $url = $navigationEndpoint['commandMetadata']['webCommandMetadata']['url'];
+                    } else {
+                        $url = $navigationEndpoint['browseEndpoint']['canonicalBaseUrl'];
+                    }
                     $contentTextItem['url'] = 'https://www.youtube.com' . $url;
                 }
             }
