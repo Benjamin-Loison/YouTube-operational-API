@@ -247,7 +247,9 @@
             $pollRenderer = $backstageAttachment['pollRenderer'];
             $choices = [];
             foreach ($pollRenderer['choices'] as $choice) {
-                array_push($choices, $choice['text']['runs'][0]);
+                $returnedChoice = $choice['text']['runs'][0];
+                $returnedChoice['image'] = $choice['image'];
+                array_push($choices, $returnedChoice);
             }
             $totalVotesStr = $pollRenderer['totalVotes']['simpleText'];
             // What if no vote? Note that haven't seen a poll with a single vote.
