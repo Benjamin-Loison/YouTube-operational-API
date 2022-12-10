@@ -156,6 +156,11 @@
         return checkRegex('[a-zA-Z0-9-_.]{3,}', $handle);
     }
 
+    function isPostId($postId)
+    {
+        return (checkRegex('Ug[w-z][a-zA-Z0-9-_]{16}4AaABCQ', $postId) || checkRegex('Ugkx[a-zA-Z0-9-_]{32}', $postId));
+    }
+
     function doesPathExist($json, $path)
     {
         $parts = explode('/', $path);
@@ -187,6 +192,98 @@
             $unitCount = eval('return ' . $unitCount . ';');
         }
         return $unitCount;
+    }
+
+    function getCommunityPostFromContent($content)
+    {
+        $backstagePost = $content['backstagePostThreadRenderer']['post']; // for posts that are shared from other channels
+        $common = array_key_exists('backstagePostRenderer', $backstagePost) ? $backstagePost['backstagePostRenderer'] : $backstagePost['sharedPostRenderer'];
+
+        $id = $common['postId'];
+        $channelId = $common['publishedTimeText']['runs'][0]['navigationEndpoint']['browseEndpoint']['browseId'];
+
+        // I haven't seen any post without any text. Note that I prefer to cover such edge case instead of spending time to find them in the wild.
+        $contentText = [];
+        $textContent = array_key_exists('contentText', $common) ? $common['contentText'] : $common['content']; // sharedPosts have the same content just in slightly different positioning
+        foreach ($textContent['runs'] as $textCommon) {
+            $contentTextItem = ['text' => $textCommon['text']];
+            if (array_key_exists('navigationEndpoint', $textCommon)) {
+                $navigationEndpoint = $textCommon['navigationEndpoint'];
+                if (array_key_exists('commandMetadata', $navigationEndpoint)) {
+                    $url = $navigationEndpoint['commandMetadata']['webCommandMetadata']['url'];
+                } else {
+                    $url = $navigationEndpoint['browseEndpoint']['canonicalBaseUrl'];
+                }
+                $contentTextItem['url'] = 'https://www.youtube.com' . $url;
+            }
+            array_push($contentText, $contentTextItem);
+        }
+
+        $backstageAttachment = [];
+        if (array_key_exists('backstageAttachment', $common)) {
+            $backstageAttachment = $common['backstageAttachment'];
+        }
+
+        $images = [];
+        if (array_key_exists('backstageImageRenderer', $backstageAttachment)) {
+            $images = [$backstageAttachment['backstageImageRenderer']['image']];
+        } else if (array_key_exists('postMultiImageRenderer', $backstageAttachment)) {
+            foreach($backstageAttachment['postMultiImageRenderer']['images'] as $image) {
+                array_push($images, $image['backstageImageRenderer']['image']);
+            }
+        }
+
+        $videoId = null;
+        if (array_key_exists('publishedTimeText', $common)) {
+            $date = $common['publishedTimeText']['runs'][0]['text'];
+        } else {
+            $videoRenderer = $backstageAttachment['videoRenderer'];
+            $videoId = $videoRenderer['videoId'];
+            $date = $videoRenderer['publishedTimeText']['simpleText'];
+        }
+        $edited = str_ends_with($date, ' (edited)');
+        $date = str_replace(' (edited)', '', $date);
+        $date = str_replace('shared ', '', $date);
+        $sharedPostId = $common['originalPost']['backstagePostRenderer']['postId'];
+
+        $poll = null;
+        if (array_key_exists('pollRenderer', $backstageAttachment)) {
+            $pollRenderer = $backstageAttachment['pollRenderer'];
+            $choices = [];
+            foreach ($pollRenderer['choices'] as $choice) {
+                array_push($choices, $choice['text']['runs'][0]);
+            }
+            $totalVotesStr = $pollRenderer['totalVotes']['simpleText'];
+            // What if no vote? Note that haven't seen a poll with a single vote.
+            $totalVotes = intval(str_replace(' vote', '', str_replace(' votes', '', $totalVotesStr)));
+            $poll = [
+                'choices' => $choices,
+                'totalVotes' => $totalVotes
+            ];
+        }
+
+        $likes = intval($common['voteCount']['simpleText']);
+
+        // Retrieving comments when using `community?part=snippet` requires another HTTPS request to `browse` YouTube UI endpoint.
+        // sharedPosts do not have 'actionButtons' so this next line will end up defaulting to 0 $comments
+        $commentsPath = 'actionButtons/commentActionButtonsRenderer/replyButton/buttonRenderer';
+        $commentsCommon = doesPathExist($common, $commentsPath) ? getValue($common, $commentsPath) : $common;
+        $comments = array_key_exists('text', $commentsCommon) ? intval($commentsCommon['text']['simpleText']) : 0;
+
+        $post = [
+            'id' => $id,
+            'channelId' => $channelId,
+            'date' => $date,
+            'contentText' => $contentText,
+            'likes' => $likes,
+            'comments' => $comments,
+            'videoId' => $videoId,
+            'images' => $images,
+            'poll' => $poll,
+            'edited' => $edited,
+            'sharedPostId' => $sharedPostId,
+        ];
+        return $post;
     }
 
     if (!function_exists('str_contains')) {

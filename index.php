@@ -27,6 +27,7 @@
     }
 
     $features = [['channels/list', 'status,premieres,shorts,community,channels,about&forUsername=USERNAME&id=CHANNEL_ID&handle=HANDLE'],
+                 ['community/list', 'snippet&id=POST_ID'],
                  ['commentThreads/list', 'snippet,replies&videoId=VIDEO_ID(&pageToken=PAGE_TOKEN)'],
                  ['playlists/list', 'statistics&id=PLAYLIST_ID'],
                  ['playlistItems/list', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
