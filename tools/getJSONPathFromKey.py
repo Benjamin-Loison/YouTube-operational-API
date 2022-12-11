@@ -2,17 +2,23 @@
 
 import sys, json
 
+def treatKey(obj, path, key):
+    objKey = obj[key]
+    objKeyType = type(objKey)
+    value = objKey if (not objKeyType is dict and not objKeyType is list) else ''
+    # used to be a print
+    return (path + '/' + key, value)
+
 def _finditem(obj, key, path = ''):
     objType = type(obj)
     results = []
     if objType is dict:
         keys = obj.keys()
-        if key in keys:
-            objKey = obj[key]
-            objKeyType = type(objKey)
-            value = objKey if (not objKeyType is dict and not objKeyType is list) else ''
-            # used to be a print
-            results += [(path + '/' + key, value)]
+        if key == '':
+            for keyTmp in keys:
+                results += [treatKey(obj, path, keyTmp)]
+        elif key in keys:
+            results += [treatKey(obj, path, key)]
         for keyTmp in keys:
             res = _finditem(obj[keyTmp], key, path + '/' + keyTmp)
             if res != []:
@@ -28,7 +34,7 @@ def _finditem(obj, key, path = ''):
     
 
 filePath = sys.argv[1]
-key = sys.argv[2]
+key = sys.argv[2] if len(sys.argv) >= 3 else ''
 # `ytVariableName` could be for instance 'ytInitialPlayerResponse'
 ytVariableName = sys.argv[3] if len(sys.argv) >= 4 else 'ytInitialData'
 
