@@ -135,7 +135,18 @@
                 $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $options);
             }
             $shorts = [];
-            $reelShelfRendererItems = !$continuationTokenProvided ? $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][2]['tabRenderer']['content']['richGridRenderer']['contents'] : $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+            if (!$continuationTokenProvided) {
+                $tabs = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
+                $path = 'tabRenderer/content/richGridRenderer/contents';
+                foreach (array_slice($tabs, 1, 2) as $tab) {
+                    if (doesPathExist($tab, $path)) {
+                        $reelShelfRendererItems = getValue($tab, $path);
+                    }
+                }
+            }
+            else {
+                $reelShelfRendererItems = $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+            }
             foreach($reelShelfRendererItems as $reelShelfRendererItem) {
                 if(!array_key_exists('richItemRenderer', $reelShelfRendererItem))
                     continue;
@@ -185,7 +196,7 @@
             if (!$continuationTokenProvided) {
                 $tabs = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
                 $path = 'tabRenderer/content/sectionListRenderer/contents/0/itemSectionRenderer/contents';
-                foreach (array_slice($tabs, 3, 3) as $tab) {
+                foreach (array_slice($tabs, 2, 4) as $tab) {
                     if (doesPathExist($tab, $path)) {
                         $contents = getValue($tab, $path);
                     }
