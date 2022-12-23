@@ -77,10 +77,10 @@
                     'Accept-Language: en',
                 ]
             ];
-            $options = [
+            $httpOptions = [
                 'http' => $http
             ];
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id, $options);
+            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id, $httpOptions);
             $status = $result['alerts'][0]['alertRenderer']['text']['simpleText'];
             $item['status'] = $status;
         }
@@ -109,10 +109,10 @@
                     ]
                 ];
 
-                $options = [
+                $httpOptions = [
                     'http' => $http
                 ];
-                $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/shorts', $options);
+                $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/shorts', $httpOptions);
                 $visitorData = $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
             } else {
                 $continuationParts = explode(',', $continuationToken);
@@ -128,11 +128,11 @@
                     'content' => $rawData
                 ];
 
-                $options = [
+                $httpOptions = [
                     'http' => $http
                 ];
 
-                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $options);
+                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
             }
             $shorts = [];
             if (!$continuationTokenProvided) {
@@ -172,11 +172,11 @@
                     'header' => ['Accept-Language: en']
                 ];
 
-                $options = [
+                $httpOptions = [
                     'http' => $http
                 ];
 
-                $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/community', $options);
+                $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/community', $httpOptions);
             } else {
                 $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
                 $http = [
@@ -185,11 +185,11 @@
                     'content' => $rawData
                 ];
 
-                $options = [
+                $httpOptions = [
                     'http' => $http
                 ];
 
-                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $options);
+                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
             }
             $community = [];
             $contents = null;
@@ -220,11 +220,11 @@
                 'header' => ['Accept-Language: en']
             ];
 
-            $options = [
+            $httpOptions = [
                 'http' => $http
             ];
 
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/channels', $options);
+            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/channels', $httpOptions);
             $sectionListRenderer = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -3)[0]['tabRenderer']['content']['sectionListRenderer'];
             $channels = [];
             $channelsItems = $sectionListRenderer['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
@@ -258,11 +258,11 @@
                 'header' => ['Accept-Language: en']
             ];
 
-            $options = [
+            $httpOptions = [
                 'http' => $http
             ];
 
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/about', $options);
+            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/about', $httpOptions);
 
             $resultCommon = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -2)[0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
 
@@ -307,11 +307,11 @@
                 'header' => ['Accept-Language: en']
             ];
 
-            $options = [
+            $httpOptions = [
                 'http' => $http
             ];
 
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id, $options);
+            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id, $httpOptions);
             $badgeTooltipPath = 'header/c4TabbedHeaderRenderer/badges/0/metadataBadgeRenderer/tooltip';
             $item['approval'] = doesPathExist($result, $badgeTooltipPath) ? getValue($result, $badgeTooltipPath) : '';
         }

@@ -41,11 +41,11 @@ function getAPI($playlistId, $continuationToken)
         $http['header'] = ['Cookie: CONSENT=YES+', 'Accept-Language: en'];
     }
 
-    $options = [
+    $httpOptions = [
         'http' => $http
     ];
 
-    $res = getRemote($url, $options);
+    $res = getRemote($url, $httpOptions);
 
     if (!$continuationTokenProvided) {
         $res = getJSONStringFromHTML($res);

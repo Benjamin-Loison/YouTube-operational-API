@@ -142,10 +142,10 @@
                 ]
             ];
 
-            $options = [
+            $httpOptions = [
                 'http' => $http
             ];
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $options);
+            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $httpOptions);
             $musics = [];
 
             $engagementPanels = $json['engagementPanels'];
