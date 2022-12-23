@@ -292,7 +292,7 @@
                            $timeComponents['minute'] * 60 +
                            $timeComponents['second'];
                 array_push($chapters, [
-                    'song' => $chapter['song']['simpleText'],
+                    'title' => $chapter['title']['simpleText'],
                     'time' => $timeInt
                 ]);
             }
