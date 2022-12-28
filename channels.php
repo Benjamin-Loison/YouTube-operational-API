@@ -193,6 +193,7 @@
             }
             $community = [];
             $contents = null;
+            $isContent = TRUE;
             if (!$continuationTokenProvided) {
                 $tabs = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
                 $path = 'tabRenderer/content/sectionListRenderer/contents/0/itemSectionRenderer/contents';
@@ -201,6 +202,9 @@
                         $contents = getValue($tab, $path);
                     }
                 }
+            } else if (!array_key_exists('continuationItems', $result['onResponseReceivedEndpoints'][0]['appendContinuationItemsAction'])) {
+                $contents = '';
+                $isContent = FALSE;
             } else {
                 $contents = $result['onResponseReceivedEndpoints'][0]['appendContinuationItemsAction']['continuationItems'];
             }
@@ -212,7 +216,7 @@
                 array_push($community, $post);
             }
             $item['community'] = $community;
-            $item['nextPageToken'] = urldecode(end($contents)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
+            $item['nextPageToken'] = ($isContent) ? urldecode(end($contents)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']) : '';
         }
 
         if ($options['channels']) {
