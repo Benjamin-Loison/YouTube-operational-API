@@ -121,7 +121,7 @@ function getAPI($videoId, $order, $continuationToken)
         array_push($answerItems, $answerItem);
     }
     $answer = [
-        'kind' => 'youtube#commentThreadListResponse',
+        'kind' => 'youtube#comment' . ($isTopLevelComment ? 'Thread' : '') . 'ListResponse',
         'etag' => 'NotImplemented',
         'pageInfo' => [
             'totalResults' => intval($result['onResponseReceivedEndpoints'][0]['reloadContinuationItemsCommand']['continuationItems'][0]['commentsHeaderRenderer']['countText']['runs'][0]['text']),
