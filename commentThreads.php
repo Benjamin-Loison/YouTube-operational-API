@@ -44,7 +44,7 @@ if (isset($_GET['part'], $_GET['videoId'], $_GET['order'])) {
     echo getAPI($videoId, $order, $continuationToken);
 }
 
-function getAPI($videoId, $order, $continuationToken, $initialResult = null)
+function getAPI($videoId, $order, $continuationToken)
 {
     $continuationTokenProvided = $continuationToken != '';
     if ($continuationTokenProvided) {
@@ -59,8 +59,8 @@ function getAPI($videoId, $order, $continuationToken, $initialResult = null)
         $result = getJSON('https://www.youtube.com/youtubei/v1/next?key=' . UI_KEY, $opts);
     } else {
         $result = getJSONFromHTML('https://www.youtube.com/watch?v=' . $videoId);
-        $continuationToken = $order === 'time' ? $result['engagementPanels'][2]['engagementPanelSectionListRenderer']['header']['engagementPanelTitleHeaderRenderer']['menu']['sortFilterSubMenuRenderer']['subMenuItems'][1]['serviceEndpoint']['continuationCommand']['token'] : end($result['contents']['twoColumnWatchNextResults']['results']['results']['contents'])['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
-        return getAPI($videoId, $order, $continuationToken, $result);
+        $continuationToken = ($order === 'time' ? $result['engagementPanels'][2]['engagementPanelSectionListRenderer']['header']['engagementPanelTitleHeaderRenderer']['menu']['sortFilterSubMenuRenderer']['subMenuItems'][1]['serviceEndpoint'] : end($result['contents']['twoColumnWatchNextResults']['results']['results']['contents'])['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint'])['continuationCommand']['token'];
+        return getAPI($videoId, $order, $continuationToken);
     }
 
     $answerItems = [];
@@ -69,15 +69,16 @@ function getAPI($videoId, $order, $continuationToken, $initialResult = null)
     $appendContinuationItems = $onResponseReceivedEndpoints[0]['appendContinuationItemsAction']['continuationItems'];
     $items = array_merge($reloadContinuationItems !== null ? $reloadContinuationItems : [], $appendContinuationItems !== null ? $appendContinuationItems : []);
     $itemsCount = $items !== null ? count($items) : 0;
-    $resultsPerPage = 20;
-    if ($items !== [] && array_key_exists('continuationItemRenderer', end($items))) {//$itemsCount == $resultsPerPage + 1) {
+    if ($items !== [] && array_key_exists('continuationItemRenderer', end($items))) {
         $continuationItemRenderer = end($items)['continuationItemRenderer'];
         $nextContinuationToken = urldecode(getValue($continuationItemRenderer, (array_key_exists('continuationEndpoint', $continuationItemRenderer) ? 'continuationEndpoint' : 'button/buttonRenderer/command') . '/continuationCommand/token'));
-        $items = array_slice($items, 0, count($items) - 1);//$resultsPerPage);
+        $items = array_slice($items, 0, count($items) - 1);
     }
+    $isTopLevelComment = true;
     foreach ($items as $item) {
         $commentThread = $item['commentThreadRenderer'];
-        $comment = (array_key_exists('commentThreadRenderer', $item) ? $commentThread['comment'] : $item)['commentRenderer'];
+        $isTopLevelComment = array_key_exists('commentThreadRenderer', $item);
+        $comment = ($isTopLevelComment ? $commentThread['comment'] : $item)['commentRenderer'];
         $texts = $comment['contentText']['runs'];
         $replies = $commentThread['replies'];
         $commentRepliesRenderer = $replies['commentRepliesRenderer'];
@@ -88,33 +89,34 @@ function getAPI($videoId, $order, $continuationToken, $initialResult = null)
         $publishedAt = str_replace(' (edited)', '', $publishedAt, $count);
         $wasEdited = $count > 0;
         $replyCount = $comment['replyCount'];
+        $internalSnippet = [
+            'textOriginal' => $text,
+            'isHearted' => $isHearted,
+            'authorDisplayName' => $comment['authorText']['simpleText'],
+            'authorProfileImageUrls' => $comment['authorThumbnail']['thumbnails'],
+            'authorChannelId' => ['value' => $comment['authorEndpoint']['browseEndpoint']['browseId']],
+            'likeCount' => intval($comment['voteCount']['simpleText']),
+            'publishedAt' => $publishedAt,
+            'wasEdited' => $wasEdited,
+            'isPinned' => array_key_exists('pinnedCommentBadge', $comment),
+            'authorIsChannelOwner' => $comment['authorIsChannelOwner'],
+            'videoCreatorHasReplied' => $commentRepliesRenderer !== null && array_key_exists('viewRepliesCreatorThumbnail', $commentRepliesRenderer),
+            // Could add the video creator thumbnails.
+            'totalReplyCount' => $replyCount !== null ? intval($replyCount) : 0,
+            'nextPageToken' => urldecode($replies['commentRepliesRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'])
+        ];
         $answerItem = [
-            'kind' => 'youtube#commentThread',
+            'kind' => 'youtube#comment' . ($isTopLevelComment ? 'Thread' : ''),
             'etag' => 'NotImplemented',
             'id' => $commentId,
-            'snippet' => [
+            'snippet' => ($isTopLevelComment ? [
                 'topLevelComment' => [
                     'kind' => 'youtube#comment',
                     'etag' => 'NotImplemented',
                     'id' => $commentId,
-                    'snippet' => [
-                        'textOriginal' => $text,
-                        'isHearted' => $isHearted,
-                        'authorDisplayName' => $comment['authorText']['simpleText'],
-                        'authorProfileImageUrls' => $comment['authorThumbnail']['thumbnails'],
-                        'authorChannelId' => ['value' => $comment['authorEndpoint']['browseEndpoint']['browseId']],
-                        'likeCount' => intval($comment['voteCount']['simpleText']),
-                        'publishedAt' => $publishedAt,
-                        'wasEdited' => $wasEdited,
-                        'isPinned' => array_key_exists('pinnedCommentBadge', $comment),
-                        'authorIsChannelOwner' => $comment['authorIsChannelOwner'],
-                        'videoCreatorHasReplied' => $commentRepliesRenderer !== null && array_key_exists('viewRepliesCreatorThumbnail', $commentRepliesRenderer),
-                        // Could add the video creator thumbnails.
-                        'nextPageToken' => urldecode($replies['commentRepliesRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'])
-                    ],
-                    'totalReplyCount' => $replyCount !== null ? intval($replyCount) : 0
+                    'snippet' => $internalSnippet
                 ]
-            ]
+            ] : $internalSnippet)
         ];
         array_push($answerItems, $answerItem);
     }
@@ -123,7 +125,7 @@ function getAPI($videoId, $order, $continuationToken, $initialResult = null)
         'etag' => 'NotImplemented',
         'pageInfo' => [
             'totalResults' => intval($result['onResponseReceivedEndpoints'][0]['reloadContinuationItemsCommand']['continuationItems'][0]['commentsHeaderRenderer']['countText']['runs'][0]['text']),
-            'resultsPerPage' => $resultsPerPage
+            'resultsPerPage' => $isTopLevelComment ? 20 : 10
         ]
     ];
     if ($nextContinuationToken != '') {
