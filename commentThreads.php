@@ -38,7 +38,7 @@ if (isset($_GET['part'], $_GET['videoId'], $_GET['order'])) {
     if (isset($_GET['pageToken'])) {
         $continuationToken = $_GET['pageToken'];
         if (!isContinuationToken($continuationToken)) {
-            die('invalid continuationToken');
+            die('invalid pageToken');
         }
     }
     echo getAPI($videoId, $order, $continuationToken);

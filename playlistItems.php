@@ -19,7 +19,7 @@ if (isset($_GET['part'], $_GET['playlistId'])) {
     if (isset($_GET['pageToken'])) {
         $continuationToken = $_GET['pageToken'];
         if (!isContinuationToken($continuationToken)) {
-            die('invalid continuationToken');
+            die('invalid pageToken');
         }
     }
     echo getAPI($playlistId, $continuationToken);

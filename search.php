@@ -73,7 +73,7 @@ if (isset($_GET['part']) &&
         $continuationToken = $_GET['pageToken'];
         // what checks to do ?
         if (!isContinuationToken($continuationToken)) {
-            die('invalid continuationToken');
+            die('invalid pageToken');
         }
     }
     echo getAPI($id, $order, $continuationToken);

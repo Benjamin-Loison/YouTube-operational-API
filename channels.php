@@ -55,7 +55,7 @@
         if (isset($_GET['pageToken'])) {
             $continuationToken = $_GET['pageToken'];
             if (($options['shorts'] && !isContinuationTokenAndVisitorData($continuationToken)) || (!$options['shorts'] && !isContinuationToken($continuationToken))) {
-                die('invalid continuationToken');
+                die('invalid pageToken');
             }
         }
         echo getAPI($id, $continuationToken);
