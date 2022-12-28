@@ -18,7 +18,7 @@
         $options[$realOption] = false;
     }
 
-    if (isset($_GET['part'], $_GET['id']) || isset($_GET['clipId']))) {
+    if (isset($_GET['part']) && (isset($_GET['id']) || isset($_GET['clipId']))) {
         $part = $_GET['part'];
         $parts = explode(',', $part, count($realOptions));
         foreach ($parts as $part) {
