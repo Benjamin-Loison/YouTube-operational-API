@@ -13,7 +13,7 @@ foreach ($realOptions as $realOption) {
     $options[$realOption] = false;
 }
 
-if (isset($_GET['part'], $_GET['videoId'])) {
+if (isset($_GET['part'], $_GET['videoId'], $_GET['order'])) {
     $part = $_GET['part'];
     $parts = explode(',', $part, count($realOptions));
     foreach ($parts as $part) {
@@ -28,6 +28,12 @@ if (isset($_GET['part'], $_GET['videoId'])) {
     if (!isVideoId($videoId)) {
         die('invalid videoId');
     }
+
+    $order = $_GET['order'];
+    if (!in_array($order, ['relevance', 'time'])) {
+        die('invalid order');
+    }
+
     $continuationToken = '';
     if (isset($_GET['pageToken'])) {
         $continuationToken = $_GET['pageToken'];
@@ -35,16 +41,14 @@ if (isset($_GET['part'], $_GET['videoId'])) {
             die('invalid continuationToken');
         }
     }
-    echo getAPI($videoId, $continuationToken);
+    echo getAPI($videoId, $order, $continuationToken);
 }
 
-function getAPI($videoId, $continuationToken)
+function getAPI($videoId, $order, $continuationToken, $initialResult = null)
 {
     $continuationTokenProvided = $continuationToken != '';
-    $result = null;
-    $nextContinuationToken = '';
     if ($continuationTokenProvided) {
-        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
         $opts = [
             "http" => [
                 "method" => "POST",
@@ -52,41 +56,38 @@ function getAPI($videoId, $continuationToken)
                 "content" => $rawData,
             ]
         ];
-        //die(getRemote('https://www.youtube.com/youtubei/v1/next?key=' . UI_KEY, $opts));
         $result = getJSON('https://www.youtube.com/youtubei/v1/next?key=' . UI_KEY, $opts);
     } else {
         $result = getJSONFromHTML('https://www.youtube.com/watch?v=' . $videoId);
-        $continuationToken = $result['contents']['twoColumnWatchNextResults']['results']['results']['contents'][2]['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
-        die($continuationToken);
-        return getAPI($videoId, $continuationToken); // for user-friendliness
+        $continuationToken = $order === 'time' ? $result['engagementPanels'][2]['engagementPanelSectionListRenderer']['header']['engagementPanelTitleHeaderRenderer']['menu']['sortFilterSubMenuRenderer']['subMenuItems'][1]['serviceEndpoint']['continuationCommand']['token'] : end($result['contents']['twoColumnWatchNextResults']['results']['results']['contents'])['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
+        return getAPI($videoId, $order, $continuationToken, $result);
     }
-    die(json_encode($result, JSON_PRETTY_PRINT));
 
     $answerItems = [];
-    $items = $result['onResponseReceivedEndpoints'][1]['reloadContinuationItemsCommand']['continuationItems'];
-    $itemsCount = count($items);
-    if ($itemsCount == 20) {
-        var_dump($result['onResponseReceivedEndpoints'][1]['reloadContinuationItemsCommand']['continuationItems'][19]);
-        $nextContinuationToken = $result['onResponseReceivedEndpoints'][1]['reloadContinuationItemsCommand']['continuationItems'][20]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
-        die($nextContinuationToken);
+    $onResponseReceivedEndpoints = $result['onResponseReceivedEndpoints'];
+    $reloadContinuationItems = $onResponseReceivedEndpoints[1]['reloadContinuationItemsCommand']['continuationItems'];
+    $appendContinuationItems = $onResponseReceivedEndpoints[0]['appendContinuationItemsAction']['continuationItems'];
+    $items = array_merge($reloadContinuationItems !== null ? $reloadContinuationItems : [], $appendContinuationItems !== null ? $appendContinuationItems : []);
+    $itemsCount = $items !== null ? count($items) : 0;
+    $resultsPerPage = 20;
+    if ($items !== [] && array_key_exists('continuationItemRenderer', end($items))) {//$itemsCount == $resultsPerPage + 1) {
+        $continuationItemRenderer = end($items)['continuationItemRenderer'];
+        $nextContinuationToken = urldecode(getValue($continuationItemRenderer, (array_key_exists('continuationEndpoint', $continuationItemRenderer) ? 'continuationEndpoint' : 'button/buttonRenderer/command') . '/continuationCommand/token'));
+        $items = array_slice($items, 0, count($items) - 1);//$resultsPerPage);
     }
-    for ($itemsIndex = 0; $itemsIndex < $itemsCount; $itemsIndex++) {
-        $item = $items[$itemsIndex];
+    foreach ($items as $item) {
         $commentThread = $item['commentThreadRenderer'];
-        $comment = $commentThread['comment']['commentRenderer'];
-        $text = '';
+        $comment = (array_key_exists('commentThreadRenderer', $item) ? $commentThread['comment'] : $item)['commentRenderer'];
         $texts = $comment['contentText']['runs'];
-        $textsCount = count($texts);
-        //var_dump($commentThread['replies']['commentRepliesRenderer']['contents'][0]);
-        //die($commentThread['replies']['commentRepliesRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
-        for ($textsIndex = 0; $textsIndex < $textsCount; $textsIndex++) {
-            $text .= $texts[$textsIndex]['text'];
-            if ($textsIndex < $textsCount - 1) {
-                $text .= "\n";
-            }
-        }
+        $replies = $commentThread['replies'];
+        $commentRepliesRenderer = $replies['commentRepliesRenderer'];
+        $text = implode(array_map(function($text) { return $text['text']; }, $texts));
         $commentId = $comment['commentId'];
         $isHearted = array_key_exists('creatorHeart', $comment['actionButtons']['commentActionButtonsRenderer']);
+        $publishedAt = $comment['publishedTimeText']['runs'][0]['text'];
+        $publishedAt = str_replace(' (edited)', '', $publishedAt, $count);
+        $wasEdited = $count > 0;
+        $replyCount = $comment['replyCount'];
         $answerItem = [
             'kind' => 'youtube#commentThread',
             'etag' => 'NotImplemented',
@@ -97,18 +98,33 @@ function getAPI($videoId, $continuationToken)
                     'etag' => 'NotImplemented',
                     'id' => $commentId,
                     'snippet' => [
-                        'textOriginal' => $text, // not exactly the same as official for â for instance (different from ')
-                        'isHearted' => $isHearted
-                    ]
+                        'textOriginal' => $text,
+                        'isHearted' => $isHearted,
+                        'authorDisplayName' => $comment['authorText']['simpleText'],
+                        'authorProfileImageUrls' => $comment['authorThumbnail']['thumbnails'],
+                        'authorChannelId' => ['value' => $comment['authorEndpoint']['browseEndpoint']['browseId']],
+                        'likeCount' => intval($comment['voteCount']['simpleText']),
+                        'publishedAt' => $publishedAt,
+                        'wasEdited' => $wasEdited,
+                        'isPinned' => array_key_exists('pinnedCommentBadge', $comment),
+                        'authorIsChannelOwner' => $comment['authorIsChannelOwner'],
+                        'videoCreatorHasReplied' => $commentRepliesRenderer !== null && array_key_exists('viewRepliesCreatorThumbnail', $commentRepliesRenderer),
+                        // Could add the video creator thumbnails.
+                        'nextPageToken' => urldecode($replies['commentRepliesRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'])
+                    ],
+                    'totalReplyCount' => $replyCount !== null ? intval($replyCount) : 0
                 ]
             ]
         ];
         array_push($answerItems, $answerItem);
     }
-    $nextContinuationToken = count($items) > 30 ? str_replace('%3D', '=', $items[30]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']) : '';
     $answer = [
         'kind' => 'youtube#commentThreadListResponse',
-        'etag' => 'NotImplemented'
+        'etag' => 'NotImplemented',
+        'pageInfo' => [
+            'totalResults' => intval($result['onResponseReceivedEndpoints'][0]['reloadContinuationItemsCommand']['continuationItems'][0]['commentsHeaderRenderer']['countText']['runs'][0]['text']),
+            'resultsPerPage' => $resultsPerPage
+        ]
     ];
     if ($nextContinuationToken != '') {
         $answer['nextPageToken'] = $nextContinuationToken;

@@ -163,7 +163,7 @@
             }
             $item['shorts'] = $shorts;
             if($reelShelfRendererItems != null && count($reelShelfRendererItems) > 48)
-                $item['nextPageToken'] = str_replace('%3D', '=', $reelShelfRendererItems[48]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ',' . $visitorData);
+                $item['nextPageToken'] = urldecode($reelShelfRendererItems[48]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ',' . $visitorData);
         }
 
         if ($options['community']) {
@@ -212,7 +212,7 @@
                 array_push($community, $post);
             }
             $item['community'] = $community;
-            $item['nextPageToken'] = str_replace('%3D', '=', end($contents)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
+            $item['nextPageToken'] = urldecode(end($contents)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
         }
 
         if ($options['channels']) {

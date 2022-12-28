@@ -106,7 +106,7 @@ function getAPI($playlistId, $continuationToken)
         ];
         array_push($answerItems, $answerItem);
     }
-    $nextContinuationToken = str_replace('%3D', '=', $items[100]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']); // it doesn't seem random but hard to reverse-engineer
+    $nextContinuationToken = urldecode($items[100]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']); // it doesn't seem random but hard to reverse-engineer
     $answer = [
         'kind' => 'youtube#playlistItemListResponse',
         'etag' => 'NotImplemented'

@@ -10,7 +10,7 @@
         $options[$realOption] = false;
     }
 
-    if (isset($_GET['part']) && isset($_GET['id']) && ($_GET['part'] != 'snippet' || isset($_GET['time']))) {
+    if (isset($_GET['part'], $_GET['id']) && ($_GET['part'] != 'snippet' || isset($_GET['time']))) {
         $part = $_GET['part'];
         $parts = explode(',', $part, count($realOptions));
         foreach ($parts as $part) {

@@ -28,7 +28,7 @@
 
     $features = [['channels/list', 'status,premieres,shorts,community,channels,about,approval&forUsername=USERNAME&id=CHANNEL_ID&handle=HANDLE'],
                  ['community/list', 'snippet&id=POST_ID'],
-                 ['commentThreads/list', 'snippet,replies&videoId=VIDEO_ID(&pageToken=PAGE_TOKEN)'],
+                 ['commentThreads/list', 'snippet,replies&videoId=VIDEO_ID&order=relevance,time(&pageToken=PAGE_TOKEN)'],
                  ['playlists/list', 'snippet,statistics&id=PLAYLIST_ID'],
                  ['playlistItems/list', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
                  ['search/list', 'id,snippet&q=QUERY&channelId=CHANNEL_ID&eventType=upcoming&hashTag=HASH_TAG&type=video&order=viewCount,relevance(&pageToken=PAGE_TOKEN)'],

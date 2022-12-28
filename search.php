@@ -175,7 +175,7 @@ function getAPI($id, $order, $continuationToken)
     if (isset($_GET['q'])) {
         $nextContinuationToken = ($continuationTokenProvided ? $json['continuationContents']['sectionListContinuation'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer'])['continuations'][0]['nextContinuationData']['continuation'];
     }
-    $nextContinuationToken = str_replace('%3D', '=', $nextContinuationToken);
+    $nextContinuationToken = urldecode($nextContinuationToken);
     $answer = [
         'kind' => 'youtube#searchListResponse',
         'etag' => 'NotImplemented'
