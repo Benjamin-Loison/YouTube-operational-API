@@ -212,7 +212,9 @@
                 array_push($community, $post);
             }
             $item['community'] = $community;
-            $item['nextPageToken'] = urldecode(end($contents)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
+            if ($contents !== null) {
+                $item['nextPageToken'] = urldecode(end($contents)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
+            }
         }
 
         if ($options['channels']) {
