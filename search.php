@@ -116,7 +116,7 @@ function getAPI($id, $order, $continuationToken)
         $items = $continuationTokenProvided ? $json['continuationContents']['sectionListContinuation']['contents'][0]['itemSectionRenderer']['contents'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'];
     } else { // should precise case to make it more readable
         $orderBase64 = 'EgZ2aWRlb3MYASAAMAE=';
-        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"' . ($continuationTokenProvided ? 'continuation":"' . $continuationToken : 'browseId":"' . $channelId . '","params":"' . $orderBase64) . '"}';
+        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"' . ($continuationTokenProvided ? 'continuation":"' . $continuationToken : 'browseId":"' . $_GET['channelId'] . '","params":"' . $orderBase64) . '"}';
         $opts = [
             "http" => [
                 "method" => "POST",
@@ -157,6 +157,7 @@ function getAPI($id, $order, $continuationToken)
         }
         if ($options['snippet']) {
             $title = $gridVideoRenderer['title']['runs'][0]['text'];
+            $channelId = $gridVideoRenderer['ownerText']['runs'][0]['navigationEndpoint']['browseEndpoint']['browseId'];
             $answerItem['snippet'] = [
                 'channelId' => $channelId,
                 'title' => $title
