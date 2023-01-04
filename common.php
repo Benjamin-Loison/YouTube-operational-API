@@ -3,6 +3,8 @@
     include_once 'compatibility.php';
     include_once 'constants.php';
 
+    ini_set('display_errors', 0);
+
     function isRedirection($url)
     {
         $ch = curl_init($url);
