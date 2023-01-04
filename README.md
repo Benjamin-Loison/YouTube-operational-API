@@ -25,7 +25,7 @@ sudo service apache2 start
 
 ### On Windows:
 
-Download and run [WampServer 3](https://sourceforge.net/projects/wampserver/files/WampServer%203/).
+Download and run [WampServer 3](https://sourceforge.net/projects/wampserver/files/latest/download).
 
 ### On MacOS:
 
