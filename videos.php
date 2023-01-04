@@ -11,7 +11,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'musics', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal']; // could load index.php from that
+    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'musics', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal', 'isRestricted']; // could load index.php from that
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -316,6 +316,20 @@
                 $isOriginal = str_contains($html, 'xtags=acont%3Doriginal');
             }
             $item['isOriginal'] = $isOriginal;
+        }
+
+        if ($options['isRestricted']) {
+            $opts = [
+                "http" => [
+                    "header" => ["cookie: PREF=f2=8000000"],
+                ]
+            ];
+            $html = getRemote('https://www.youtube.com/watch?v=' . $id, $opts);
+            $jsonStr = getJSONStringFromHTML($html, 'ytInitialPlayerResponse');
+            $json = json_decode($jsonStr, true);
+            $playabilityStatus = $json['playabilityStatus'];
+            $isRestricted = array_key_exists('isBlockedInRestrictedMode', $playabilityStatus);
+            $item['isRestricted'] = $isRestricted;
         }
 
         return $item;
