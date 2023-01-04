@@ -9,7 +9,7 @@
     $content = file_get_contents(KEYS_FILE);
     $keys = explode("\n", $content);
     $keysCount = count($keys);
-    $url = 'https://www.googleapis.com/youtube/v3/' . str_replace('/noKey/', '', $requestUri) . '&key=';
+    $url = 'https://www.googleapis.com/youtube/v3/' . end(explode('/', $requestUri)) . '&key=';
     $options = ['http' => ['ignore_errors' => true]];
     $context = stream_context_create($options);
     /// is there any way someone may get the keys out ? could restrict syntax with the one of the official API but that's not that much clean

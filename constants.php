@@ -2,7 +2,7 @@
 
     define('DOMAIN_NAME', $_SERVER['SERVER_NAME']);
     $protocol = (!empty($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on')) ? 'https' : 'http';
-    define('WEBSITE_URL', $protocol . '://' . $_SERVER['HTTP_HOST'] . '/');
+    define('WEBSITE_URL', $protocol . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     define('SUB_VERSION_STR', '.9999099');
     define('KEYS_FILE', '/var/www/ytPrivate/keys.txt');
 
