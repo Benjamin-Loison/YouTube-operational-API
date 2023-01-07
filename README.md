@@ -43,7 +43,7 @@ echo '<IfModule php_module>
   </FilesMatch>
 
   <IfModule dir_module>
-    DirectoryIndex index.html index.php
+    DirectoryIndex index.php
   </IfModule>
 </IfModule>' >> /opt/homebrew/etc/httpd/extra/httpd-php.conf
 
