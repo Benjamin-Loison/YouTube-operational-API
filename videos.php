@@ -23,7 +23,7 @@
         $parts = explode(',', $part, count($realOptions));
         foreach ($parts as $part) {
             if (!in_array($part, $realOptions)) {
-                die('invalid part ' . $part);
+                die("invalid part $part");
             } else {
                 $options[$part] = true;
             }
@@ -38,7 +38,7 @@
         }
         foreach ($realIds as $realId) {
             if ((!$isClip && !isVideoId($realId)) && !isClipId($realId)) {
-                die('invalid ' . $field);
+                die("invalid $field");
             }
         }
 
@@ -110,7 +110,7 @@
 
         if ($options['short']) {
             $short = [
-                'available' => !isRedirection('https://www.youtube.com/shorts/' . $id)
+                'available' => !isRedirection("https://www.youtube.com/shorts/$id")
             ];
             $item['short'] = $short;
         }
@@ -118,7 +118,7 @@
         if ($options['impressions']) {
             $headers = [
                 "x-origin: https://studio.youtube.com",
-                "authorization: SAPISIDHASH " . $_GET['SAPISIDHASH'],
+                "authorization: SAPISIDHASH {$_GET['SAPISIDHASH']}",
                 "Content-Type:",
                 "cookie: HSID=A4BqSu4moNA0Be1N9; SSID=AA0tycmNyGWo-Z_5v; APISID=a; SAPISID=zRbK-_14V7wIAieP/Ab_wY1sjLVrKQUM2c; SID=HwhYm6rJKOn_3R9oOrTNDJjpHIiq9Uos0F5fv4LPdMRSqyVHA1EDZwbLXo0kuUYAIN_MUQ."
             ];
@@ -145,7 +145,7 @@
             $httpOptions = [
                 'http' => $http
             ];
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $httpOptions);
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", $httpOptions);
             $musics = [];
 
             $engagementPanels = $json['engagementPanels'];
@@ -217,31 +217,31 @@
         }
 
         if ($options['id'] && isset($_GET['clipId'])) {
-            $json = getJSONFromHTML('https://www.youtube.com/clip/' . $id);
+            $json = getJSONFromHTML("https://www.youtube.com/clip/$id");
             $videoId = $json['currentVideoEndpoint']['watchEndpoint']['videoId'];
             $item['videoId'] = $videoId;
         }
 
         if ($options['isPaidPromotion']) {
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, [], 'ytInitialPlayerResponse');
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", [], 'ytInitialPlayerResponse');
             $isPaidPromotion = array_key_exists('paidContentOverlay', $json);
             $item['isPaidPromotion'] = $isPaidPromotion;
         }
 
         if ($options['isPremium']) {
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
             $isPremium = array_key_exists('offerModule', $json['contents']['twoColumnWatchNextResults']['secondaryResults']['secondaryResults']);
             $item['isPremium'] = $isPremium;
         }
 
         if ($options['isMemberOnly']) {
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, $opts);
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", $opts);
             $isMemberOnly = array_key_exists('badges', $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']);
             $item['isMemberOnly'] = $isMemberOnly;
         }
 
         if ($options['mostReplayed']) {
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
             $markerMap = end($json['playerOverlays']['playerOverlayRenderer']['decoratedPlayerBarRenderer']['decoratedPlayerBarRenderer']['playerBar']['multiMarkersPlayerBarRenderer']['markersMap']);
             $mostReplayed = $markerMap['value']['heatmap']['heatmapRenderer'];
             // What is `Dp` in `maxHeightDp` and `minHeightDp` ? If not relevant could add ['heatMarkers'] to the JSON path above.
@@ -249,7 +249,7 @@
         }
 
         if ($options['qualities']) {
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id, [], 'ytInitialPlayerResponse');
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", [], 'ytInitialPlayerResponse');
             $qualities = [];
             foreach ($json['streamingData']['adaptiveFormats'] as $quality) {
                 if (array_key_exists('qualityLabel', $quality)) {
@@ -263,13 +263,13 @@
         }
 
         if ($options['location']) {
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
             $location = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']['superTitleLink']['runs'][0]['text'];
             $item['location'] = $location;
         }
 
         if ($options['chapters']) {
-            $json = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
             $chapters = [];
             $contents = $json['engagementPanels'][1]['engagementPanelSectionListRenderer']['content']['macroMarkersListRenderer']['contents'];
             $areAutoGenerated = array_key_exists('macroMarkersInfoItemRenderer', $contents[0]);
@@ -281,10 +281,10 @@
                 $timeParts = explode(':', $timeStr);
                 $timePartsCount = count($timeParts);
                 $minutes = $timeParts[$timePartsCount - 2];
-                $timeParts[$timePartsCount - 2] = strlen($minutes) == 1 ? '0' . $minutes : $minutes;
+                $timeParts[$timePartsCount - 2] = strlen($minutes) == 1 ? "0$minutes" : $minutes;
                 $timeStr = implode(':', $timeParts);
                 for ($timePartsIndex = 0; $timePartsIndex < 4 - $timePartsCount; $timePartsIndex++) {
-                    $timeStr = '00:' . $timeStr;
+                    $timeStr = "00:$timeStr";
                 }
                 while (date_parse_from_format($format, $timeStr) === false) {
                     $format = substr($format, 2);
@@ -308,7 +308,7 @@
         }
 
         if ($options['isOriginal']) {
-            $html = getRemote('https://www.youtube.com/watch?v=' . $id);
+            $html = getRemote("https://www.youtube.com/watch?v=$id");
             $jsonStr = getJSONStringFromHTML($html);
             $json = json_decode($jsonStr, true);
             $isOriginal = doesPathExist($json, 'contents/twoColumnWatchNextResults/results/results/contents/1/videoSecondaryInfoRenderer/metadataRowContainer/metadataRowContainerRenderer/rows/2/metadataRowRenderer/contents/0/simpleText');
@@ -324,7 +324,7 @@
                     "header" => ["cookie: PREF=f2=8000000"],
                 ]
             ];
-            $html = getRemote('https://www.youtube.com/watch?v=' . $id, $opts);
+            $html = getRemote("https://www.youtube.com/watch?v=$id", $opts);
             $jsonStr = getJSONStringFromHTML($html, 'ytInitialPlayerResponse');
             $json = json_decode($jsonStr, true);
             $playabilityStatus = $json['playabilityStatus'];

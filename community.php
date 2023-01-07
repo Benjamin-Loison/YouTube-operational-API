@@ -13,7 +13,7 @@ if (isset($_GET['part'], $_GET['id'])) {
     $parts = explode(',', $part, count($realOptions));
     foreach ($parts as $part) {
         if (!in_array($part, $realOptions)) {
-            die('invalid part ' . $part);
+            die("invalid part $part");
         } else {
             $options[$part] = true;
         }
@@ -36,7 +36,7 @@ function getAPI($postId)
 		'http' => $http
 	];
 
-	$result = getJSONFromHTML('https://www.youtube.com/post/' . $postId, $options);
+	$result = getJSONFromHTML("https://www.youtube.com/post/$postId", $options);
 	$content = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0];
 	$post = getCommunityPostFromContent($content);
 

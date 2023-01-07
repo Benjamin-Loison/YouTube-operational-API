@@ -37,7 +37,7 @@ function getAPI($playlistId, $continuationToken)
         $http['header'] = 'Content-Type: application/json';
         $http['content'] = $rawData;
     } else {
-        $url = 'https://www.youtube.com/playlist?list=' . $playlistId;
+        $url = "https://www.youtube.com/playlist?list=$playlistId";
         $http['header'] = ['Cookie: CONSENT=YES+', 'Accept-Language: en'];
     }
 
@@ -90,7 +90,7 @@ function getAPI($playlistId, $continuationToken)
                 break;
             }
         }
-        $publishedAt = time() - eval('return ' . $publishedAtStr . ';');
+        $publishedAt = time() - eval("return $publishedAtStr;");
         // the time is not perfectly accurate this way
         $answerItem = [
             'kind' => 'youtube#playlistItem',

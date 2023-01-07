@@ -15,7 +15,7 @@
         $parts = explode(',', $part, count($realOptions));
         foreach ($parts as $part) {
             if (!in_array($part, $realOptions)) {
-                die('invalid part ' . $part);
+                die("invalid part $part");
             } else {
                 $options[$part] = true;
             }
@@ -43,7 +43,7 @@
     {
         global $options;
 
-        $result = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+        $result = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
         $continuation = $result['contents']['twoColumnWatchNextResults']['conversationBar']['liveChatRenderer']['continuations'][0]['reloadContinuationData']['continuation'];
         
         $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuation . '","currentPlayerState":{"playerOffsetMs":"' . $_GET['time'] . '"}}';
@@ -83,7 +83,7 @@
                 ]
             ];
 
-            $result = getJSONFromHTML('https://www.youtube.com/live_chat?continuation=' . $continuation, $opts, 'window["ytInitialData"]', '');
+            $result = getJSONFromHTML("https://www.youtube.com/live_chat?continuation=$continuation", $opts, 'window["ytInitialData"]', '');
             $participants = array_slice($result['continuationContents']['liveChatContinuation']['actions'], 1);
             $item['participants'] = $participants;
         }

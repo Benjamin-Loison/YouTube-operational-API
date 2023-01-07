@@ -55,7 +55,7 @@
 
     function getJSONFromHTMLScriptPrefix($html, $scriptPrefix)
     {
-        $html = explode(';</script>', explode('">' . $scriptPrefix, $html, 3)[1], 2)[0];
+        $html = explode(';</script>', explode("\">$scriptPrefix", $html, 3)[1], 2)[0];
         return json_decode($html, true);
     }
 
@@ -65,7 +65,7 @@
         if ($scriptVariable === '') {
             $scriptVariable = 'ytInitialData';
         }
-        return explode(';</script>', explode('">' . $prefix . $scriptVariable . ' = ', $html, 3)[1], 2)[0];
+        return explode(';</script>', explode("\">$prefix$scriptVariable = ", $html, 3)[1], 2)[0];
     }
 
     function getJSONFromHTML($url, $opts = [], $scriptVariable = '', $prefix = 'var ')
@@ -77,7 +77,7 @@
 
     function checkRegex($regex, $str)
     {
-        return preg_match('/^' . $regex . '$/', $str) === 1;
+        return preg_match("/^$regex$/", $str) === 1;
     }
 
     function isContinuationToken($continuationToken)
@@ -178,12 +178,12 @@
 
     function getIntValue($unitCount, $unit)
     {
-        $unitCount = str_replace(' ' . $unit . 's', '', $unitCount);
-        $unitCount = str_replace(' ' . $unit, '', $unitCount);
+        $unitCount = str_replace(" {$unit}s", '', $unitCount);
+        $unitCount = str_replace(" $unit", '', $unitCount);
         $unitCount = str_replace('K', '*1000', $unitCount);
         $unitCount = str_replace('M', '*1000000', $unitCount);
         if(checkRegex('[0-9.*KM]+', $unitCount)) {
-            $unitCount = eval('return ' . $unitCount . ';');
+            $unitCount = eval("return $unitCount;");
         }
         return $unitCount;
     }
@@ -211,7 +211,7 @@
                     } else {
                         $url = $navigationEndpoint['browseEndpoint']['canonicalBaseUrl'];
                     }
-                    $contentTextItem['url'] = 'https://www.youtube.com' . $url;
+                    $contentTextItem['url'] = "https://www.youtube.com$url";
                 }
             }
             array_push($contentText, $contentTextItem);

@@ -19,7 +19,7 @@
             $parts = explode(',', $part, count($realOptions));
             foreach ($parts as $part) {
                 if (!in_array($part, $realOptions)) {
-                    die('invalid part ' . $part);
+                    die("invalid part $part");
                 } else {
                     $options[$part] = true;
                 }
@@ -36,7 +36,7 @@
                     "header" => 'Cookie: CONSENT=YES+'
                 ]
             ];
-            $result = getJSONFromHTML('https://www.youtube.com/c/' . $forUsername . '/about', $opts);
+            $result = getJSONFromHTML("https://www.youtube.com/c/$forUsername/about", $opts);
             $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
         } else if (isset($_GET['id'])) {
             $id = $_GET['id'];
@@ -48,7 +48,7 @@
             if (!isHandle($handle)) {
                 die('invalid handle');
             }
-            $result = getJSONFromHTML('https://www.youtube.com/@' . $handle);
+            $result = getJSONFromHTML("https://www.youtube.com/@$handle");
             $id = $result['responseContext']['serviceTrackingParams'][0]['params'][6]['value'];
         }
         $continuationToken = '';
@@ -80,14 +80,14 @@
             $httpOptions = [
                 'http' => $http
             ];
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id, $httpOptions);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", $httpOptions);
             $status = $result['alerts'][0]['alertRenderer']['text']['simpleText'];
             $item['status'] = $status;
         }
 
         if ($options['premieres']) {
             $premieres = [];
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id");
             $subItems = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['shelfRenderer']['content']['horizontalListRenderer']['items'];
             foreach ($subItems as $subItem) {
                 $subItem = $subItem['gridVideoRenderer'];
@@ -112,7 +112,7 @@
                 $httpOptions = [
                     'http' => $http
                 ];
-                $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/shorts', $httpOptions);
+                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/shorts", $httpOptions);
                 $visitorData = $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
             } else {
                 $continuationParts = explode(',', $continuationToken);
@@ -122,7 +122,7 @@
                 $http = [
                     'header' => [
                         'Content-Type: application/json',
-                        'X-Goog-EOM-Visitor-Id: ' . $visitorData
+                        "X-Goog-EOM-Visitor-Id: $visitorData"
                     ],
                     'method' => 'POST',
                     'content' => $rawData
@@ -163,7 +163,7 @@
             }
             $item['shorts'] = $shorts;
             if($reelShelfRendererItems != null && count($reelShelfRendererItems) > 48)
-                $item['nextPageToken'] = urldecode($reelShelfRendererItems[48]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ',' . $visitorData);
+                $item['nextPageToken'] = urldecode($reelShelfRendererItems[48]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ",$visitorData");
         }
 
         if ($options['community']) {
@@ -176,7 +176,7 @@
                     'http' => $http
                 ];
 
-                $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/community', $httpOptions);
+                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/community", $httpOptions);
             } else {
                 $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
                 $http = [
@@ -226,7 +226,7 @@
                 'http' => $http
             ];
 
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/channels', $httpOptions);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id/channels", $httpOptions);
             $sectionListRenderer = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -3)[0]['tabRenderer']['content']['sectionListRenderer'];
             $channels = [];
             $channelsItems = $sectionListRenderer['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
@@ -264,7 +264,7 @@
                 'http' => $http
             ];
 
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id . '/about', $httpOptions);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id/about", $httpOptions);
 
             $resultCommon = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -2)[0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
 
@@ -313,7 +313,7 @@
                 'http' => $http
             ];
 
-            $result = getJSONFromHTML('https://www.youtube.com/channel/' . $id, $httpOptions);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", $httpOptions);
             $badgeTooltipPath = 'header/c4TabbedHeaderRenderer/badges/0/metadataBadgeRenderer/tooltip';
             $item['approval'] = doesPathExist($result, $badgeTooltipPath) ? getValue($result, $badgeTooltipPath) : '';
         }

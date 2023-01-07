@@ -9,7 +9,7 @@
         if ($name === '') {
             $name = $url;
         }
-        return '<a href="' . $url . '">' . $name . '</a>';
+        return "<a href=\"$url\">$name</a>";
     }
 
     function yt()
@@ -19,20 +19,20 @@
 
     function feature($feature)
     {
-        $suburl = $feature[0];
+        $suburl = "$feature[0]/list";
         $webpage = explode('/', $suburl, 2)[0];
         $url = $feature[1];
         $name = ucfirst(str_replace('/', ': ', $suburl));
-        echo 'Based on <a href="https://developers.google.com/youtube/v3/docs/' . $suburl . '">' . $name . '</a>: ' . url(WEBSITE_URL . $webpage . '?part=' . $url) . '<br/>';
+        echo "Based on <a href=\"https://developers.google.com/youtube/v3/docs/$suburl\">$name</a>: " . url(WEBSITE_URL . "$webpage?part=$url") . '<br/>';
     }
 
-    $features = [['channels/list', 'status,premieres,shorts,community,channels,about,approval,playlists&forUsername=USERNAME&id=CHANNEL_ID&handle=HANDLE'],
-                 ['community/list', 'snippet&id=POST_ID'],
-                 ['commentThreads/list', 'snippet,replies&videoId=VIDEO_ID&order=relevance,time(&pageToken=PAGE_TOKEN)'],
-                 ['playlists/list', 'snippet,statistics&id=PLAYLIST_ID'],
-                 ['playlistItems/list', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
-                 ['search/list', 'id,snippet&q=QUERY&channelId=CHANNEL_ID&eventType=upcoming&hashTag=HASH_TAG&type=video&order=viewCount,relevance(&pageToken=PAGE_TOKEN)'],
-                 ['videos/list', 'id,status,contentDetails,music,short,impressions,musics,isPaidPromotion,isPremium,isMemberOnly,mostReplayed,qualities,chapters,isOriginal,isRestricted&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
+    $features = [['channels', 'status,premieres,shorts,community,channels,about,approval,playlists&forUsername=USERNAME&id=CHANNEL_ID&handle=HANDLE'],
+                 ['community', 'snippet&id=POST_ID'],
+                 ['commentThreads', 'snippet,replies&videoId=VIDEO_ID&order=relevance,time(&pageToken=PAGE_TOKEN)'],
+                 ['playlists', 'snippet,statistics&id=PLAYLIST_ID'],
+                 ['playlistItems', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
+                 ['search', 'id,snippet&q=QUERY&channelId=CHANNEL_ID&eventType=upcoming&hashTag=HASH_TAG&type=video&order=viewCount,relevance(&pageToken=PAGE_TOKEN)'],
+                 ['videos', 'id,status,contentDetails,music,short,impressions,musics,isPaidPromotion,isPremium,isMemberOnly,mostReplayed,qualities,chapters,isOriginal,isRestricted&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
 
 ?>
 
@@ -46,15 +46,20 @@
     }
 
     echo '<br/>';
-    echo url(WEBSITE_URL . 'lives' . '?part=' . 'donations&id=VIDEO_ID') . '<br/>';
-    echo url(WEBSITE_URL . 'liveChats' . '?part=' . 'snippet,participants&id=VIDEO_ID&time=TIME_MS') . '<br/>';
+
+    $features = [['lives', 'donations&id=VIDEO_ID'],
+                 ['liveChats', 'snippet,participants&id=VIDEO_ID&time=TIME_MS']];
+
+    foreach ($features as $feature) {
+        echo url(WEBSITE_URL . "$feature[0]?part=$feature[1]<br/>");
+    }
 
 ?>
 
 <h2>Make <?php yt(); ?> request WITHOUT ANY KEY:</h2>
 
-To make <strong>ANY <?php yt(); ?> request WITHOUT ANY KEY/USING YOUR QUOTA</strong>, you can use: <?php $noKey = 'noKey'/*used to be yt*/; echo url(WEBSITE_URL . $noKey . '/YOUR_REQUEST'); ?><br/>
-For instance you can use: <?php $example = 'videos?part=snippet&id=VIDEO_ID'; echo url(WEBSITE_URL . $noKey . '/' . $example); ?> instead of <?php echo url('https://www.googleapis.com/youtube/v3/' . $example); ?><br/>
+To make <strong>ANY <?php yt(); ?> request WITHOUT ANY KEY/USING YOUR QUOTA</strong>, you can use: <?php $noKey = 'noKey'/*used to be yt*/; echo url(WEBSITE_URL . "$noKey/YOUR_REQUEST"); ?><br/>
+For instance you can use: <?php $example = 'videos?part=snippet&id=VIDEO_ID'; echo url(WEBSITE_URL . "$noKey/$example"); ?> instead of <?php echo url("https://www.googleapis.com/youtube/v3/$example"); ?><br/>
 I may add in the future limitation per IP etc if the quota need to be better shared among the persons using this API.<br/>
 <?php
 
@@ -96,7 +101,7 @@ If a feature you are looking for which isn't working on <?php yt(); ?>, ask kind
 
     $hash = file_get_contents('.git/refs/heads/main');
     if ($hash !== false) {
-        echo '<br/><br/>This instance uses version: <a href="https://github.com/Benjamin-Loison/YouTube-operational-API/commit/' . $hash . '">' . $hash . '</a>';
+        echo "<br/><br/>This instance uses version: <a href=\"https://github.com/Benjamin-Loison/YouTube-operational-API/commit/$hash\">$hash</a>";
     }
 
 ?>

@@ -18,7 +18,7 @@ if (isset($_GET['part'], $_GET['videoId'], $_GET['order'])) {
     $parts = explode(',', $part, count($realOptions));
     foreach ($parts as $part) {
         if (!in_array($part, $realOptions)) {
-            die('invalid part ' . $part);
+            die("invalid part $part");
         } else {
             $options[$part] = true;
         }
@@ -58,7 +58,7 @@ function getAPI($videoId, $order, $continuationToken)
         ];
         $result = getJSON('https://www.youtube.com/youtubei/v1/next?key=' . UI_KEY, $opts);
     } else {
-        $result = getJSONFromHTML('https://www.youtube.com/watch?v=' . $videoId);
+        $result = getJSONFromHTML("https://www.youtube.com/watch?v=$videoId");
         $continuationToken = ($order === 'time' ? $result['engagementPanels'][2]['engagementPanelSectionListRenderer']['header']['engagementPanelTitleHeaderRenderer']['menu']['sortFilterSubMenuRenderer']['subMenuItems'][1]['serviceEndpoint'] : end($result['contents']['twoColumnWatchNextResults']['results']['results']['contents'])['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint'])['continuationCommand']['token'];
         return getAPI($videoId, $order, $continuationToken);
     }

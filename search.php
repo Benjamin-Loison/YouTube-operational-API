@@ -23,7 +23,7 @@ if (isset($_GET['part']) &&
     $parts = explode(',', $part, count($realOptions));
     foreach ($parts as $part) {
         if (!in_array($part, $realOptions)) {
-            die('invalid part ' . $part);
+            die("invalid part $part");
         } else {
             $options[$part] = true;
         }
@@ -100,7 +100,7 @@ function getAPI($id, $order, $continuationToken)
         }
         $items = $continuationTokenProvided ? $json['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['richGridRenderer']['contents'];
     } elseif (isset($_GET['eventType'])) {
-        $json = getJSONFromHTML('https://www.youtube.com/channel/' . $_GET['channelId'] . '/videos?view=2&live_view=502');
+        $json = getJSONFromHTML("https://www.youtube.com/channel/{$_GET['channelId']}/videos?view=2&live_view=502");
         $items = $json['contents']['twoColumnBrowseResultsRenderer']['tabs']['1']['tabRenderer']['content']['sectionListRenderer']['contents']['0']['itemSectionRenderer']['contents']['0']['gridRenderer']['items'];
     } elseif (isset($_GET['q'])) {
         $typeBase64 = 'EgIQAQ==';

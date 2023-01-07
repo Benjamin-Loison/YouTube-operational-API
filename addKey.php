@@ -15,7 +15,7 @@
                         'ignore_errors' => true,
                     ]
                 ];
-                $content = getJSON('https://www.googleapis.com/youtube/v3/videos?part=snippet&id=mWdFMNQBcjs&key=' . $key, $httpOptions);
+                $content = getJSON("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=mWdFMNQBcjs&key=$key", $httpOptions);
                 if ($content['items'][0]['snippet']['title'] === 'A public video') {
                     file_put_contents(KEYS_FILE, ($keysContent === '' ? '' : "\n") . $key, FILE_APPEND);
                     echo 'YouTube Data API v3 key added.';

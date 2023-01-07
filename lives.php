@@ -15,7 +15,7 @@
         $parts = explode(',', $part, count($realOptions));
         foreach ($parts as $part) {
             if (!in_array($part, $realOptions)) {
-                die('invalid part ' . $part);
+                die("invalid part $part");
             } else {
                 $options[$part] = true;
             }
@@ -39,7 +39,7 @@
     {
         global $options;
 
-        $result = getJSONFromHTML('https://www.youtube.com/watch?v=' . $id);
+        $result = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
         $continuation = $result['contents']['twoColumnWatchNextResults']['conversationBar']['liveChatRenderer']['continuations'][0]['reloadContinuationData']['continuation'];
 
         $opts = [
@@ -47,7 +47,7 @@
                 "user_agent" => USER_AGENT,
             ]
         ];
-        $html = getJSONFromHTML('https://www.youtube.com/live_chat?continuation=' . $continuation, $opts, 'window["ytInitialData"]', '');
+        $html = getJSONFromHTML("https://www.youtube.com/live_chat?continuation=$continuation", $opts, 'window["ytInitialData"]', '');
 
         $item = [
             'kind' => 'youtube#video',

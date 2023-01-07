@@ -16,7 +16,7 @@
         $parts = explode(',', $part, count($realOptions));
         foreach ($parts as $part) {
             if (!in_array($part, $realOptions)) {
-                die('invalid part ' . $part);
+                die("invalid part $part");
             } else {
                 $options[$part] = true;
             }
@@ -43,7 +43,7 @@
                 "header" => ['Cookie: CONSENT=YES+', 'Accept-Language: en']
             ]
         ];
-        $result = getJSONFromHTML('https://www.youtube.com/playlist?list=' . $id, $opts);
+        $result = getJSONFromHTML("https://www.youtube.com/playlist?list=$id", $opts);
         if ($options['snippet']) {
             $title = $result['metadata']['playlistMetadataRenderer']['title'];
         }
