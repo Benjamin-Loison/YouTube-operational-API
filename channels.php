@@ -31,12 +31,7 @@
             if (!isUsername($forUsername)) { // what's minimal length ?
                 die('invalid forUsername');
             }
-            $opts = [
-                "http" => [
-                    "header" => 'Cookie: CONSENT=YES+'
-                ]
-            ];
-            $result = getJSONFromHTML("https://www.youtube.com/c/$forUsername/about", $opts);
+            $result = getJSONFromHTML("https://www.youtube.com/c/$forUsername/about");
             $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
         } else if (isset($_GET['id'])) {
             $id = $_GET['id'];

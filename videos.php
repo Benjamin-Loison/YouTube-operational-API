@@ -120,7 +120,7 @@
                 "x-origin: https://studio.youtube.com",
                 "authorization: SAPISIDHASH {$_GET['SAPISIDHASH']}",
                 "Content-Type:",
-                "cookie: HSID=A4BqSu4moNA0Be1N9; SSID=AA0tycmNyGWo-Z_5v; APISID=a; SAPISID=zRbK-_14V7wIAieP/Ab_wY1sjLVrKQUM2c; SID=HwhYm6rJKOn_3R9oOrTNDJjpHIiq9Uos0F5fv4LPdMRSqyVHA1EDZwbLXo0kuUYAIN_MUQ."
+                "Cookie: HSID=A4BqSu4moNA0Be1N9; SSID=AA0tycmNyGWo-Z_5v; APISID=a; SAPISID=zRbK-_14V7wIAieP/Ab_wY1sjLVrKQUM2c; SID=HwhYm6rJKOn_3R9oOrTNDJjpHIiq9Uos0F5fv4LPdMRSqyVHA1EDZwbLXo0kuUYAIN_MUQ."
             ];
             $rawData = '{"screenConfig":{"entity":{"videoId":"' . $id . '"}},"desktopState":{"tabId":"ANALYTICS_TAB_ID_REACH"}}';
             $opts = [
@@ -321,7 +321,7 @@
         if ($options['isRestricted']) {
             $opts = [
                 "http" => [
-                    "header" => ["cookie: PREF=f2=8000000"],
+                    "header" => ["Cookie: PREF=f2=8000000"],
                 ]
             ];
             $html = getRemote("https://www.youtube.com/watch?v=$id", $opts);

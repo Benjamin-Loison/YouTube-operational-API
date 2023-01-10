@@ -17,18 +17,23 @@
         return $code == 303;
     }
 
-    function getRemote($url, $opts = [])
+    function fileGetContentsFromOpts($url, $opts)
     {
         $context = stream_context_create($opts);
         $result = file_get_contents($url, false, $context);
+        return $result;
+    }
+
+    function getRemote($url, $opts = [])
+    {
+        $result = fileGetContentsFromOpts($url, $opts);
         if ($result === false) {
             $opts = [
                 'http' => [
                     'follow_location' => false
                 ]
             ];
-            $context = stream_context_create($opts);
-            $result = file_get_contents($url, false, $context);
+            $result = fileGetContentsFromOpts($url, $opts);
             if (str_contains($result, 'https://www.google.com/sorry/index?continue=')) {
                 detectedAsSendingUnusualTraffic();
             }
