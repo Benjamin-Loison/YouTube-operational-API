@@ -19,6 +19,29 @@
 
     function fileGetContentsFromOpts($url, $opts)
     {
+        if (GOOGLE_ABUSE_EXEMPTION !== '') {
+            $cookieToAdd = 'GOOGLE_ABUSE_EXEMPTION=' . GOOGLE_ABUSE_EXEMPTION;
+            if (array_key_exists('http', $opts)) {
+                $http = $opts['http'];
+                if (array_key_exists('header', $http)) {
+                    $headers = $http['header'];
+                    foreach ($headers as $headerIndex => $header) {
+                        if (str_starts_with($header, 'Cookie: ')) {
+                            $opts['http']['header'][$headerIndex] = "$header; $cookieToAdd";
+                            break;
+                        }
+                    }
+                }
+            } else {
+                $opts = [
+                    'http' => [
+                        'header' => [
+                            "Cookie: $cookieToAdd"
+                        ]
+                    ]
+                ];
+            }
+        }
         $context = stream_context_create($opts);
         $result = file_get_contents($url, false, $context);
         return $result;
