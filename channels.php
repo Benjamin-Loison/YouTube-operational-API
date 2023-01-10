@@ -275,7 +275,7 @@
             $viewCount = $resultCommon['viewCountText']['simpleText'];
             // Could try to find a YouTube channel with a single view to make sure it displays "view" and not "views".
             $viewCount = str_replace(' view', '', str_replace(' views', '', str_replace(',', '', $viewCount)));
-            $stats['viewCount'] = $viewCount;
+            $stats['viewCount'] = intval($viewCount);
 
             $about['stats'] = $stats;
 
