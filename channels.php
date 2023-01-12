@@ -5,7 +5,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['status', 'premieres', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists'];
+    $realOptions = ['status', 'upcomingEvents', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -80,8 +80,8 @@
             $item['status'] = $status;
         }
 
-        if ($options['premieres']) {
-            $premieres = [];
+        if ($options['upcomingEvents']) {
+            $upcomingEvents = [];
             $result = getJSONFromHTML("https://www.youtube.com/channel/$id");
             $subItems = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['shelfRenderer']['content']['horizontalListRenderer']['items'];
             foreach ($subItems as $subItem) {
@@ -90,10 +90,10 @@
                     foreach (['navigationEndpoint', 'menu', 'trackingParams', 'thumbnailOverlays'] as $toRemove) {
                         unset($subItem[$toRemove]);
                     }
-                    array_push($premieres, $subItem);
+                    array_push($upcomingEvents, $subItem);
                 }
             }
-            $item['premieres'] = $premieres;
+            $item['upcomingEvents'] = $upcomingEvents;
         }
 
         if ($options['shorts']) {

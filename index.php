@@ -26,7 +26,7 @@
         echo "Based on <a href=\"https://developers.google.com/youtube/v3/docs/$suburl\">$name</a>: " . url(WEBSITE_URL . "$webpage?part=$url") . '<br/>';
     }
 
-    $features = [['channels', 'status,premieres,shorts,community,channels,about,approval,playlists&forUsername=USERNAME&id=CHANNEL_ID&handle=HANDLE'],
+    $features = [['channels', 'status,upcomingEvents,shorts,community,channels,about,approval,playlists&forUsername=USERNAME&id=CHANNEL_ID&handle=HANDLE'],
                  ['community', 'snippet&id=POST_ID'],
                  ['commentThreads', 'snippet,replies&videoId=VIDEO_ID&order=relevance,time(&pageToken=PAGE_TOKEN)'],
                  ['playlists', 'snippet,statistics&id=PLAYLIST_ID'],
