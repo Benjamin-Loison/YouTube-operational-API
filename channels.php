@@ -117,6 +117,7 @@
                 $http = [
                     'header' => [
                         'Content-Type: application/json',
+                        // Isn't it always the same `$visitorData`?
                         "X-Goog-EOM-Visitor-Id: $visitorData"
                     ],
                     'method' => 'POST',
@@ -148,11 +149,28 @@
                 $reelShelfRendererItem = $reelShelfRendererItem['richItemRenderer']['content'];
                 $reelItemRenderer = $reelShelfRendererItem['reelItemRenderer'];
                 $viewCount = getIntValue($reelItemRenderer['viewCountText']['simpleText'], 'view');
+                $reelWatchEndpoint = $reelItemRenderer['navigationEndpoint']['reelWatchEndpoint'];
+                $frame0Thumbnails = $reelWatchEndpoint['thumbnail']['thumbnails'];
+                $reelPlayerHeaderRenderer = $reelWatchEndpoint['overlay']['reelPlayerOverlayRenderer']['reelPlayerHeaderSupportedRenderers']['reelPlayerHeaderRenderer'];
+                $browseEndpoint = $reelPlayerHeaderRenderer['channelNavigationEndpoint']['browseEndpoint'];
+                $durationParts = explode(' - ', $reelItemRenderer['accessibility']['accessibilityData']['label']);
+                end($durationParts);
+                // Can be `n seconds` or `1 minute` it seems.
+                $duration = prev($durationParts);
+
                 $short = [
                     'videoId' => $reelItemRenderer['videoId'],
                     'title' => $reelItemRenderer['headline']['simpleText'],
+                    // Both `sqp` and `rs` parameters are required to crop correctly the thumbnail.
                     'thumbnails' => $reelItemRenderer['thumbnail']['thumbnails'],
                     'viewCount' => $viewCount,
+                    'frame0Thumbnails' => $frame0Thumbnails,
+                    'timestamp' => $reelPlayerHeaderRenderer['timestampText']['simpleText'],
+                    'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 2),
+                    'channelId' => $browseEndpoint['browseId'],
+                    'channelTitle' => $reelPlayerHeaderRenderer['channelTitleText']['runs'][0]['text'],
+                    'channelThumbnails' => $reelPlayerHeaderRenderer['channelThumbnail']['thumbnails'],
+                    'duration' => $duration
                 ];
                 array_push($shorts, $short);
             }
