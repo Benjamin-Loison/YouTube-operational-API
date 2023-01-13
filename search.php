@@ -113,7 +113,7 @@ function getAPI($id, $order, $continuationToken)
                ]
         ];
         $json = getJSON('https://www.youtube.com/youtubei/v1/search?key=' . UI_KEY, $opts);
-        $items = $continuationTokenProvided ? $json['continuationContents']['sectionListContinuation']['contents'][0]['itemSectionRenderer']['contents'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'];
+        $items = ($continuationTokenProvided ? $json['onResponseReceivedCommands'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'])[0]['itemSectionRenderer']['contents'];
     } else { // should precise case to make it more readable
         $orderBase64 = 'EgZ2aWRlb3MYASAAMAE=';
         $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"' . ($continuationTokenProvided ? 'continuation":"' . $continuationToken : 'browseId":"' . $_GET['channelId'] . '","params":"' . $orderBase64) . '"}';
@@ -198,7 +198,7 @@ function getAPI($id, $order, $continuationToken)
         $nextContinuationToken = $nextContinuationToken['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
     }
     if (isset($_GET['q'])) {
-        $nextContinuationToken = ($continuationTokenProvided ? $json['continuationContents']['sectionListContinuation'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer'])['continuations'][0]['nextContinuationData']['continuation'];
+        $nextContinuationToken = $continuationTokenProvided ? $json['continuationContents']['sectionListContinuation'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'][1]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
     }
     $nextContinuationToken = urldecode($nextContinuationToken);
     $answer = [
