@@ -104,7 +104,7 @@ function getAPI($id, $order, $continuationToken)
         $items = $json['contents']['twoColumnBrowseResultsRenderer']['tabs']['1']['tabRenderer']['content']['sectionListRenderer']['contents']['0']['itemSectionRenderer']['contents']['0']['gridRenderer']['items'];
     } elseif (isset($_GET['q'])) {
         $typeBase64 = $order === 'relevance' ? '' : 'EgIQAQ==';
-        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}}' . ($continuationTokenProvided ? ',"continuation":"' . $continuationToken . '"' : ',"query":"' . str_replace('"', '\"', $_GET['q']) . '"' . ($typeBase64 !== '' ? ',"params":"' . $typeBase64 . '"' : '')) . '}';
+        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}}' . ($continuationTokenProvided ? ',"continuation":"' . $continuationToken . '"' : ',"query":"' . str_replace('"', '\"', $_GET['q']) . '"' . ($typeBase64 !== '' ? ',"params":"' . $typeBase64 . '"' : '')) . '}';
         $opts = [
                "http" => [
                    "method" => "POST",
@@ -155,14 +155,22 @@ function getAPI($id, $order, $continuationToken)
                 'videoId' => $videoId
             ];
         }
-		if ($options['snippet']) {
+        if ($options['snippet']) {
             $title = $gridVideoRenderer['title']['runs'][0]['text'];
             $run = $gridVideoRenderer['ownerText']['runs'][0];
             $browseEndpoint = $run['navigationEndpoint']['browseEndpoint'];
             $channelId = $browseEndpoint['browseId'];
             $views = getIntFromViewCount($gridVideoRenderer['viewCountText']['simpleText']);
             $badges = $gridVideoRenderer['badges'];
-            $badges = !empty($badges) ? array_map(fn($badge) => $badge['textBadge']['label']['simpleText'], $badges) : [];
+            $badges = !empty($badges) ? array_map(fn($badge) => $badge['metadataBadgeRenderer']['label'], $badges) : [];
+            $chapters = $gridVideoRenderer['expandableMetadata']['expandableMetadataRenderer']['expandedContent']['horizontalCardListRenderer']['cards'];
+            $chapters = !empty($chapters) ? array_map(function($chapter) {
+                $macroMarkersListItemRenderer = $chapter['macroMarkersListItemRenderer'];
+                return [
+                    'title' => $macroMarkersListItemRenderer['title']['simpleText'],
+                    'time' => getIntFromDuration($macroMarkersListItemRenderer['timeDescription']['simpleText']),
+                    'thumbnails' => $macroMarkersListItemRenderer['thumbnail']['thumbnails']
+            ]; }, $chapters) : [];
             $answerItem['snippet'] = [
                 'channelId' => $channelId,
                 'title' => $title,
@@ -173,9 +181,10 @@ function getAPI($id, $order, $continuationToken)
                 'duration' => getIntFromDuration($gridVideoRenderer['lengthText']['simpleText']),
                 'views' => $views,
                 'badges' => $badges,
-                'channelApproval' => $gridVideoRenderer['ownerBadges'][0]['verifiedBadge']['tooltip'],
-                'channelThumbnails' => $gridVideoRenderer['channelThumbnail']['thumbnails'],
-                'detailedMetadataSnippet' => $gridVideoRenderer['detailedMetadataSnippets'][0]['snippetText']['runs'][0]['text']
+                'channelApproval' => $gridVideoRenderer['ownerBadges'][0]['metadataBadgeRenderer']['tooltip'],
+                'channelThumbnails' => $gridVideoRenderer['channelThumbnailSupportedRenderers']['channelThumbnailWithLinkRenderer']['thumbnail']['thumbnails'],
+                'detailedMetadataSnippet' => $gridVideoRenderer['detailedMetadataSnippets'][0]['snippetText']['runs'][0]['text'],
+                'chapters' => $chapters
             ];
         }
         array_push($answerItems, $answerItem);
