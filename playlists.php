@@ -49,12 +49,7 @@
         }
         if ($options['statistics']) {
             $viewCount = $result['sidebar']['playlistSidebarRenderer']['items'][0]['playlistSidebarPrimaryInfoRenderer']['stats'][1]['simpleText'];
-            if ($viewCount === 'No views') {
-                $viewCount = 0;
-            } else {
-                $viewCount = str_replace(' views', '', str_replace(' view', '', str_replace(',', '', $viewCount)));
-            } // don't know if the 1 view case is useful
-            $viewCount = intval($viewCount);
+            $viewCount = getIntFromViewCount($viewCount);
         }
 
         $item = [

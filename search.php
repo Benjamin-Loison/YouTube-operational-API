@@ -103,8 +103,8 @@ function getAPI($id, $order, $continuationToken)
         $json = getJSONFromHTML("https://www.youtube.com/channel/{$_GET['channelId']}/videos?view=2&live_view=502");
         $items = $json['contents']['twoColumnBrowseResultsRenderer']['tabs']['1']['tabRenderer']['content']['sectionListRenderer']['contents']['0']['itemSectionRenderer']['contents']['0']['gridRenderer']['items'];
     } elseif (isset($_GET['q'])) {
-        $typeBase64 = 'EgIQAQ==';
-        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}}' . ($continuationTokenProvided ? ',"continuation":"' . $continuationToken . '"' : ',"query":"' . $_GET['q'] . '"' . ($typeBase64 !== '' ? ',"params":"' . $typeBase64 . '"' : '')) . '}';
+        $typeBase64 = $order === 'relevance' ? '' : 'EgIQAQ==';
+        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}}' . ($continuationTokenProvided ? ',"continuation":"' . $continuationToken . '"' : ',"query":"' . str_replace('"', '\"', $_GET['q']) . '"' . ($typeBase64 !== '' ? ',"params":"' . $typeBase64 . '"' : '')) . '}';
         $opts = [
                "http" => [
                    "method" => "POST",
@@ -128,7 +128,7 @@ function getAPI($id, $order, $continuationToken)
         $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $opts);
         // repeated on official API but not in UI requests
         //if(!$continuationTokenProvided)
-        //	$regionCode = $result['topbar']['desktopTopbarRenderer']['countryCode'];
+        //     $regionCode = $result['topbar']['desktopTopbarRenderer']['countryCode'];
         $items = $continuationTokenProvided ? $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'] : $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][1]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
     }
     $answerItems = [];
@@ -155,12 +155,27 @@ function getAPI($id, $order, $continuationToken)
                 'videoId' => $videoId
             ];
         }
-        if ($options['snippet']) {
+		if ($options['snippet']) {
             $title = $gridVideoRenderer['title']['runs'][0]['text'];
-            $channelId = $gridVideoRenderer['ownerText']['runs'][0]['navigationEndpoint']['browseEndpoint']['browseId'];
+            $run = $gridVideoRenderer['ownerText']['runs'][0];
+            $browseEndpoint = $run['navigationEndpoint']['browseEndpoint'];
+            $channelId = $browseEndpoint['browseId'];
+            $views = getIntFromViewCount($gridVideoRenderer['viewCountText']['simpleText']);
+            $badges = $gridVideoRenderer['badges'];
+            $badges = !empty($badges) ? array_map(fn($badge) => $badge['textBadge']['label']['simpleText'], $badges) : [];
             $answerItem['snippet'] = [
                 'channelId' => $channelId,
-                'title' => $title
+                'title' => $title,
+                'thumbnails' => $gridVideoRenderer['thumbnail']['thumbnails'],
+                'channelTitle' => $run['text'],
+                'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 2),
+                'timestamp' => $gridVideoRenderer['publishedTimeText']['simpleText'],
+                'duration' => getIntFromDuration($gridVideoRenderer['lengthText']['simpleText']),
+                'views' => $views,
+                'badges' => $badges,
+                'channelApproval' => $gridVideoRenderer['ownerBadges'][0]['verifiedBadge']['tooltip'],
+                'channelThumbnails' => $gridVideoRenderer['channelThumbnail']['thumbnails'],
+                'detailedMetadataSnippet' => $gridVideoRenderer['detailedMetadataSnippets'][0]['snippetText']['runs'][0]['text']
             ];
         }
         array_push($answerItems, $answerItem);
@@ -187,7 +202,7 @@ function getAPI($id, $order, $continuationToken)
         $answer['nextPageToken'] = $nextContinuationToken;
     }
     //if(!$continuationTokenProvided) // doesn't seem accurate
-    //	$answer['regionCode'] = $regionCode;
+    //  $answer['regionCode'] = $regionCode;
     $answer['items'] = $answerItems;
 
     return json_encode($answer, JSON_PRETTY_PRINT);

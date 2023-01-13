@@ -291,4 +291,39 @@
         return $post;
     }
 
+    function getIntFromViewCount($viewCount)
+    {
+        if ($viewCount === 'No views') {
+            $viewCount = 0;
+        } else {
+            foreach([',', ' views', 'view'] as $toRemove) {
+                $viewCount = str_replace($toRemove, '', $viewCount);
+            }
+        } // don't know if the 1 view case is useful
+        $viewCount = intval($viewCount);
+        return $viewCount;
+    }
+
+    function getIntFromDuration($timeStr)
+    {
+        $format = 'j:H:i:s';
+        $timeParts = explode(':', $timeStr);
+        $timePartsCount = count($timeParts);
+        $minutes = $timeParts[$timePartsCount - 2];
+        $timeParts[$timePartsCount - 2] = strlen($minutes) == 1 ? "0$minutes" : $minutes;
+        $timeStr = implode(':', $timeParts);
+        for ($timePartsIndex = 0; $timePartsIndex < 4 - $timePartsCount; $timePartsIndex++) {
+            $timeStr = "00:$timeStr";
+        }
+        while (date_parse_from_format($format, $timeStr) === false) {
+            $format = substr($format, 2);
+        }
+        $timeComponents = date_parse_from_format($format, $timeStr);
+        $timeInt = $timeComponents['day'] * (3600 * 24) +
+                   $timeComponents['hour'] * 3600 +
+                   $timeComponents['minute'] * 60 +
+                   $timeComponents['second'];
+        return $timeInt;
+    }
+
 ?>
