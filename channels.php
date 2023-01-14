@@ -345,16 +345,22 @@
 
                 $tabs = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
                 $path = 'tabRenderer/content/sectionListRenderer/contents';
-                foreach (array_slice($tabs, 1, 3) as $tab) {
+                foreach (array_slice($tabs, 1, 4) as $tab) {
                     if (doesPathExist($tab, $path)) {
-                        $content = end(getValue($tab, $path))['itemSectionRenderer']['contents'][0];
-                        if (array_key_exists('shelfRenderer', $content)) {
-                            $content = $content['shelfRenderer']['content'];
-                            $content = array_key_exists('horizontalListRenderer', $content) ? $content['horizontalListRenderer'] : $content['expandedShelfContentsRenderer'];
-                        } else {
-                            $content = $content['gridRenderer'];
+                        $contents = array_map(fn($content) => $content['itemSectionRenderer']['contents'][0], getValue($tab, $path));
+                        $itemsArray = [];
+                        foreach($contents as $content)
+                        {
+                            if (array_key_exists('shelfRenderer', $content)) {
+                                $sectionTitle = $content['shelfRenderer']['title']['runs'][0]['text'];
+                                $content = $content['shelfRenderer']['content'];
+                                $content = array_key_exists('horizontalListRenderer', $content) ? $content['horizontalListRenderer'] : $content['expandedShelfContentsRenderer'];
+                            } else {
+                                $content = $content['gridRenderer'];
+                            }
+                            //$items = $content['items'];
+                            array_push($itemsArray, [$sectionTitle, $content['items']]);
                         }
-                        $items = $content['items'];
                     }
                 }
             } else {
@@ -372,66 +378,91 @@
                 ];
 
                 $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
-                $items = $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+                $itemsArray = [[null, $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems']]];
             }
 
-            function getVideoFromItsThumbnails($videoThumbnails) {
+            function getVideoFromItsThumbnails($videoThumbnails, $isVideo = true) {
                 $videoThumbnails = $videoThumbnails['thumbnails'];
-                $videoThumbnails[0]['url'] = explode('?', $videoThumbnails[0]['url'])[0];
-                $videoId = substr($videoThumbnails[0]['url'], 23, 11);
+                // Maybe we can simplify URLs, as we used to as follows, but keep in mind that the resolution or the access may then become incorrect for both kind of thumbnails.
+                //$videoThumbnails[0]['url'] = explode('?', $videoThumbnails[0]['url'])[0];
+                $videoId = $isVideo ? substr($videoThumbnails[0]['url'], 23, 11) : null;
                 return [
                     'id' => $videoId,
                     'thumbnails' => $videoThumbnails
                 ];
             }
 
-            // Note that empty playlists aren't listed at all.
-            $savedPlaylists = [];
             // Note that if there is a `Created playlist`, then there isn't any pagination mechanism on YouTube UI.
+            // This comment was assuming that they were only `Created playlists` and `Saved playlists`, which isn't the case.
             $MAXIMAL_ITEMS_COUNT = 30;
-            if (count($items) > $MAXIMAL_ITEMS_COUNT) {
-                $nextPageToken = end($items)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
-                $items = array_slice($items, 0, $MAXIMAL_ITEMS_COUNT);
-            }
-            foreach($items as $savedPlaylistItem) {
-                $playlistRenderer = array_key_exists('gridPlaylistRenderer', $savedPlaylistItem) ? $savedPlaylistItem['gridPlaylistRenderer'] : $savedPlaylistItem['playlistRenderer'];
-                $shortBylineRun = $playlistRenderer['shortBylineText']['runs'][0];
-                $shortBylineNavigationEndpoint = $shortBylineRun['navigationEndpoint'];
 
-                $thumbnailVideo = getVideoFromItsThumbnails($playlistRenderer['thumbnailRenderer']['playlistVideoThumbnailRenderer']['thumbnail']);
+            $c4TabbedHeaderRenderer = $result['header']['c4TabbedHeaderRenderer'];
+            $authorChannelName = $c4TabbedHeaderRenderer['title'];
+            $authorChannelHandle = substr($c4TabbedHeaderRenderer['channelHandleText']['runs'][0]['text'], 1);
+            $authorChannelApproval = $c4TabbedHeaderRenderer['badges'][0]['metadataBadgeRenderer']['tooltip'];
 
-                $firstVideos = array_key_exists('thumbnail', $playlistRenderer) ? [getVideoFromItsThumbnails($playlistRenderer['thumbnail'])] : array_map(fn($videoThumbnails) => getVideoFromItsThumbnails($videoThumbnails), $playlistRenderer['thumbnails']);
+            $playlistSections = [];
+            foreach($itemsArray as [$sectionTitle, $items]) {
+                // Note that empty playlists aren't listed at all.
+                $sectionPlaylists = [];
+                if (count($items) > $MAXIMAL_ITEMS_COUNT) {
+                    $nextPageToken = end($items)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
+                    $items = array_slice($items, 0, $MAXIMAL_ITEMS_COUNT);
+                }
+                $isCreatedPlaylists = $sectionTitle === 'Created playlists';
+                foreach($items as $sectionPlaylistItem) {
+                    $playlistRenderer = array_key_exists('gridPlaylistRenderer', $sectionPlaylistItem) ? $sectionPlaylistItem['gridPlaylistRenderer'] : $sectionPlaylistItem['playlistRenderer'];
+                    $runs = $playlistRenderer['shortBylineText']['runs'];
+                    if ($isCreatedPlaylists) {
+                        $runs = [null];
+                    }
+                    $authors = !empty($runs) ? array_values(array_filter(array_map(function($shortBylineRun) use ($isCreatedPlaylists, $authorChannelName, $authorChannelHandle, $id, $authorChannelApproval) {
+                        $shortBylineNavigationEndpoint = $shortBylineRun['navigationEndpoint'];
+                        $channelHandle = $shortBylineNavigationEndpoint['commandMetadata']['webCommandMetadata']['url'];
+                        return [
+                            // The following fields `channel*` are `null` without additional code for the `Created playlists` section if there are multiple videos in this section.
+                            'channelName' => $isCreatedPlaylists ? $authorChannelName : $shortBylineRun['text'],
+                            'channelHandle' => $isCreatedPlaylists ? $authorChannelHandle : (str_starts_with($channelHandle, "/@") ? substr($channelHandle, 2) : null),
+                            'channelId' => $isCreatedPlaylists ? $id : $shortBylineNavigationEndpoint['browseEndpoint']['browseId'],
+                            'channelApproval' => $isCreatedPlaylists ? $authorChannelApproval : $playlistRenderer['ownerBadges'][0]['metadataBadgeRenderer']['tooltip'],
+                        ];
+                    }, $runs), fn($author) => $author['channelName'] !== ', ')) : [];
 
-                $sidebarThumbnails = $playlistRenderer['sidebarThumbnails'];
-                $secondToFourthVideo = $sidebarThumbnails !== null ? array_map(fn($videoThumbnails) => getVideoFromItsThumbnails($videoThumbnails), $sidebarThumbnails) : [];
+                    $thumbnailRenderer = $playlistRenderer['thumbnailRenderer'];
+                    // For unknown reasons, the playlist `OLAK5uy_ku1ocdOmuBzWb3XrtrAQglseslpye5eIw` has achieved to have a custom thumbnail according to YouTube UI source code.
+                    // The playlist `Playlist with a thumbnail different than the first video one` on https://www.youtube.com/@anothertestagain5569/playlists isn't detected as using a custom thumbnail.
+                    $isThumbnailAVideo = array_key_exists('playlistVideoThumbnailRenderer', $thumbnailRenderer);
+                    $thumbnailVideo = getVideoFromItsThumbnails(($thumbnailRenderer['playlist' . ($isThumbnailAVideo ? 'Video' : 'Custom') . 'ThumbnailRenderer'])['thumbnail'], $isThumbnailAVideo);
 
-                $firstVideos = array_merge($firstVideos, $secondToFourthVideo);
+                    $firstVideos = array_key_exists('thumbnail', $playlistRenderer) ? [getVideoFromItsThumbnails($playlistRenderer['thumbnail'])] : array_map(fn($videoThumbnails) => getVideoFromItsThumbnails($videoThumbnails), $playlistRenderer['thumbnails']);
 
-                $title = $playlistRenderer['title'];
+                    $sidebarThumbnails = $playlistRenderer['sidebarThumbnails'];
+                    $secondToFourthVideo = $sidebarThumbnails !== null ? array_map(fn($videoThumbnails) => getVideoFromItsThumbnails($videoThumbnails), $sidebarThumbnails) : [];
 
-                $savedPlaylist = [
-                    'id' => $playlistRenderer['playlistId'],
-                    'thumbnailVideo' => $thumbnailVideo,
-                    'firstVideos' => $firstVideos,
-                    'title' => array_key_exists('runs', $title) ? $title['runs'][0]['text'] : $title['simpleText'],
-                    'videoCount' => intval($playlistRenderer['videoCountText']['runs'][0]['text']),
-                    'authorChannelName' => $shortBylineRun['text'],
-                    'authorChannelHandle' => substr($shortBylineNavigationEndpoint['commandMetadata']['webCommandMetadata']['url'], 2),
-                    'authorChannelId' => $shortBylineNavigationEndpoint['browseEndpoint']['browseId'],
-                    'authorChannelApproval' => $playlistRenderer['ownerBadges'][0]['metadataBadgeRenderer']['tooltip'],
-                    // Does it always start with `Updated `?
-                    'publishedTimeText' => $playlistRenderer['publishedTimeText']['simpleText']
-                ];
-                array_push($savedPlaylists, $savedPlaylist);
-            }
-            $playlists = [
-                'createdPlaylists' => null,
-                'savedPlaylists' => [
-                    'savedPlaylists' => $savedPlaylists,
+                    $firstVideos = array_merge($firstVideos, $secondToFourthVideo);
+
+                    $title = $playlistRenderer['title'];
+
+                    $sectionPlaylist = [
+                        'id' => $playlistRenderer['playlistId'],
+                        'thumbnailVideo' => $thumbnailVideo,
+                        'firstVideos' => $firstVideos,
+                        'title' => array_key_exists('runs', $title) ? $title['runs'][0]['text'] : $title['simpleText'],
+                        'videoCount' => intval($playlistRenderer['videoCountText']['runs'][0]['text']),
+                        'authors' => $authors,
+                        // Does it always start with `Updated `?
+                        // Note that for channels we don't have this field.
+                        'publishedTimeText' => $playlistRenderer['publishedTimeText']['simpleText']
+                    ];
+                    array_push($sectionPlaylists, $sectionPlaylist);
+                }
+                array_push($playlistSections, [
+                    'title' => $sectionTitle,
+                    'playlists' => $sectionPlaylists,
                     'nextPageToken' => $nextPageToken
-                ]
-            ];
-            $item['playlists'] = $playlists;
+                ]);
+            }
+            $item['playlistSections'] = $playlistSections;
         }
 
         return $item;
