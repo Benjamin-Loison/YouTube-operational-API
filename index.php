@@ -51,7 +51,7 @@
                  ['liveChats', 'snippet,participants&id=VIDEO_ID&time=TIME_MS']];
 
     foreach ($features as $feature) {
-        echo url(WEBSITE_URL . "$feature[0]?part=$feature[1]<br/>");
+        echo url(WEBSITE_URL . "$feature[0]?part=$feature[1]") . "<br/>";
     }
 
 ?>
