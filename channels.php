@@ -370,10 +370,11 @@
                 $result = getJSONFromHTML("https://www.youtube.com/channel/$id/playlists", $httpOptions);
 
                 $tabs = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
-                $path = 'tabRenderer/content/sectionListRenderer/contents';
+                $path = 'tabRenderer/content/sectionListRenderer';
                 foreach (array_slice($tabs, 1, 4) as $tab) {
                     if (doesPathExist($tab, $path)) {
-                        $contents = array_map(fn($content) => $content['itemSectionRenderer']['contents'][0], getValue($tab, $path));
+                        $sectionListRenderer = getValue($tab, $path);
+                        $contents = array_map(fn($content) => $content['itemSectionRenderer']['contents'][0], $sectionListRenderer['contents']);
                         $itemsArray = [];
                         foreach($contents as $content)
                         {
@@ -382,9 +383,9 @@
                                 $content = $content['shelfRenderer']['content'];
                                 $content = array_key_exists('horizontalListRenderer', $content) ? $content['horizontalListRenderer'] : $content['expandedShelfContentsRenderer'];
                             } else {
+                                $sectionTitle = $sectionListRenderer['subMenu']['channelSubMenuRenderer']['contentTypeSubMenuItems'][0]['title'];
                                 $content = $content['gridRenderer'];
                             }
-                            //$items = $content['items'];
                             array_push($itemsArray, [$sectionTitle, $content['items']]);
                         }
                     }
