@@ -231,18 +231,42 @@
         }
 
         if ($options['channels']) {
-            $http = [
-                'header' => ['Accept-Language: en']
-            ];
+            if (!$continuationTokenProvided) {
+                $http = [
+                    'header' => ['Accept-Language: en']
+                ];
 
-            $httpOptions = [
-                'http' => $http
-            ];
+                $httpOptions = [
+                    'http' => $http
+                ];
 
-            $result = getJSONFromHTML("https://www.youtube.com/channel/$id/channels", $httpOptions);
-            $sectionListRenderer = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -3)[0]['tabRenderer']['content']['sectionListRenderer'];
+                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/channels", $httpOptions);
+                $sectionListRenderer = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -3)[0]['tabRenderer']['content']['sectionListRenderer'];
+                $channelsItems = $sectionListRenderer['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
+            } else {
+                $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+                $http = [
+                    'header' => [
+                        'Content-Type: application/json'
+                    ],
+                    'method' => 'POST',
+                    'content' => $rawData
+                ];
+
+                $httpOptions = [
+                    'http' => $http
+                ];
+
+                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
+                $channelsItems = $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+            }
+            $MAXIMUM_CHANNELS_ITEMS = $continuationTokenProvided ? 30 : 12;
             $channels = [];
-            $channelsItems = $sectionListRenderer['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
+            $nextPageToken = null;
+            if (!empty($channelsItems) && count($channelsItems) > $MAXIMUM_CHANNELS_ITEMS) {
+                $nextPageToken = urldecode(end($channelsItems)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
+                $channelsItems = array_slice($channelsItems, 0, $MAXIMUM_CHANNELS_ITEMS);
+            }
             foreach($channelsItems as $channelItem) {
                 $gridChannelRenderer = $channelItem['gridChannelRenderer'];
                 $thumbnails = [];
@@ -262,6 +286,7 @@
                 array_push($channels, $channel);
             }
             $channels = [
+                'nextPageToken' => $nextPageToken,
                 'paratext' => $sectionListRenderer['subMenu']['channelSubMenuRenderer']['contentTypeSubMenuItems'][0]['title'],
                 'channels' => $channels
             ];
