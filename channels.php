@@ -260,12 +260,13 @@
                 $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
                 $channelsItems = $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
             }
-            $MAXIMUM_CHANNELS_ITEMS = $continuationTokenProvided ? 30 : 12;
             $channels = [];
             $nextPageToken = null;
-            if (!empty($channelsItems) && count($channelsItems) > $MAXIMUM_CHANNELS_ITEMS) {
-                $nextPageToken = urldecode(end($channelsItems)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
-                $channelsItems = array_slice($channelsItems, 0, $MAXIMUM_CHANNELS_ITEMS);
+            $lastChannelItem = !empty($channelsItems) ? end($channelsItems) : [];
+            $path = 'continuationItemRenderer/continuationEndpoint/continuationCommand/token';
+            if (doesPathExist($lastChannelItem, $path)) {
+                $nextPageToken = urldecode(getValue($lastChannelItem, $path));
+                $channelsItems = array_slice($channelsItems, 0, count($channelsItems) - 1);
             }
             foreach($channelsItems as $channelItem) {
                 $gridChannelRenderer = $channelItem['gridChannelRenderer'];
