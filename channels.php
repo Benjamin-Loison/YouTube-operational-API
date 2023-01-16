@@ -241,8 +241,22 @@
                 ];
 
                 $result = getJSONFromHTML("https://www.youtube.com/channel/$id/channels", $httpOptions);
+
                 $sectionListRenderer = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -3)[0]['tabRenderer']['content']['sectionListRenderer'];
-                $channelsItems = $sectionListRenderer['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
+                $contents = array_map(fn($content) => $content['itemSectionRenderer']['contents'][0], $sectionListRenderer['contents']);
+                $itemsArray = [];
+                foreach($contents as $content)
+                {
+                    if (array_key_exists('shelfRenderer', $content)) {
+                        $sectionTitle = $content['shelfRenderer']['title']['runs'][0]['text'];
+                        $content = $content['shelfRenderer']['content'];
+                        $content = array_key_exists('horizontalListRenderer', $content) ? $content['horizontalListRenderer'] : $content['expandedShelfContentsRenderer'];
+                    } else {
+                        $sectionTitle = $sectionListRenderer['subMenu']['channelSubMenuRenderer']['contentTypeSubMenuItems'][0]['title'];
+                        $content = $content['gridRenderer'];
+                    }
+                    array_push($itemsArray, [$sectionTitle, $content['items']]);
+                }
             } else {
                 $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
                 $http = [
@@ -258,40 +272,43 @@
                 ];
 
                 $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
-                $channelsItems = $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+                $itemsArray = [[null, $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems']]];
             }
-            $channels = [];
-            $nextPageToken = null;
-            $lastChannelItem = !empty($channelsItems) ? end($channelsItems) : [];
-            $path = 'continuationItemRenderer/continuationEndpoint/continuationCommand/token';
-            if (doesPathExist($lastChannelItem, $path)) {
-                $nextPageToken = urldecode(getValue($lastChannelItem, $path));
-                $channelsItems = array_slice($channelsItems, 0, count($channelsItems) - 1);
-            }
-            foreach($channelsItems as $channelItem) {
-                $gridChannelRenderer = $channelItem['gridChannelRenderer'];
-                $thumbnails = [];
-                foreach($gridChannelRenderer['thumbnail']['thumbnails'] as $thumbnail) {
-                    $thumbnail['url'] = 'https://' . substr($thumbnail['url'], 2);
-                    array_push($thumbnails, $thumbnail);
+            $channelSections = [];
+            foreach($itemsArray as [$sectionTitle, $items]) {
+                $sectionChannels = [];
+                $nextPageToken = null;
+                $lastChannelItem = !empty($items) ? end($items) : [];
+                $path = 'continuationItemRenderer/continuationEndpoint/continuationCommand/token';
+                if (doesPathExist($lastChannelItem, $path)) {
+                    $nextPageToken = urldecode(getValue($lastChannelItem, $path));
+                    $items = array_slice($items, 0, count($items) - 1);
                 }
-                $subscriberCount = getIntValue($gridChannelRenderer['subscriberCountText']['simpleText'], 'subscriber');
-                // Have observed the singular case for the channel: https://www.youtube.com/channel/UCbOoDorgVGd-4vZdIrU4C1A
-                $channel = [
-                    'channelId' => $gridChannelRenderer['channelId'],
-                    'title' => $gridChannelRenderer['title']['simpleText'],
-                    'thumbnails' => $thumbnails,
-                    'videoCount' => intval(str_replace(',', '', $gridChannelRenderer['videoCountText']['runs'][0]['text'])),
-                    'subscriberCount' => $subscriberCount
-                ];
-                array_push($channels, $channel);
+                foreach($items as $sectionChannelItem) {
+                    $gridChannelRenderer = $sectionChannelItem[array_key_exists('gridChannelRenderer', $sectionChannelItem) ? 'gridChannelRenderer' : 'channelRenderer'];
+                    $thumbnails = [];
+                    foreach($gridChannelRenderer['thumbnail']['thumbnails'] as $thumbnail) {
+                        $thumbnail['url'] = 'https://' . substr($thumbnail['url'], 2);
+                        array_push($thumbnails, $thumbnail);
+                    }
+                    $subscriberCount = getIntValue($gridChannelRenderer['subscriberCountText']['simpleText'], 'subscriber');
+                    // Have observed the singular case for the channel: https://www.youtube.com/channel/UCbOoDorgVGd-4vZdIrU4C1A
+                    $channel = [
+                        'channelId' => $gridChannelRenderer['channelId'],
+                        'title' => $gridChannelRenderer['title']['simpleText'],
+                        'thumbnails' => $thumbnails,
+                        'videoCount' => intval(str_replace(',', '', $gridChannelRenderer['videoCountText']['runs'][0]['text'])),
+                        'subscriberCount' => $subscriberCount
+                    ];
+                    array_push($sectionChannels, $channel);
+                }
+                array_push($channelSections, [
+                    'title' => $sectionTitle,
+                    'sectionChannels' => $sectionChannels,
+                    'nextPageToken' => $nextPageToken
+                ]);
             }
-            $channels = [
-                'nextPageToken' => $nextPageToken,
-                'paratext' => $sectionListRenderer['subMenu']['channelSubMenuRenderer']['contentTypeSubMenuItems'][0]['title'],
-                'channels' => $channels
-            ];
-            $item['channels'] = $channels;
+            $item['channelSections'] = $channelSections;
         }
 
         if ($options['about']) {
