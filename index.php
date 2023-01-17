@@ -27,7 +27,6 @@
     }
 
     $features = [['channels', 'status,upcomingEvents,shorts,community,channels,about,approval,playlists&forUsername=USERNAME&id=CHANNEL_ID&handle=HANDLE'],
-                 ['community', 'snippet&id=POST_ID'],
                  ['commentThreads', 'snippet,replies&videoId=VIDEO_ID&order=relevance,time(&pageToken=PAGE_TOKEN)'],
                  ['playlists', 'snippet,statistics&id=PLAYLIST_ID'],
                  ['playlistItems', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
@@ -47,7 +46,8 @@
 
     echo '<br/>';
 
-    $features = [['lives', 'donations&id=VIDEO_ID'],
+    $features = [['community', 'snippet&id=POST_ID'],
+                 ['lives', 'donations&id=VIDEO_ID'],
                  ['liveChats', 'snippet,participants&id=VIDEO_ID&time=TIME_MS']];
 
     foreach ($features as $feature) {
