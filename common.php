@@ -181,7 +181,7 @@
         return getValue($json[$parts[0]], join('/', array_slice($parts, 1, $partsCount - 1)));
     }
 
-    function getIntValue($unitCount, $unit)
+    function getIntValue($unitCount, $unit = '')
     {
         $unitCount = str_replace(" {$unit}s", '', $unitCount);
         $unitCount = str_replace(" $unit", '', $unitCount);

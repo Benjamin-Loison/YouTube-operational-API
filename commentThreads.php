@@ -68,7 +68,6 @@ function getAPI($videoId, $order, $continuationToken)
     $reloadContinuationItems = $onResponseReceivedEndpoints[1]['reloadContinuationItemsCommand']['continuationItems'];
     $appendContinuationItems = $onResponseReceivedEndpoints[0]['appendContinuationItemsAction']['continuationItems'];
     $items = array_merge($reloadContinuationItems !== null ? $reloadContinuationItems : [], $appendContinuationItems !== null ? $appendContinuationItems : []);
-    $itemsCount = $items !== null ? count($items) : 0;
     if ($items !== [] && array_key_exists('continuationItemRenderer', end($items))) {
         $continuationItemRenderer = end($items)['continuationItemRenderer'];
         $nextContinuationToken = urldecode(getValue($continuationItemRenderer, (array_key_exists('continuationEndpoint', $continuationItemRenderer) ? 'continuationEndpoint' : 'button/buttonRenderer/command') . '/continuationCommand/token'));
@@ -93,9 +92,10 @@ function getAPI($videoId, $order, $continuationToken)
             'textOriginal' => $text,
             'isHearted' => $isHearted,
             'authorDisplayName' => $comment['authorText']['simpleText'],
+            'authorHandle' => $comment['authorText']['simpleText'],
             'authorProfileImageUrls' => $comment['authorThumbnail']['thumbnails'],
             'authorChannelId' => ['value' => $comment['authorEndpoint']['browseEndpoint']['browseId']],
-            'likeCount' => intval($comment['voteCount']['simpleText']),
+            'likeCount' => getIntValue($comment['voteCount']['simpleText']),
             'publishedAt' => $publishedAt,
             'wasEdited' => $wasEdited,
             'isPinned' => array_key_exists('pinnedCommentBadge', $comment),
