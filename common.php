@@ -175,7 +175,7 @@
 
     function isHandle($handle)
     {
-        return checkRegex('[a-zA-Z0-9-_.]{3,}', $handle);
+        return checkRegex('@[a-zA-Z0-9-_.]{3,}', $handle);
     }
 
     function isPostId($postId)

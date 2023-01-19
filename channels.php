@@ -43,7 +43,7 @@
             if (!isHandle($handle)) {
                 die('invalid handle');
             }
-            $result = getJSONFromHTML("https://www.youtube.com/@$handle");
+            $result = getJSONFromHTML("https://www.youtube.com/$handle");
             $id = $result['responseContext']['serviceTrackingParams'][0]['params'][6]['value'];
         }
         $continuationToken = '';
@@ -166,7 +166,7 @@
                     'viewCount' => $viewCount,
                     'frame0Thumbnails' => $frame0Thumbnails,
                     'timestamp' => $reelPlayerHeaderRenderer['timestampText']['simpleText'],
-                    'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 2),
+                    'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 1),
                     'channelId' => $browseEndpoint['browseId'],
                     'channelTitle' => $reelPlayerHeaderRenderer['channelTitleText']['runs'][0]['text'],
                     'channelThumbnails' => $reelPlayerHeaderRenderer['channelThumbnail']['thumbnails'],
@@ -356,7 +356,7 @@
                 array_push($links, $link);
             }
             $about['links'] = $links;
-            $about['handle'] = substr($result['header']['c4TabbedHeaderRenderer']['channelHandleText']['runs'][0]['text'], 1);
+            $about['handle'] = $result['header']['c4TabbedHeaderRenderer']['channelHandleText']['runs'][0]['text'];
 
             $item['about'] = $about;
         }
@@ -443,7 +443,7 @@
 
             $c4TabbedHeaderRenderer = $result['header']['c4TabbedHeaderRenderer'];
             $authorChannelName = $c4TabbedHeaderRenderer['title'];
-            $authorChannelHandle = substr($c4TabbedHeaderRenderer['channelHandleText']['runs'][0]['text'], 1);
+            $authorChannelHandle = $c4TabbedHeaderRenderer['channelHandleText']['runs'][0]['text'];
             $authorChannelApproval = $c4TabbedHeaderRenderer['badges'][0]['metadataBadgeRenderer']['tooltip'];
 
             $playlistSections = [];
@@ -467,7 +467,7 @@
                         return [
                             // The following fields `channel*` are `null` without additional code for the `Created playlists` section if there are multiple videos in this section.
                             'channelName' => $isCreatedPlaylists ? $authorChannelName : $shortBylineRun['text'],
-                            'channelHandle' => $isCreatedPlaylists ? $authorChannelHandle : (str_starts_with($channelHandle, "/@") ? substr($channelHandle, 2) : null),
+                            'channelHandle' => $isCreatedPlaylists ? $authorChannelHandle : (str_starts_with($channelHandle, "/@") ? substr($channelHandle, 1) : null),
                             'channelId' => $isCreatedPlaylists ? $id : $shortBylineNavigationEndpoint['browseEndpoint']['browseId'],
                             'channelApproval' => $isCreatedPlaylists ? $authorChannelApproval : $playlistRenderer['ownerBadges'][0]['metadataBadgeRenderer']['tooltip'],
                         ];

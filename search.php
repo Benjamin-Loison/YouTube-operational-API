@@ -176,7 +176,7 @@ function getAPI($id, $order, $continuationToken)
                 'title' => $title,
                 'thumbnails' => $gridVideoRenderer['thumbnail']['thumbnails'],
                 'channelTitle' => $run['text'],
-                'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 2),
+                'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 1),
                 'timestamp' => $gridVideoRenderer['publishedTimeText']['simpleText'],
                 'duration' => getIntFromDuration($gridVideoRenderer['lengthText']['simpleText']),
                 'views' => $views,
