@@ -356,6 +356,7 @@
                 array_push($links, $link);
             }
             $about['links'] = $links;
+            $about['handle'] = substr($result['header']['c4TabbedHeaderRenderer']['channelHandleText']['runs'][0]['text'], 1);
 
             $item['about'] = $about;
         }
