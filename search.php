@@ -171,12 +171,13 @@ function getAPI($id, $order, $continuationToken)
                     'time' => getIntFromDuration($macroMarkersListItemRenderer['timeDescription']['simpleText']),
                     'thumbnails' => $macroMarkersListItemRenderer['thumbnail']['thumbnails']
             ]; }, $chapters) : [];
+            $channelHandle = substr($browseEndpoint['canonicalBaseUrl'], 1);
             $answerItem['snippet'] = [
                 'channelId' => $channelId,
                 'title' => $title,
                 'thumbnails' => $gridVideoRenderer['thumbnail']['thumbnails'],
                 'channelTitle' => $run['text'],
-                'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 1),
+                'channelHandle' => $channelHandle[0] === '@' ? $channelHandle : null,
                 'timestamp' => $gridVideoRenderer['publishedTimeText']['simpleText'],
                 'duration' => getIntFromDuration($gridVideoRenderer['lengthText']['simpleText']),
                 'views' => $views,
