@@ -13,7 +13,7 @@ foreach ($realOptions as $realOption) {
     $options[$realOption] = false;
 }
 
-if (isset($_GET['part'], $_GET['videoId'], $_GET['order'])) {
+if (isset($_GET['part'], $_GET['videoId'])) {
     $part = $_GET['part'];
     $parts = explode(',', $part, count($realOptions));
     foreach ($parts as $part) {
@@ -29,7 +29,7 @@ if (isset($_GET['part'], $_GET['videoId'], $_GET['order'])) {
         die('invalid videoId');
     }
 
-    $order = $_GET['order'];
+    $order = isset($_GET['order']) ? $_GET['order'] : 'relevance';
     if (!in_array($order, ['relevance', 'time'])) {
         die('invalid order');
     }
