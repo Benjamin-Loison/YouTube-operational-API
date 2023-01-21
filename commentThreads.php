@@ -44,7 +44,7 @@ if (isset($_GET['part'], $_GET['videoId'], $_GET['order'])) {
     echo getAPI($videoId, $order, $continuationToken);
 }
 
-function getAPI($videoId, $order, $continuationToken)
+function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = false)
 {
     $continuationTokenProvided = $continuationToken != '';
     if ($continuationTokenProvided) {
@@ -57,14 +57,14 @@ function getAPI($videoId, $order, $continuationToken)
             ]
         ];
         $result = getJSON('https://www.youtube.com/youtubei/v1/next?key=' . UI_KEY, $opts);
-        if ($order === 'time') {
+        if ($order === 'time' && $simulatedContinuation) {
             $continuationToken = $result['onResponseReceivedEndpoints'][0]['reloadContinuationItemsCommand']['continuationItems'][0]['commentsHeaderRenderer']['sortMenu']['sortFilterSubMenuRenderer']['subMenuItems'][1]['serviceEndpoint']['continuationCommand']['token'];
             return getAPI($videoId, null, $continuationToken);
         }
     } else {
         $result = getJSONFromHTML("https://www.youtube.com/watch?v=$videoId");
         $continuationToken = end($result['contents']['twoColumnWatchNextResults']['results']['results']['contents'])['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
-        return getAPI($videoId, $order, $continuationToken);
+        return getAPI($videoId, $order, $continuationToken, true);
     }
 
     $answerItems = [];
@@ -92,11 +92,13 @@ function getAPI($videoId, $order, $continuationToken)
         $publishedAt = str_replace(' (edited)', '', $publishedAt, $count);
         $wasEdited = $count > 0;
         $replyCount = $comment['replyCount'];
+        $author = $comment['authorText']['simpleText'];
+        $isAuthorAHandle = $author[0] === '@';
         $internalSnippet = [
             'textOriginal' => $text,
             'isHearted' => $isHearted,
-            'authorDisplayName' => $comment['authorText']['simpleText'],
-            'authorHandle' => $comment['authorText']['simpleText'],
+            'authorDisplayName' => $isAuthorAHandle ? null : $author,
+            'authorHandle' => $isAuthorAHandle ? $author : null,
             'authorProfileImageUrls' => $comment['authorThumbnail']['thumbnails'],
             'authorChannelId' => ['value' => $comment['authorEndpoint']['browseEndpoint']['browseId']],
             'likeCount' => getIntValue($comment['voteCount']['simpleText']),
