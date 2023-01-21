@@ -286,6 +286,10 @@
                 }
                 foreach($items as $sectionChannelItem) {
                     $gridChannelRenderer = $sectionChannelItem[array_key_exists('gridChannelRenderer', $sectionChannelItem) ? 'gridChannelRenderer' : 'channelRenderer'];
+                    // Condition required for channel `UC-1BnotsIsigEK4zLw20IDQ` which doesn't have a `CHANNELS` tab and using the `channel/CHANNEL_ID/channels` URL shows the `HOME` channel tab content.
+                    if($gridChannelRenderer === null) {
+                        goto breakChannelSectionsTreatment;
+                    }
                     $thumbnails = [];
                     foreach($gridChannelRenderer['thumbnail']['thumbnails'] as $thumbnail) {
                         $thumbnail['url'] = 'https://' . substr($thumbnail['url'], 2);
@@ -308,6 +312,7 @@
                     'nextPageToken' => $nextPageToken
                 ]);
             }
+        breakChannelSectionsTreatment:
             $item['channelSections'] = $channelSections;
         }
 
