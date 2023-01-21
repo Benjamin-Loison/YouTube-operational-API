@@ -13,7 +13,7 @@ foreach ($realOptions as $realOption) {
     $options[$realOption] = false;
 }
 
-if (isset($_GET['part'], $_GET['videoId'])) {
+if (isset($_GET['part'])) {
     $part = $_GET['part'];
     $parts = explode(',', $part, count($realOptions));
     foreach ($parts as $part) {
@@ -24,9 +24,12 @@ if (isset($_GET['part'], $_GET['videoId'])) {
         }
     }
 
-    $videoId = $_GET['videoId'];
-    if (!isVideoId($videoId)) {
-        die('invalid videoId');
+    $videoId = null;
+    if (isset($_GET['videoId'])) {
+        $videoId = $_GET['videoId'];
+        if (!isVideoId($videoId)) {
+            die('invalid videoId');
+        }
     }
 
     $order = isset($_GET['order']) ? $_GET['order'] : 'relevance';
@@ -56,7 +59,7 @@ function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = f
                 "content" => $rawData,
             ]
         ];
-        $result = getJSON('https://www.youtube.com/youtubei/v1/next?key=' . UI_KEY, $opts);
+        $result = getJSON('https://www.youtube.com/youtubei/v1/' . ($videoId !== null ? 'next' : 'browse') . '?key=' . UI_KEY, $opts);
         if ($order === 'time' && $simulatedContinuation) {
             $continuationToken = $result['onResponseReceivedEndpoints'][0]['reloadContinuationItemsCommand']['continuationItems'][0]['commentsHeaderRenderer']['sortMenu']['sortFilterSubMenuRenderer']['subMenuItems'][1]['serviceEndpoint']['continuationCommand']['token'];
             return getAPI($videoId, null, $continuationToken);
