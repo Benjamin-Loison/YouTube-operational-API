@@ -230,7 +230,9 @@
         foreach ($textContent['runs'] as $textCommon) {
             $contentTextItem = ['text' => $textCommon['text']];
             if (array_key_exists('navigationEndpoint', $textCommon)) {
+                // `$url` isn't defined.
                 if (str_starts_with($url, 'https://www.youtube.com/redirect?')) {
+                    // `$text` isn't defined here.
                     $contentTextItem['url'] = $text;
                 } else {
                     $navigationEndpoint = $textCommon['navigationEndpoint'];
