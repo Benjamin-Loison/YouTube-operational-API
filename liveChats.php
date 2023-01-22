@@ -67,7 +67,8 @@
             $snippet = [];
             $actions = $result['continuationContents']['liveChatContinuation']['actions'];
             foreach ($actions as $action) {
-                $liveChatTextMessageRenderer = $action['replayChatItemAction']['actions'][0]['addChatItemAction']['item']['liveChatTextMessageRenderer'];
+                $replayChatItemAction = $action['replayChatItemAction'];
+                $liveChatTextMessageRenderer = $replayChatItemAction['actions'][0]['addChatItemAction']['item']['liveChatTextMessageRenderer'];
                 if ($liveChatTextMessageRenderer != null) {
                     $message = [
                         'id' => urldecode($liveChatTextMessageRenderer['id']),
@@ -76,7 +77,8 @@
                         'authorThumbnails' => $liveChatTextMessageRenderer['authorPhoto']['thumbnails'],
                         'timestampAbsoluteUsec' => intval($liveChatTextMessageRenderer['timestampUsec']),
                         'authorChannelId' => $liveChatTextMessageRenderer['authorExternalChannelId'],
-                        'timestamp' => getIntFromDuration($liveChatTextMessageRenderer['timestampText']['simpleText'])
+                        'timestamp' => getIntFromDuration($liveChatTextMessageRenderer['timestampText']['simpleText']),
+                        'videoOffsetTimeMsec' => intval($replayChatItemAction['videoOffsetTimeMsec'])
                     ];
                     array_push($snippet, $message);
                 }
