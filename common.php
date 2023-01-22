@@ -331,6 +331,10 @@
 
     function getIntFromDuration($timeStr)
     {
+        $isNegative = $timeStr[0] === '-';
+        if ($isNegative) {
+            $timeStr = substr($timeStr, 1);
+        }
         $format = 'j:H:i:s';
         $timeParts = explode(':', $timeStr);
         $timePartsCount = count($timeParts);
@@ -348,7 +352,7 @@
                    $timeComponents['hour'] * 3600 +
                    $timeComponents['minute'] * 60 +
                    $timeComponents['second'];
-        return $timeInt;
+        return ($isNegative ? -1 : 1) * $timeInt;
     }
 
 ?>
