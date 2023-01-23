@@ -100,7 +100,7 @@ function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = f
         $internalSnippet = [
             'textOriginal' => $text,
             'isHearted' => $isHearted,
-            'authorDisplayName' => $isAuthorAHandle ? null : $author,
+            'authorName' => $isAuthorAHandle ? null : $author,
             'authorHandle' => $isAuthorAHandle ? $author : null,
             'authorProfileImageUrls' => $comment['authorThumbnail']['thumbnails'],
             'authorChannelId' => ['value' => $comment['authorEndpoint']['browseEndpoint']['browseId']],
