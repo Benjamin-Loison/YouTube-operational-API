@@ -5,19 +5,7 @@
 
     ini_set('display_errors', 0);
 
-    function isRedirection($url)
-    {
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_exec($ch);
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if ($code == 302) {
-            detectedAsSendingUnusualTraffic();
-        }
-        return $code == 303;
-    }
-
-    function fileGetContentsFromOpts($url, $opts)
+    function getContextFromOpts($opts)
     {
         if (GOOGLE_ABUSE_EXEMPTION !== '') {
             $cookieToAdd = 'GOOGLE_ABUSE_EXEMPTION=' . GOOGLE_ABUSE_EXEMPTION;
@@ -43,8 +31,36 @@
             }
         }
         $context = stream_context_create($opts);
+        return $context;
+    }
+
+    function getHeadersFromOpts($url, $opts)
+    {
+        $context = getContextFromOpts($opts);
+        $headers = get_headers($url, false, $context);
+        return $headers;
+    }
+
+    function fileGetContentsFromOpts($url, $opts)
+    {
+        $context = getContextFromOpts($opts);
         $result = file_get_contents($url, false, $context);
         return $result;
+    }
+
+    function isRedirection($url)
+    {
+        $opts = [
+            'http' => [
+                'ignore_errors' => true
+            ]
+        ];
+        $http_response_header = getHeadersFromOpts($url, $opts);
+        $code = intval(explode(' ', $http_response_header[0])[1]);
+        if ($code == 302) {
+            detectedAsSendingUnusualTraffic();
+        }
+        return $code == 303;
     }
 
     function getRemote($url, $opts = [])
