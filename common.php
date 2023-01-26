@@ -41,11 +41,16 @@
         return $headers;
     }
 
-    function fileGetContentsFromOpts($url, $opts)
+    function fileGetContentsAndHeadersFromOpts($url, $opts)
     {
         $context = getContextFromOpts($opts);
         $result = file_get_contents($url, false, $context);
-        return $result;
+        return [$result, $http_response_header];
+    }
+
+    function fileGetContentsFromOpts($url, $opts)
+    {
+        return fileGetContentsAndHeadersFromOpts($result, $opts)[0];
     }
 
     function isRedirection($url)
@@ -57,7 +62,7 @@
         ];
         $http_response_header = getHeadersFromOpts($url, $opts);
         $code = intval(explode(' ', $http_response_header[0])[1]);
-        if ($code == 302) {
+        if ($code == HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC) {
             detectedAsSendingUnusualTraffic();
         }
         return $code == 303;
@@ -65,17 +70,9 @@
 
     function getRemote($url, $opts = [])
     {
-        $result = fileGetContentsFromOpts($url, $opts);
-        if ($result === false) {
-            $opts = [
-                'http' => [
-                    'follow_location' => false
-                ]
-            ];
-            $result = fileGetContentsFromOpts($url, $opts);
-            if (str_contains($result, 'https://www.google.com/sorry/index?continue=')) {
-                detectedAsSendingUnusualTraffic();
-            }
+        [$result, $headers] = fileGetContentsAndHeadersFromOpts($url, $opts);
+        if (str_contains($headers[0], HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC)) {
+            detectedAsSendingUnusualTraffic();
         }
         return $result;
     }

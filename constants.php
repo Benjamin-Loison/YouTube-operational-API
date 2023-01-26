@@ -11,5 +11,6 @@
     define('UI_KEY', 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'); // this isn't a YouTube Data API v3 key
     define('USER_AGENT', 'Firefox/100');
     define('GOOGLE_ABUSE_EXEMPTION', '');
+    define('HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC', 302);
 
 ?>
