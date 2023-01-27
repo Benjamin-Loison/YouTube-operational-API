@@ -5,6 +5,7 @@
     define('WEBSITE_URL', "$protocol://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}");
     define('SUB_VERSION_STR', '.9999099');
     define('KEYS_FILE', '/var/www/ytPrivate/keys.txt');
+    define('SERVER_NAME', 'my instance');
 
     define('MUSIC_VERSION', '2' . SUB_VERSION_STR);
     define('CLIENT_VERSION', '1' . SUB_VERSION_STR);

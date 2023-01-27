@@ -101,7 +101,7 @@ If a feature you are looking for which isn't working on <?php yt(); ?>, ask kind
 
     $hash = file_get_contents('.git/refs/heads/main');
     if ($hash !== false) {
-        echo "<br/><br/>This instance uses version: <a href=\"https://github.com/Benjamin-Loison/YouTube-operational-API/commit/$hash\">$hash</a>";
+        echo "<br/><br/>This instance (" . SERVER_NAME . ") uses version: <a href=\"https://github.com/Benjamin-Loison/YouTube-operational-API/commit/$hash\">$hash</a>";
     }
 
 ?>
