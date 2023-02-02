@@ -19,7 +19,7 @@
             $parts = explode(',', $part, count($realOptions));
             foreach ($parts as $part) {
                 if (!in_array($part, $realOptions)) {
-                    die("invalid part $part");
+                    dieWithJsonMessage("Invalid part $part");
                 } else {
                     $options[$part] = true;
                 }
@@ -29,19 +29,19 @@
         if (isset($_GET['forUsername'])) {
             $forUsername = $_GET['forUsername'];
             if (!isUsername($forUsername)) { // what's minimal length ?
-                die('invalid forUsername');
+                dieWithJsonMessage('Invalid forUsername');
             }
             $result = getJSONFromHTML("https://www.youtube.com/c/$forUsername/about");
             $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
         } else if (isset($_GET['id'])) {
             $id = $_GET['id'];
             if (!isChannelId($id)) {
-                die('invalid id'); // could directly die within the function
+                dieWithJsonMessage('Invalid id'); // could directly die within the function
             }
         } else { // if (isset($_GET['handle']))
             $handle = $_GET['handle'];
             if (!isHandle($handle)) {
-                die('invalid handle');
+                dieWithJsonMessage('Invalid handle');
             }
             $result = getJSONFromHTML("https://www.youtube.com/$handle");
             $id = $result['responseContext']['serviceTrackingParams'][0]['params'][6]['value'];
@@ -50,7 +50,7 @@
         if (isset($_GET['pageToken'])) {
             $continuationToken = $_GET['pageToken'];
             if (($options['shorts'] && !isContinuationTokenAndVisitorData($continuationToken)) || (!$options['shorts'] && !isContinuationToken($continuationToken))) {
-                die('invalid pageToken');
+                dieWithJsonMessage('Invalid pageToken');
             }
         }
         echo getAPI($id, $continuationToken);

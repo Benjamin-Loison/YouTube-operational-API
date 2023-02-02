@@ -23,7 +23,7 @@ if (isset($_GET['part']) &&
     $parts = explode(',', $part, count($realOptions));
     foreach ($parts as $part) {
         if (!in_array($part, $realOptions)) {
-            die("invalid part $part");
+            dieWithJsonMessage("Invalid part $part");
         } else {
             $options[$part] = true;
         }
@@ -38,34 +38,34 @@ if (isset($_GET['part']) &&
         $id = $_GET['channelId'];
     
         if (!isChannelId($id)) {
-            die('invalid channelId');
+            dieWithJsonMessage('Invalid channelId');
         }
     } elseif ($_GET['eventType']) {
         $eventType = $_GET['eventType'];
 
         if (!isEventType($eventType)) {
-            die('invalid eventType');
+            dieWithJsonMessage('Invalid eventType');
         }
     } elseif ($_GET['hashTag']) {
         $id = $_GET['hashTag'];
 
         if (!isHashTag($id)) {
-            die('invalid hashTag');
+            dieWithJsonMessage('Invalid hashTag');
         }
     } elseif ($_GET['q']) {
         $id = $_GET['q'];
 
         if (!isQuery($id)) {
-            die('invalid q');
+            dieWithJsonMessage('Invalid q');
         }
     } else {
-        die('no channelId or hashTag or q field was provided');
+        dieWithJsonMessage('No channelId or hashTag or q field was provided');
     }
 
     if ((isset($_GET['order']) || !isset($_GET['q'])) && !isset($_GET['eventType'])) {
         $order = $_GET['order'];
         if (!in_array($order, ['viewCount', 'relevance'])) {
-            die('invalid order');
+            dieWithJsonMessage('Invalid order');
         }
     }
     $continuationToken = '';
@@ -73,7 +73,7 @@ if (isset($_GET['part']) &&
         $continuationToken = $_GET['pageToken'];
         // what checks to do ?
         if (!isContinuationToken($continuationToken)) {
-            die('invalid pageToken');
+            dieWithJsonMessage('Invalid pageToken');
         }
     }
     echo getAPI($id, $order, $continuationToken);

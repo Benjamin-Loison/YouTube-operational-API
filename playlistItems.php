@@ -9,17 +9,17 @@ include_once 'common.php';
 if (isset($_GET['part'], $_GET['playlistId'])) {
     $part = $_GET['part'];
     if (!in_array($part, ['snippet'])) {
-        die('invalid part');
+        dieWithJsonMessage('Invalid part');
     }
     $playlistId = $_GET['playlistId'];
     if (!isPlaylistId($playlistId)) {
-        die('invalid playlistId');
+        dieWithJsonMessage('Invalid playlistId');
     }
     $continuationToken = '';
     if (isset($_GET['pageToken'])) {
         $continuationToken = $_GET['pageToken'];
         if (!isContinuationToken($continuationToken)) {
-            die('invalid pageToken');
+            dieWithJsonMessage('Invalid pageToken');
         }
     }
     echo getAPI($playlistId, $continuationToken);

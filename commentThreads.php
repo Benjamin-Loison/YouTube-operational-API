@@ -18,7 +18,7 @@ if (isset($_GET['part'])) {
     $parts = explode(',', $part, count($realOptions));
     foreach ($parts as $part) {
         if (!in_array($part, $realOptions)) {
-            die("invalid part $part");
+            dieWithJsonMessage("Invalid part $part");
         } else {
             $options[$part] = true;
         }
@@ -28,20 +28,20 @@ if (isset($_GET['part'])) {
     if (isset($_GET['videoId'])) {
         $videoId = $_GET['videoId'];
         if (!isVideoId($videoId)) {
-            die('invalid videoId');
+            dieWithJsonMessage('Invalid videoId');
         }
     }
 
     $order = isset($_GET['order']) ? $_GET['order'] : 'relevance';
     if (!in_array($order, ['relevance', 'time'])) {
-        die('invalid order');
+        dieWithJsonMessage('Invalid order');
     }
 
     $continuationToken = '';
     if (isset($_GET['pageToken'])) {
         $continuationToken = $_GET['pageToken'];
         if (!isContinuationToken($continuationToken)) {
-            die('invalid pageToken');
+            dieWithJsonMessage('Invalid pageToken');
         }
     }
     echo getAPI($videoId, $order, $continuationToken);

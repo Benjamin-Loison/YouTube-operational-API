@@ -23,7 +23,7 @@
         $parts = explode(',', $part, count($realOptions));
         foreach ($parts as $part) {
             if (!in_array($part, $realOptions)) {
-                die("invalid part $part");
+                dieWithJsonMessage("Invalid part $part");
             } else {
                 $options[$part] = true;
             }
@@ -34,16 +34,16 @@
         $ids = $_GET[$field];
         $realIds = str_contains($ids, ',') ? explode(',', $ids, 50) : [$ids];
         if (count($realIds) == 0) {
-            die('invalid id');
+            dieWithJsonMessage('Invalid id');
         }
         foreach ($realIds as $realId) {
             if ((!$isClip && !isVideoId($realId)) && !isClipId($realId)) {
-                die("invalid $field");
+                dieWithJsonMessage("Invalid $field");
             }
         }
 
         if ($options['impressions'] && (!isset($_GET['SAPISIDHASH']) || !isSAPISIDHASH($_GET['SAPISIDHASH']))) {
-            die('invalid SAPISIDHASH');
+            dieWithJsonMessage('Invalid SAPISIDHASH');
         }
         echo getAPI($realIds);
     }

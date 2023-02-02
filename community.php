@@ -13,7 +13,7 @@ if (isset($_GET['part'], $_GET['id'])) {
     $parts = explode(',', $part, count($realOptions));
     foreach ($parts as $part) {
         if (!in_array($part, $realOptions)) {
-            die("invalid part $part");
+            dieWithJsonMessage("Invalid part $part");
         } else {
             $options[$part] = true;
         }
@@ -21,12 +21,12 @@ if (isset($_GET['part'], $_GET['id'])) {
 
     $postId = $_GET['id'];
     if (!isPostId($postId)) {
-        die('invalid postId');
+        dieWithJsonMessage('Invalid postId');
     }
 
     $order = isset($_GET['order']) ? $_GET['order'] : 'relevance';
     if (!in_array($order, ['relevance', 'time'])) {
-        die('invalid order');
+        dieWithJsonMessage('Invalid order');
     }
 
     echo getAPI($postId, $order);
