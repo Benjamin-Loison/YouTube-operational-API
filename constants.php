@@ -2,6 +2,13 @@
 
     include_once 'configuration.php';
 
+    $newAddKeyForceSecret = ADD_KEY_FORCE_SECRET;
+    if (ADD_KEY_FORCE_SECRET === '') {
+        $newAddKeyForceSecret = bin2hex(random_bytes(16));
+    }
+    define('NEW_ADD_KEY_FORCE_SECRET', $newAddKeyForceSecret);
+    use const NEW_ADD_KEY_FORCE_SECRET as ADD_KEY_FORCE_SECRET;
+
     define('DOMAIN_NAME', $_SERVER['SERVER_NAME']);
     $protocol = (!empty($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on')) ? 'https' : 'http';
     define('WEBSITE_URL', "$protocol://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}");
