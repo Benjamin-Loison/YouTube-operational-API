@@ -1,8 +1,6 @@
 <?php
 
-
     include_once 'common.php';
-
 
     if (isset($_GET['key'])) {
         $key = $_GET['key'];

@@ -71,7 +71,7 @@
     function getRemote($url, $opts = [])
     {
         [$result, $headers] = fileGetContentsAndHeadersFromOpts($url, $opts);
-        if (str_contains($headers[0], HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC)) {
+        if (str_contains($headers[0], strval(HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC))) {
             detectedAsSendingUnusualTraffic();
         }
         return $result;
