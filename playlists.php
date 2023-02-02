@@ -1,5 +1,7 @@
 <?php
 
+    header('Content-Type: application/json; charset=UTF-8');
+
     // StackOverflow source: https://stackoverflow.com/q/71457319
 
     include_once 'common.php';

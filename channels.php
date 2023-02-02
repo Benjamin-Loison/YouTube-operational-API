@@ -1,5 +1,7 @@
 <?php
 
+    header('Content-Type: application/json; charset=UTF-8');
+
     // StackOverflow source: https://stackoverflow.com/a/71067222
     $channelsTests = [['forUsername=FolkartTr', 'items/0/id', 'UCnS--2e1yzQCm5r4ClrMJBg']];
 

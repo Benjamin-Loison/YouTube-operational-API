@@ -1,5 +1,7 @@
 <?php
 
+    header('Content-Type: application/json; charset=UTF-8');
+
     // StackOverflow contentDetails source: https://stackoverflow.com/a/70908689
     // StackOverflow status source: https://stackoverflow.com/a/70894799
     // StackOverflow music source: https://stackoverflow.com/a/71012426

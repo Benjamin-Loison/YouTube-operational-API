@@ -1,5 +1,7 @@
 <?php
 
+    header('Content-Type: application/json; charset=UTF-8');
+
     // StackOverflow source: https://stackoverflow.com/q/71186488
     $commentThreadsTests = [['snippet&videoId=UC4QobU6STFB0P71PMvOGN5A&order=viewCount', 'items/0/id/videoId', 'jNQXAC9IVRw']];
     // example: https://youtu.be/mrJachWLjHU
