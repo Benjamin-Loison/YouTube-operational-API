@@ -79,6 +79,8 @@ if (isset($_GET['part']) &&
         }
     }
     echo getAPI($id, $order, $continuationToken);
+} else {
+    dieWithJsonMessage("Required parameters not provided");
 }
 
 function getAPI($id, $order, $continuationToken)

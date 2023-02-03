@@ -56,6 +56,8 @@
             }
         }
         echo getAPI($id, $continuationToken);
+    } else {
+        dieWithJsonMessage("Required parameters not provided");
     }
 
     function getItem($id, $continuationToken)

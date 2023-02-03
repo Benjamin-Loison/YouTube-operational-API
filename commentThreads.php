@@ -47,6 +47,8 @@ if (isset($_GET['part'])) {
         }
     }
     echo getAPI($videoId, $order, $continuationToken);
+} else {
+    dieWithJsonMessage("Required parameters not provided");
 }
 
 function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = false)

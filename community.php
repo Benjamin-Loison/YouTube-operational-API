@@ -32,6 +32,8 @@ if (isset($_GET['part'], $_GET['id'])) {
     }
 
     echo getAPI($postId, $order);
+} else {
+    dieWithJsonMessage("Required parameters not provided");
 }
 
 function getAPI($postId, $order)

@@ -34,8 +34,9 @@
             }
         }
         echo getAPI($realIds);
+    } else {
+        dieWithJsonMessage("Required parameters not provided");
     }
-    // could provide an error message if such fields aren't provided
 
     function getItem($id)
     {
