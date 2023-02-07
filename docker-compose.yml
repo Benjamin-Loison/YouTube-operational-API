@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  api:
+    image: youtube-operational-api
+    build: .
+    restart: on-failure
+    volumes:
+      - ./:/var/www/html/
+    ports:
+      - ${EXPOSED_HTTP_PORT}:80
