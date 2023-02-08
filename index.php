@@ -90,7 +90,7 @@
 
 <h2>Make <?php yt(); ?> request WITHOUT ANY KEY:</h2>
 
-<p>To make <strong>ANY <?php yt(); ?> request WITHOUT ANY KEY/USING YOUR QUOTA</strong>, you can use: <?php $noKey = 'noKey'/*used to be yt*/; echo url(WEBSITE_URL . "$noKey/YOUR_REQUEST"); ?></p>
+<p>To make <strong>ANY <?php yt(); ?> request WITHOUT ANY KEY/USING YOUR QUOTA</strong>, you can use: <?php $noKey = 'noKey'; echo url(WEBSITE_URL . "$noKey/YOUR_REQUEST"); ?></p>
 <p>For instance you can use: <?php $example = 'videos?part=snippet&id=VIDEO_ID'; echo url(WEBSITE_URL . "$noKey/$example"); ?> instead of <?php echo url("https://www.googleapis.com/youtube/v3/$example"); ?></p>
 <p>I may add in the future limitation per IP etc if the quota need to be better shared among the persons using this API.</p>
 <?php
