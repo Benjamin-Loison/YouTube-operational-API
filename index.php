@@ -1,5 +1,39 @@
-<title>YouTube operational API</title>
-
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>YouTube operational API</title>
+        <style>
+            body {
+                max-width: 73%;
+                margin: 5% auto;
+                font-family: sans-serif;
+                color: #444;
+                padding: 0;
+            }
+            h1,
+            h2,
+            h3 {
+                line-height: 1.2;
+            }
+            p {
+                word-break: break-word;
+            }
+            @media (prefers-color-scheme: dark) {
+                body {
+                    color: #c9d1d9;
+                    background: #0d1117;
+                }
+                a:link {
+                    color: #58a6ff;
+                }
+                a:visited {
+                    color: #8e96f0;
+                }
+            }
+        </style>
+    </head>
+    <body>
 <?php
 
     include_once 'common.php';
@@ -23,7 +57,7 @@
         $webpage = explode('/', $suburl, 2)[0];
         $url = $feature[1];
         $name = ucfirst(str_replace('/', ': ', $suburl));
-        echo "Based on <a href=\"https://developers.google.com/youtube/v3/docs/$suburl\">$name</a>: " . url(WEBSITE_URL . "$webpage?part=$url") . '<br/>';
+        echo "<p>Based on <a href=\"https://developers.google.com/youtube/v3/docs/$suburl\">$name</a>: " . url(WEBSITE_URL . "$webpage?part=$url") . '</p>';
     }
 
     $features = [['channels', 'status,upcomingEvents,shorts,community,channels,about,approval,playlists&forUsername=USERNAME&id=CHANNEL_ID&handle=HANDLE'],
@@ -44,30 +78,28 @@
         feature($feature);
     }
 
-    echo '<br/>';
-
     $features = [['community', 'snippet&id=POST_ID&order=relevance,time'],
                  ['lives', 'donations&id=VIDEO_ID'],
                  ['liveChats', 'snippet,participants&id=VIDEO_ID&time=TIME_MS']];
 
     foreach ($features as $feature) {
-        echo url(WEBSITE_URL . "$feature[0]?part=$feature[1]") . "<br/>";
+        echo "<p>" . url(WEBSITE_URL . "$feature[0]?part=$feature[1]") . "</p>";
     }
 
 ?>
 
 <h2>Make <?php yt(); ?> request WITHOUT ANY KEY:</h2>
 
-To make <strong>ANY <?php yt(); ?> request WITHOUT ANY KEY/USING YOUR QUOTA</strong>, you can use: <?php $noKey = 'noKey'/*used to be yt*/; echo url(WEBSITE_URL . "$noKey/YOUR_REQUEST"); ?><br/>
-For instance you can use: <?php $example = 'videos?part=snippet&id=VIDEO_ID'; echo url(WEBSITE_URL . "$noKey/$example"); ?> instead of <?php echo url("https://www.googleapis.com/youtube/v3/$example"); ?><br/>
-I may add in the future limitation per IP etc if the quota need to be better shared among the persons using this API.<br/>
+<p>To make <strong>ANY <?php yt(); ?> request WITHOUT ANY KEY/USING YOUR QUOTA</strong>, you can use: <?php $noKey = 'noKey'/*used to be yt*/; echo url(WEBSITE_URL . "$noKey/YOUR_REQUEST"); ?></p>
+<p>For instance you can use: <?php $example = 'videos?part=snippet&id=VIDEO_ID'; echo url(WEBSITE_URL . "$noKey/$example"); ?> instead of <?php echo url("https://www.googleapis.com/youtube/v3/$example"); ?></p>
+<p>I may add in the future limitation per IP etc if the quota need to be better shared among the persons using this API.</p>
 <?php
 
     $keysFile = '/var/www/ytPrivate/keys.txt';
     $keysCount = substr_count(file_get_contents($keysFile), "\n") + 1;
 
 ?>
-Currently this service is <a href="keys.php">powered by <?php echo $keysCount; ?> keys</a>.<br/>
+<p>Currently this service is <a href="keys.php">powered by <?php echo $keysCount; ?> keys</a>.</p>
 <script>
 
 function share() {
@@ -105,3 +137,6 @@ If a feature you are looking for which isn't working on <?php yt(); ?>, ask kind
     }
 
 ?>
+
+    </body>
+</html>
