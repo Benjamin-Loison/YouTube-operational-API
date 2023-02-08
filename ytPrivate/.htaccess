@@ -1,0 +1,4 @@
+<FilesMatch "keys.txt">
+Order allow,deny
+Deny from all
+</FilesMatch>
