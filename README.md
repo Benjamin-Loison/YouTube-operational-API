@@ -72,10 +72,32 @@ brew services start httpd
 
 If you want me to advertise your instance (if you have opened your port, and have a fixed IP address or a domain name), please use below contacts.
 
+## Run the API with Docker
+
+1. Install [Docker](https://www.docker.com) and make sure that its daemon is running.
+
+2. Create a `.env` file and update it with your preferred port:
+
+```sh
+cp .env.sample .env
+```
+
+3. Start the container with `docker-compose`:
+
+```sh
+# start in the foreground
+docker-compose up
+# start in the background
+docker-compose up -d
+```
+
+4. Verify that your API instance is reachable by trying to access:
+- http://localhost:8080 (update preferred port if not 8080)
+
 ## Contact:
 
-- [Matrix](https://matrix.to/#/#youtube-operational-api:matrix.org)
-- [Discord](https://discord.gg/pDzafhGWzf)
+- [Matrix](https://yt.lemnoslife.com/matrix)
+- [Discord](https://yt.lemnoslife.com/discord)
 
 ## Contributing:
 
