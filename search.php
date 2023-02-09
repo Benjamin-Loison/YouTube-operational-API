@@ -19,7 +19,7 @@ foreach ($realOptions as $realOption) {
 }
 
 if (isset($_GET['part']) &&
-  (isset($_GET['channelId']) || isset($_GET['channelId'], $_GET['eventType']) || isset($_GET['hashTag']) || isset($_GET['q'])) &&
+  (isset($_GET['channelId']) || isset($_GET['channelId'], $_GET['eventType']) || isset($_GET['hashtag']) || isset($_GET['q'])) &&
   (isset($_GET['order']) || isset($_GET['q']) || isset($_GET['eventType']))) {
     $part = $_GET['part'];
     $parts = explode(',', $part, count($realOptions));
@@ -48,11 +48,11 @@ if (isset($_GET['part']) &&
         if (!isEventType($eventType)) {
             dieWithJsonMessage('Invalid eventType');
         }
-    } elseif ($_GET['hashTag']) {
-        $id = $_GET['hashTag'];
+    } elseif ($_GET['hashtag']) {
+        $id = $_GET['hashtag'];
 
-        if (!isHashTag($id)) {
-            dieWithJsonMessage('Invalid hashTag');
+        if (!isHashtag($id)) {
+            dieWithJsonMessage('Invalid hashtag');
         }
     } elseif ($_GET['q']) {
         $id = $_GET['q'];
@@ -61,7 +61,7 @@ if (isset($_GET['part']) &&
             dieWithJsonMessage('Invalid q');
         }
     } else {
-        dieWithJsonMessage('No channelId or hashTag or q field was provided');
+        dieWithJsonMessage('No channelId or hashtag or q field was provided');
     }
 
     if ((isset($_GET['order']) || !isset($_GET['q'])) && !isset($_GET['eventType'])) {
@@ -88,7 +88,7 @@ function getAPI($id, $order, $continuationToken)
     global $options;
     $items = null;
     $continuationTokenProvided = $continuationToken != '';
-    if (isset($_GET['hashTag'])) {
+    if (isset($_GET['hashtag'])) {
         if ($continuationTokenProvided) {
             $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
             $opts = [
@@ -137,10 +137,10 @@ function getAPI($id, $order, $continuationToken)
     }
     $answerItems = [];
     $itemsCount = count($items);
-    for ($itemsIndex = 0; $itemsIndex < $itemsCount - ($continuationTokenProvided || $_GET['hashTag'] ? 1 : 0); $itemsIndex++) { // check upper bound for hashtags
+    for ($itemsIndex = 0; $itemsIndex < $itemsCount - ($continuationTokenProvided || $_GET['hashtag'] ? 1 : 0); $itemsIndex++) { // check upper bound for hashtags
         $item = $items[$itemsIndex];
         $path = '';
-        if (isset($_GET['hashTag'])) {
+        if (isset($_GET['hashtag'])) {
             $path = 'richItemRenderer/content/videoRenderer';
         } elseif (isset($_GET['q'])) {
             $path = 'videoRenderer';
@@ -194,7 +194,7 @@ function getAPI($id, $order, $continuationToken)
         }
         array_push($answerItems, $answerItem);
     }
-    if (isset($_GET['hashTag'])) {
+    if (isset($_GET['hashtag'])) {
         $nextContinuationToken = $itemsCount > 60 ? $items[60] : '';
     } else {
         $nextContinuationToken = $itemsCount > 30 ? $items[30] : '';

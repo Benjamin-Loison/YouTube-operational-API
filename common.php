@@ -156,9 +156,9 @@
         return checkRegex('[a-zA-Z0-9-_]{11}', $videoId);
     }
 
-    function isHashTag($hashTag)
+    function isHashtag($hashtag)
     {
-        return true; // checkRegex('[a-zA-Z0-9_]+', $hashTag); // 'é' is a valid hashtag for instance
+        return true; // checkRegex('[a-zA-Z0-9_]+', $hashtag); // 'é' is a valid hashtag for instance
     }
 
     function isSAPISIDHASH($SAPISIDHASH)
