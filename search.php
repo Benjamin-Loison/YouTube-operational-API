@@ -20,7 +20,7 @@ foreach ($realOptions as $realOption) {
 
 if (isset($_GET['part']) &&
   (isset($_GET['channelId']) || isset($_GET['channelId'], $_GET['eventType']) || isset($_GET['hashtag']) || isset($_GET['q'])) &&
-  (isset($_GET['order']) || isset($_GET['q']) || isset($_GET['eventType']))) {
+  (isset($_GET['order']) || isset($_GET['hashtag']) || isset($_GET['q']) || isset($_GET['eventType']))) {
     $part = $_GET['part'];
     $parts = explode(',', $part, count($realOptions));
     foreach ($parts as $part) {
@@ -64,7 +64,7 @@ if (isset($_GET['part']) &&
         dieWithJsonMessage('No channelId or hashtag or q field was provided');
     }
 
-    if ((isset($_GET['order']) || !isset($_GET['q'])) && !isset($_GET['eventType'])) {
+    if ((isset($_GET['order'])) && !isset($_GET['eventType'])) {
         $order = $_GET['order'];
         if (!in_array($order, ['viewCount', 'relevance'])) {
             dieWithJsonMessage('Invalid order');
