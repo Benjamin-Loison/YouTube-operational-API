@@ -95,8 +95,7 @@
 <p>I may add in the future limitation per IP etc if the quota need to be better shared among the persons using this API.</p>
 <?php
 
-    $keysFile = '/var/www/ytPrivate/keys.txt';
-    $keysCount = substr_count(file_get_contents($keysFile), "\n") + 1;
+    $keysCount = substr_count(file_get_contents(KEYS_FILE), "\n") + 1;
 
 ?>
 <p>Currently this service is <a href="keys.php">powered by <?php echo $keysCount; ?> keys</a>.</p>

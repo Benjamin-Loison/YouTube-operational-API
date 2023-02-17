@@ -2,7 +2,9 @@
 
     header('Content-Type: application/json; charset=UTF-8');
 
-    include_once '../common.php';
+    chdir('..');
+
+    include_once 'common.php';
 
     $requestUri = $_SERVER['REQUEST_URI'];
     // As YouTube Data API v3 considers only the first passed `key` parameter if there are multiple of them, providing a first incorrect key convince the no-key service that all its keys are incorrect.
