@@ -466,6 +466,10 @@
                 }
                 $isCreatedPlaylists = $sectionTitle === 'Created playlists';
                 foreach($items as $sectionPlaylistItem) {
+                    if (array_key_exists('showRenderer', $sectionPlaylistItem)) {
+                        continue;
+                    }
+
                     $playlistRenderer = array_key_exists('gridPlaylistRenderer', $sectionPlaylistItem) ? $sectionPlaylistItem['gridPlaylistRenderer'] : (array_key_exists('playlistRenderer', $sectionPlaylistItem) ? $sectionPlaylistItem['playlistRenderer'] : $sectionPlaylistItem['gridShowRenderer']);
                     $runs = $playlistRenderer['shortBylineText']['runs'];
                     if ($isCreatedPlaylists) {
