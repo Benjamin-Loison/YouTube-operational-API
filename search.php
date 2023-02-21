@@ -105,7 +105,7 @@ function getAPI($id, $order, $continuationToken)
         $items = $continuationTokenProvided ? $json['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['richGridRenderer']['contents'];
     } elseif (isset($_GET['eventType'])) {
         $json = getJSONFromHTML("https://www.youtube.com/channel/{$_GET['channelId']}/videos?view=2&live_view=502");
-        $items = $json['contents']['twoColumnBrowseResultsRenderer']['tabs']['1']['tabRenderer']['content']['sectionListRenderer']['contents']['0']['itemSectionRenderer']['contents']['0']['gridRenderer']['items'];
+        $items = $json['contents']['twoColumnBrowseResultsRenderer']['tabs'][1]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
     } elseif (isset($_GET['q'])) {
         $typeBase64 = $order === 'relevance' ? '' : 'EgIQAQ==';
         $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}}' . ($continuationTokenProvided ? ',"continuation":"' . $continuationToken . '"' : ',"query":"' . str_replace('"', '\"', $_GET['q']) . '"' . ($typeBase64 !== '' ? ',"params":"' . $typeBase64 . '"' : '')) . '}';

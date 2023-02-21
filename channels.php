@@ -136,13 +136,8 @@
             }
             $shorts = [];
             if (!$continuationTokenProvided) {
-                $tabs = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
-                $path = 'tabRenderer/content/richGridRenderer/contents';
-                foreach (array_slice($tabs, 1, 2) as $tab) {
-                    if (doesPathExist($tab, $path)) {
-                        $reelShelfRendererItems = getValue($tab, $path);
-                    }
-                }
+                $tab = getTabByName($result, 'Shorts');
+                $reelShelfRendererItems = $tab['tabRenderer']['content']['richGridRenderer']['contents'];
             }
             else {
                 $reelShelfRendererItems = $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
@@ -211,13 +206,8 @@
             $community = [];
             $contents = null;
             if (!$continuationTokenProvided) {
-                $tabs = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
-                $path = 'tabRenderer/content/sectionListRenderer/contents/0/itemSectionRenderer/contents';
-                foreach (array_slice($tabs, 2, 4) as $tab) {
-                    if (doesPathExist($tab, $path)) {
-                        $contents = getValue($tab, $path);
-                    }
-                }
+                $tab = getTabByName($result, 'Community');
+                $contents = $tab['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'];
             } else {
                 $contents = $result['onResponseReceivedEndpoints'][0]['appendContinuationItemsAction']['continuationItems'];
             }
@@ -246,7 +236,8 @@
 
                 $result = getJSONFromHTML("https://www.youtube.com/channel/$id/channels", $httpOptions);
 
-                $sectionListRenderer = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -3)[0]['tabRenderer']['content']['sectionListRenderer'];
+                $tab = getTabByName($result, 'Channels');
+                $sectionListRenderer = $tab['tabRenderer']['content']['sectionListRenderer'];
                 $contents = array_map(fn($content) => $content['itemSectionRenderer']['contents'][0], $sectionListRenderer['contents']);
                 $itemsArray = [];
                 foreach($contents as $content)
@@ -331,7 +322,8 @@
 
             $result = getJSONFromHTML("https://www.youtube.com/channel/$id/about", $httpOptions);
 
-            $resultCommon = array_slice($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], -2)[0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
+            $tab = getTabByName($result, 'About');
+            $resultCommon = $tab['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
 
             $stats = [];
 
@@ -396,26 +388,21 @@
                 ];
                 $result = getJSONFromHTML("https://www.youtube.com/channel/$id/playlists", $httpOptions);
 
-                $tabs = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
-                $path = 'tabRenderer/content/sectionListRenderer';
-                foreach (array_slice($tabs, 1, 4) as $tab) {
-                    if (doesPathExist($tab, $path)) {
-                        $sectionListRenderer = getValue($tab, $path);
-                        $contents = array_map(fn($content) => $content['itemSectionRenderer']['contents'][0], $sectionListRenderer['contents']);
-                        $itemsArray = [];
-                        foreach($contents as $content)
-                        {
-                            if (array_key_exists('shelfRenderer', $content)) {
-                                $sectionTitle = $content['shelfRenderer']['title']['runs'][0]['text'];
-                                $content = $content['shelfRenderer']['content'];
-                                $content = array_key_exists('horizontalListRenderer', $content) ? $content['horizontalListRenderer'] : $content['expandedShelfContentsRenderer'];
-                            } else {
-                                $sectionTitle = $sectionListRenderer['subMenu']['channelSubMenuRenderer']['contentTypeSubMenuItems'][0]['title'];
-                                $content = $content['gridRenderer'];
-                            }
-                            array_push($itemsArray, [$sectionTitle, $content['items']]);
-                        }
+                $tab = getTabByName($result, 'Playlists');
+                $sectionListRenderer = $tab['tabRenderer']['content']['sectionListRenderer'];
+                $contents = array_map(fn($content) => $content['itemSectionRenderer']['contents'][0], $sectionListRenderer['contents']);
+                $itemsArray = [];
+                foreach($contents as $content)
+                {
+                    if (array_key_exists('shelfRenderer', $content)) {
+                        $sectionTitle = $content['shelfRenderer']['title']['runs'][0]['text'];
+                        $content = $content['shelfRenderer']['content'];
+                        $content = array_key_exists('horizontalListRenderer', $content) ? $content['horizontalListRenderer'] : $content['expandedShelfContentsRenderer'];
+                    } else {
+                        $sectionTitle = $sectionListRenderer['subMenu']['channelSubMenuRenderer']['contentTypeSubMenuItems'][0]['title'];
+                        $content = $content['gridRenderer'];
                     }
+                    array_push($itemsArray, [$sectionTitle, $content['items']]);
                 }
             } else {
                 $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';

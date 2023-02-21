@@ -373,4 +373,8 @@
         return ($isNegative ? -1 : 1) * $timeInt;
     }
 
+    function getTabByName($result, $tabName) {
+        return array_values(array_filter($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], fn($tab) => $tab['tabRenderer']['title'] === $tabName))[0];
+    }
+
 ?>
