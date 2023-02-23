@@ -493,7 +493,19 @@
 
                     $title = $playlistRenderer['title'];
 
-                    $id = array_key_exists('playlistId', $playlistRenderer) ? $playlistRenderer['playlistId'] : substr($playlistRenderer['navigationEndpoint']['browseEndpoint']['browseId'], 2);
+                    if (array_key_exists('playlistId', $playlistRenderer)) {
+                        $id = $playlistRenderer['playlistId'];
+                    } else {
+                        $browseId = $playlistRenderer['navigationEndpoint']['browseEndpoint']['browseId'];
+                        // For instance https://www.youtube.com/@FlyMinimal/playlists contains https://www.youtube.com/show/SCG2QET_lsEE-lsp4Kjk7HjA while neither `SCG2QET_lsEE-lsp4Kjk7HjA` nor `G2QET_lsEE-lsp4Kjk7HjA` are correct playlist ids.
+                        // While https://www.youtube.com/@Goldenmoustache/playlists contains https://www.youtube.com/playlist?list=PLHYVKdTa8XHWIEnerFQ-X2dQT5liZpDix which is encoded as `VLPLHYVKdTa8XHWIEnerFQ-X2dQT5liZpDix` in `$browseId` which still seems more appropriate than the `$playlistRenderer['navigationEndpoint']['commandMetadata']['webCommandMetadata']['url']` which contains `/playlist?list=PLHYVKdTa8XHWIEnerFQ-X2dQT5liZpDix`.
+                        // Note that https://www.youtube.com/@FlyMinimal/playlists only contain in its source code `SCG2QET_lsEE-lsp4Kjk7HjA`.
+                        // Only `$browseId` and `url` are common fields to both of these edge cases.
+                        if (str_starts_with($browseId, 'VL')) {
+                            $browseId = substr($browseId, 2);
+                        }
+                        $id = $browseId;
+                    }
 
                     $videoCount = intval((array_key_exists('videoCountText', $playlistRenderer) ? $playlistRenderer['videoCountText'] : $playlistRenderer['thumbnailOverlays'][0]['thumbnailOverlayBottomPanelRenderer']['text'])['runs'][0]['text']);
 
