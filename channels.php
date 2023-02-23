@@ -389,6 +389,9 @@
                 $result = getJSONFromHTML("https://www.youtube.com/channel/$id/playlists", $httpOptions);
 
                 $tab = getTabByName($result, 'Playlists');
+                if ($tab === null) {
+                    die(returnItems([]));
+                }
                 $sectionListRenderer = $tab['tabRenderer']['content']['sectionListRenderer'];
                 $contents = array_map(fn($content) => $content['itemSectionRenderer']['contents'][0], $sectionListRenderer['contents']);
                 $itemsArray = [];
@@ -534,11 +537,8 @@
         return $item;
     }
 
-    function getAPI($id, $continuationToken)
+    function returnItems($items)
     {
-        $items = [];
-        array_push($items, getItem($id, $continuationToken));
-
         $answer = [
             'kind' => 'youtube#channelListResponse',
             'etag' => 'NotImplemented',
@@ -547,4 +547,11 @@
         // should add in some way the pageInfo ?
 
         return json_encode($answer, JSON_PRETTY_PRINT);
+    }
+
+    function getAPI($id, $continuationToken)
+    {
+        $items = [];
+        array_push($items, getItem($id, $continuationToken));
+        return returnItems($items);
     }

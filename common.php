@@ -374,7 +374,11 @@
     }
 
     function getTabByName($result, $tabName) {
-        return array_values(array_filter($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], fn($tab) => $tab['tabRenderer']['title'] === $tabName))[0];
+        if (array_key_exists('contents', $result)) {
+            return array_values(array_filter($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], fn($tab) => $tab['tabRenderer']['title'] === $tabName))[0];
+        } else {
+            return null;
+        }
     }
 
 ?>
