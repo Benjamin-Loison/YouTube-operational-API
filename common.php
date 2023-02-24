@@ -229,7 +229,7 @@
         $unitCount = str_replace('K', '*1000', $unitCount);
         $unitCount = str_replace('M', '*1000000', $unitCount);
         if(checkRegex('[0-9.*KM]+', $unitCount)) {
-            $unitCount = eval("return $unitCount;");
+            $unitCount = eval("return round($unitCount);");
         }
         return $unitCount;
     }
