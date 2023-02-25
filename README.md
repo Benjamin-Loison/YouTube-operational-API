@@ -11,7 +11,7 @@ YouTube operational API works when [YouTube Data API v3](https://developers.goog
 
 ```
 sudo apt install apache2 php
-sudo a2enmod rewrite
+sudo a2enmod rewrite headers
 ```
 
 Replace `AllowOverride None` with `AllowOverride All` in `<Directory /var/www/>` in `/etc/apache2/apache2.conf`.
