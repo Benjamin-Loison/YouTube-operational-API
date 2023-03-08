@@ -349,9 +349,10 @@
             $links = [];
             foreach ($linksObjects as $linkObject) {
                 $link = [];
-                $urlComponents = parse_url($linkObject['navigationEndpoint']['urlEndpoint']['url']);
+                $url = $linkObject['navigationEndpoint']['urlEndpoint']['url'];
+                $urlComponents = parse_url($url);
                 parse_str($urlComponents['query'], $params);
-                $link['url'] = $params['q'];
+                $link['url'] = array_key_exists('q', $params) ? $params['q'] : $url;
                 $link['thumbnail'] = $linkObject['icon']['thumbnails'][0]['url'];
                 $link['title'] = $linkObject['title']['simpleText'];
                 array_push($links, $link);
