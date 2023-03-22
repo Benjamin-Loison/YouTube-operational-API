@@ -245,7 +245,17 @@
         }
 
         if ($options['mostReplayed']) {
-            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
+            $http = [
+                'header' => [
+                    'Accept-Language: en',
+                ]
+            ];
+
+            $httpOptions = [
+                'http' => $http
+            ];
+
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", $httpOptions);
             $markersMap = $json['playerOverlays']['playerOverlayRenderer']['decoratedPlayerBarRenderer']['decoratedPlayerBarRenderer']['playerBar']['multiMarkersPlayerBarRenderer']['markersMap'];
             $mostReplayed = $markersMap !== null ? end($markersMap)['value']['heatmap']['heatmapRenderer'] : null;
             // What is `Dp` in `maxHeightDp` and `minHeightDp` ? If not relevant could add ['heatMarkers'] to the JSON path above.
