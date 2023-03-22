@@ -95,7 +95,7 @@
 <p>I may add in the future limitation per IP etc if the quota need to be better shared among the persons using this API.</p>
 <?php
 
-    $keysCount = substr_count(file_get_contents(KEYS_FILE), "\n") + 1;
+    $keysCount = file_exists(KEYS_FILE) ? substr_count(file_get_contents(KEYS_FILE), "\n") + 1 : 0;
 
 ?>
 <p>Currently this service is <a href="keys.php">powered by <?php echo $keysCount; ?> keys</a>.</p>
