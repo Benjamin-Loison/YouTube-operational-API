@@ -9,7 +9,7 @@
     $requestUri = $_SERVER['REQUEST_URI'];
     // As YouTube Data API v3 considers only the first passed `key` parameter if there are multiple of them, providing a first incorrect key convince the no-key service that all its keys are incorrect.
     if(str_contains($requestUri, 'key='))
-        die('No YouTube Data API v3 key is required to use the no-key service!');
+        dieWithJsonMessage('No YouTube Data API v3 key is required to use the no-key service!');
     $content = file_get_contents(KEYS_FILE);
     $keys = explode("\n", $content);
     $keysCount = count($keys);
