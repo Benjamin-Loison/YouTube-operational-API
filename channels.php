@@ -3,7 +3,7 @@
     header('Content-Type: application/json; charset=UTF-8');
 
     // StackOverflow source: https://stackoverflow.com/a/71067222
-    $channelsTests = [['forUsername=FolkartTr', 'items/0/id', 'UCnS--2e1yzQCm5r4ClrMJBg']];
+    $channelsTests = [['cId=FolkartTr', 'items/0/id', 'UCnS--2e1yzQCm5r4ClrMJBg']];
 
     include_once 'common.php';
 
@@ -15,7 +15,7 @@
     }
 
     // Forbidding URL with no `part` and using `id` filter is debatable.
-    if (isset($_GET['forUsername']) || isset($_GET['id']) || isset($_GET['handle'])) {
+    if (isset($_GET['cId']) || isset($_GET['id']) || isset($_GET['handle'])) {
         if(isset($_GET['part'])) {
             $part = $_GET['part'];
             $parts = explode(',', $part, count($realOptions));
@@ -28,12 +28,12 @@
             }
         }
         $id = '';
-        if (isset($_GET['forUsername'])) {
-            $forUsername = $_GET['forUsername'];
-            if (!isUsername($forUsername)) { // what's minimal length ?
-                dieWithJsonMessage('Invalid forUsername');
+        if (isset($_GET['cId'])) {
+            $cId = $_GET['cId'];
+            if (!isCId($cId)) { // what's minimal length ?
+                dieWithJsonMessage('Invalid cId');
             }
-            $result = getJSONFromHTML("https://www.youtube.com/c/$forUsername/about");
+            $result = getJSONFromHTML("https://www.youtube.com/c/$cId/about");
             $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
         } else if (isset($_GET['id'])) {
             $id = $_GET['id'];

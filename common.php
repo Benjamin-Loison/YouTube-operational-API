@@ -141,9 +141,9 @@
         return checkRegex('[a-zA-Z0-9-_]+', $playlistId);
     }
 
-    function isUsername($forUsername)
+    function isCId($cId)
     {
-        return checkRegex('[a-zA-Z0-9]+', $forUsername);
+        return checkRegex('[a-zA-Z0-9]+', $cId);
     }
 
     function isChannelId($channelId)
