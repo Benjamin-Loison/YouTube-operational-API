@@ -38,15 +38,7 @@ if (isset($_GET['part'], $_GET['id'])) {
 
 function getAPI($postId, $order)
 {
-    $http = [
-        'header' => ['Accept-Language: en']
-    ];
-
-    $options = [
-        'http' => $http
-    ];
-
-    $result = getJSONFromHTML("https://www.youtube.com/post/$postId", $options);
+    $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/post/$postId");
     $contents = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'];
     $content = $contents[0]['itemSectionRenderer']['contents'][0];
     $post = getCommunityPostFromContent($content);

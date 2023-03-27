@@ -41,12 +41,7 @@
     function getItem($id)
     {
         global $options;
-        $opts = [
-            "http" => [
-                "header" => ['Accept-Language: en']
-            ]
-        ];
-        $result = getJSONFromHTML("https://www.youtube.com/playlist?list=$id", $opts);
+        $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/playlist?list=$id");
         if ($options['snippet']) {
             $title = $result['metadata']['playlistMetadataRenderer']['title'];
         }

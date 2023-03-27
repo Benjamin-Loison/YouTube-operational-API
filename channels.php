@@ -71,15 +71,7 @@
         $continuationTokenProvided = $continuationToken != '';
 
         if ($options['status']) {
-            $http = [
-                'header' => [
-                    'Accept-Language: en',
-                ]
-            ];
-            $httpOptions = [
-                'http' => $http
-            ];
-            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", $httpOptions);
+            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id");
             $status = $result['alerts'][0]['alertRenderer']['text']['simpleText'];
             $item['status'] = $status;
         }
@@ -102,16 +94,7 @@
 
         if ($options['shorts']) {
             if (!$continuationTokenProvided) {
-                $http = [
-                    'header' => [
-                        'Accept-Language: en',
-                    ]
-                ];
-
-                $httpOptions = [
-                    'http' => $http
-                ];
-                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/shorts", $httpOptions);
+                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/shorts");
                 $visitorData = $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
             } else {
                 $continuationParts = explode(',', $continuationToken);
@@ -180,15 +163,7 @@
 
         if ($options['community']) {
             if (!$continuationTokenProvided) {
-                $http = [
-                    'header' => ['Accept-Language: en']
-                ];
-
-                $httpOptions = [
-                    'http' => $http
-                ];
-
-                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/community", $httpOptions);
+                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/community");
             } else {
                 $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
                 $http = [
@@ -226,15 +201,7 @@
 
         if ($options['channels']) {
             if (!$continuationTokenProvided) {
-                $http = [
-                    'header' => ['Accept-Language: en']
-                ];
-
-                $httpOptions = [
-                    'http' => $http
-                ];
-
-                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/channels", $httpOptions);
+                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/channels");
 
                 $tab = getTabByName($result, 'Channels');
                 $sectionListRenderer = $tab['tabRenderer']['content']['sectionListRenderer'];
@@ -312,15 +279,7 @@
         }
 
         if ($options['about']) {
-            $http = [
-                'header' => ['Accept-Language: en']
-            ];
-
-            $httpOptions = [
-                'http' => $http
-            ];
-
-            $result = getJSONFromHTML("https://www.youtube.com/channel/$id/about", $httpOptions);
+            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/about");
 
             $tab = getTabByName($result, 'About');
             $resultCommon = $tab['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
@@ -364,30 +323,14 @@
         }
 
         if ($options['approval']) {
-            $http = [
-                'header' => ['Accept-Language: en']
-            ];
-
-            $httpOptions = [
-                'http' => $http
-            ];
-
-            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", $httpOptions);
+            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id");
             $badgeTooltipPath = 'header/c4TabbedHeaderRenderer/badges/0/metadataBadgeRenderer/tooltip';
             $item['approval'] = doesPathExist($result, $badgeTooltipPath) ? getValue($result, $badgeTooltipPath) : '';
         }
 
         if ($options['playlists']) {
             if (!$continuationTokenProvided) {
-                $http = [
-                    'header' => [
-                        'Accept-Language: en',
-                    ]
-                ];
-                $httpOptions = [
-                    'http' => $http
-                ];
-                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/playlists", $httpOptions);
+                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/playlists");
 
                 $tab = getTabByName($result, 'Playlists');
                 if ($tab === null) {

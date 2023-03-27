@@ -109,11 +109,21 @@
         return explode(';</script>', explode("\">$prefix$scriptVariable = ", $html, 3)[1], 2)[0];
     }
 
-    function getJSONFromHTML($url, $opts = [], $scriptVariable = '', $prefix = 'var ')
+    function getJSONFromHTML($url, $opts = [], $scriptVariable = '', $prefix = 'var ', $forceLanguage = false)
     {
         $html = getRemote($url, $opts);
         $jsonStr = getJSONStringFromHTML($html, $scriptVariable, $prefix);
         return json_decode($jsonStr, true);
+    }
+
+    function getJSONFromHTMLForcingLanguage($url)
+    {
+        $opts = [
+            'http' => [
+                'header' => ['Accept-Language: en']
+            ]
+        ];
+        return getJSONFromHTML($url, $opts);
     }
 
     function checkRegex($regex, $str)
