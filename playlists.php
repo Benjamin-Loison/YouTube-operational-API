@@ -43,7 +43,7 @@
         global $options;
         $opts = [
             "http" => [
-                "header" => ['Cookie: CONSENT=YES+', 'Accept-Language: en']
+                "header" => ['Accept-Language: en']
             ]
         ];
         $result = getJSONFromHTML("https://www.youtube.com/playlist?list=$id", $opts);

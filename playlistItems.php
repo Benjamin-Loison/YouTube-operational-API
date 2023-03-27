@@ -42,7 +42,7 @@ function getAPI($playlistId, $continuationToken)
         $http['content'] = $rawData;
     } else {
         $url = "https://www.youtube.com/playlist?list=$playlistId";
-        $http['header'] = ['Cookie: CONSENT=YES+', 'Accept-Language: en'];
+        $http['header'] = ['Accept-Language: en'];
     }
 
     $httpOptions = [
