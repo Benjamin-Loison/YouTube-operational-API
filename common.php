@@ -48,11 +48,6 @@
         return [$result, $http_response_header];
     }
 
-    function fileGetContentsFromOpts($url, $opts)
-    {
-        return fileGetContentsAndHeadersFromOpts($result, $opts)[0];
-    }
-
     function isRedirection($url)
     {
         $opts = [
