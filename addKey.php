@@ -18,7 +18,7 @@
                 $content = getJSON("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=mWdFMNQBcjs&key=$key", $httpOptions);
                 // The force secret is used to store the YouTube Data API v3 even if it's not having quota, as we assume that the trusted instance that send it to this one has checked that it has quota.
                 if ($content['items'][0]['snippet']['title'] === 'A public video' || (isset($_GET['forceSecret']) && $_GET['forceSecret'] === ADD_KEY_FORCE_SECRET)) {
-                    file_put_contents(KEYS_FILE, ($keysContent === '' ? '' : "\n") . $key, FILE_APPEND);
+                    file_put_contents(KEYS_FILE, ($keysContent === '' || $keysContent === false ? '' : "\n") . $key, FILE_APPEND);
                     // Avoid sending another time the given key to all instances.
                     if (!isset($_GET['forceSecret'])) {
                         foreach (ADD_KEY_TO_INSTANCES as $addKeyToInstance) {
