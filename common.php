@@ -94,9 +94,15 @@
         return json_decode(getRemote($url, $opts), true);
     }
 
-    function getJSONFromHTMLScriptPrefix($html, $scriptPrefix)
+    function getJSONStringFromHTMLScriptPrefix($html, $scriptPrefix)
     {
         $html = explode(';</script>', explode("\">$scriptPrefix", $html, 3)[1], 2)[0];
+        return $html;
+    }
+
+    function getJSONFromHTMLScriptPrefix($html, $scriptPrefix)
+    {
+        $html = getJSONStringFromHTMLScriptPrefix($html, $scriptPrefix);
         return json_decode($html, true);
     }
 
@@ -106,7 +112,7 @@
         if ($scriptVariable === '') {
             $scriptVariable = 'ytInitialData';
         }
-        return explode(';</script>', explode("\">$prefix$scriptVariable = ", $html, 3)[1], 2)[0];
+        return getJSONStringFromHTMLScriptPrefix($html, "$prefix$scriptVariable = ");
     }
 
     function getJSONFromHTML($url, $opts = [], $scriptVariable = '', $prefix = 'var ', $forceLanguage = false)
