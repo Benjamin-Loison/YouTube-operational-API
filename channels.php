@@ -63,6 +63,7 @@
     function getItem($id, $continuationToken)
     {
         global $options;
+
         $item = [
             'kind' => 'youtube#channel',
             'etag' => 'NotImplemented',
@@ -71,18 +72,19 @@
         $continuationTokenProvided = $continuationToken != '';
 
         if ($options['status']) {
-            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id");
+            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id", true);
             $status = $result['alerts'][0]['alertRenderer']['text']['simpleText'];
             $item['status'] = $status;
         }
 
         if ($options['upcomingEvents']) {
             $upcomingEvents = [];
-            $result = getJSONFromHTML("https://www.youtube.com/channel/$id");
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", [], '', 'var ', false, true);
             $subItems = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['shelfRenderer']['content']['horizontalListRenderer']['items'];
             foreach ($subItems as $subItem) {
-                $subItem = $subItem['gridVideoRenderer'];
-                if (array_key_exists('upcomingEventData', $subItem)) {
+                $path = 'gridVideoRenderer/upcomingEventData';
+                if (doesPathExist($subItem, $path)) {
+                    $subItem = $subItem['gridVideoRenderer'];
                     foreach (['navigationEndpoint', 'menu', 'trackingParams', 'thumbnailOverlays'] as $toRemove) {
                         unset($subItem[$toRemove]);
                     }
@@ -94,7 +96,7 @@
 
         if ($options['shorts']) {
             if (!$continuationTokenProvided) {
-                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/shorts");
+                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/shorts", true);
                 $visitorData = $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
             } else {
                 $continuationParts = explode(',', $continuationToken);
@@ -163,7 +165,7 @@
 
         if ($options['community']) {
             if (!$continuationTokenProvided) {
-                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/community");
+                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/community", true);
             } else {
                 $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
                 $http = [
@@ -201,7 +203,7 @@
 
         if ($options['channels']) {
             if (!$continuationTokenProvided) {
-                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/channels");
+                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/channels", true);
 
                 $tab = getTabByName($result, 'Channels');
                 $sectionListRenderer = $tab['tabRenderer']['content']['sectionListRenderer'];
@@ -279,7 +281,9 @@
         }
 
         if ($options['about']) {
-            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/about");
+            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/about", true);
+
+            $item['countryChannelId'] = $result['header']['c4TabbedHeaderRenderer']['channelId'];
 
             $tab = getTabByName($result, 'About');
             $resultCommon = $tab['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
@@ -323,14 +327,14 @@
         }
 
         if ($options['approval']) {
-            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id");
+            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id", true);
             $badgeTooltipPath = 'header/c4TabbedHeaderRenderer/badges/0/metadataBadgeRenderer/tooltip';
             $item['approval'] = doesPathExist($result, $badgeTooltipPath) ? getValue($result, $badgeTooltipPath) : '';
         }
 
         if ($options['playlists']) {
             if (!$continuationTokenProvided) {
-                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/playlists");
+                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/playlists", true);
 
                 $tab = getTabByName($result, 'Playlists');
                 if ($tab === null) {

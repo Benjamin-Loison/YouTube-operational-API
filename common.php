@@ -115,21 +115,33 @@
         return getJSONStringFromHTMLScriptPrefix($html, "$prefix$scriptVariable = ");
     }
 
-    function getJSONFromHTML($url, $opts = [], $scriptVariable = '', $prefix = 'var ', $forceLanguage = false)
+    function getJSONFromHTML($url, $opts = [], $scriptVariable = '', $prefix = 'var ', $forceLanguage = false, $verifiesChannelRedirection = false)
     {
         $html = getRemote($url, $opts);
         $jsonStr = getJSONStringFromHTML($html, $scriptVariable, $prefix);
-        return json_decode($jsonStr, true);
+        $json = json_decode($jsonStr, true);
+        if($verifiesChannelRedirection)
+        {
+            $redirectedToChannelIdPath = 'onResponseReceivedActions/0/navigateAction/endpoint/browseEndpoint/browseId';
+            if(doesPathExist($json, $redirectedToChannelIdPath))
+            {
+                $redirectedToChannelId = getValue($json, $redirectedToChannelIdPath);
+                $url = preg_replace('/[a-zA-Z0-9-_]{24}/', $redirectedToChannelId, $url);
+                // Does a redirection of redirection for a channel exist?
+                return getJSONFromHTML($url, $opts, $scriptVariable, $prefix, $forceLanguage, $verifiesChannelRedirection);
+            }
+        }
+        return $json;
     }
 
-    function getJSONFromHTMLForcingLanguage($url)
+    function getJSONFromHTMLForcingLanguage($url, $verifiesChannelRedirection = false)
     {
         $opts = [
             'http' => [
                 'header' => ['Accept-Language: en']
             ]
         ];
-        return getJSONFromHTML($url, $opts);
+        return getJSONFromHTML($url, $opts, '', 'var ', false, $verifiesChannelRedirection);
     }
 
     function checkRegex($regex, $str)
