@@ -65,7 +65,7 @@
                  ['playlists', 'snippet,statistics&id=PLAYLIST_ID'],
                  ['playlistItems', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
                  ['search', 'id,snippet&q=QUERY&channelId=CHANNEL_ID&eventType=upcoming&hashtag=HASH_TAG&type=video&order=viewCount,relevance(&pageToken=PAGE_TOKEN)'],
-                 ['videos', 'id,status,contentDetails,music,short,impressions,musics,isPaidPromotion,isPremium,isMemberOnly,mostReplayed,qualities,chapters,isOriginal,isRestricted&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
+                 ['videos', 'id,status,contentDetails,music,short,impressions,musics,isPaidPromotion,isPremium,isMemberOnly,mostReplayed,qualities,chapters,isOriginal,isRestricted,snippet&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH']];
 
 ?>
 

@@ -13,7 +13,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'musics', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal', 'isRestricted']; // could load index.php from that
+    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'musics', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal', 'isRestricted', 'snippet']; // could load index.php from that
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -311,6 +311,16 @@
             $playabilityStatus = $json['playabilityStatus'];
             $isRestricted = array_key_exists('isBlockedInRestrictedMode', $playabilityStatus);
             $item['isRestricted'] = $isRestricted;
+        }
+
+        if ($options['snippet']) {
+            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
+            // Note that `publishedAt` has a day only precision.
+            $publishedAt = strtotime($json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']['dateText']['simpleText']);
+            $snippet = [
+                'publishedAt' => $publishedAt
+            ];
+            $item['snippet'] = $snippet;
         }
 
         return $item;
