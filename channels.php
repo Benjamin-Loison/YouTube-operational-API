@@ -189,6 +189,7 @@
                 $contents = $result['onResponseReceivedEndpoints'][0]['appendContinuationItemsAction']['continuationItems'];
             }
             foreach ($contents as $content) {
+                // What is the purpose of this condition?
                 if (!array_key_exists('backstagePostThreadRenderer', $content)) {
                     continue;
                 }
