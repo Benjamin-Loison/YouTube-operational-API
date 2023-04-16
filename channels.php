@@ -284,7 +284,8 @@
         if ($options['about']) {
             $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/about", true);
 
-            $item['countryChannelId'] = $result['header']['c4TabbedHeaderRenderer']['channelId'];
+            $c4TabbedHeaderRenderer = $result['header']['c4TabbedHeaderRenderer'];
+            $item['countryChannelId'] = $c4TabbedHeaderRenderer['channelId'];
 
             $tab = getTabByName($result, 'About');
             $resultCommon = $tab['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
@@ -297,6 +298,9 @@
             // Could try to find a YouTube channel with a single view to make sure it displays "view" and not "views".
             $viewCount = str_replace(' view', '', str_replace(' views', '', str_replace(',', '', $viewCount)));
             $stats['viewCount'] = intval($viewCount);
+
+            $subscriberCount = getIntValue($c4TabbedHeaderRenderer['subscriberCountText']['simpleText'], 'subscriber');
+            $stats['subscriberCount'] = $subscriberCount;
 
             $about['stats'] = $stats;
 
