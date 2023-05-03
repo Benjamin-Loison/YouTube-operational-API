@@ -9,15 +9,21 @@
     {
         if (GOOGLE_ABUSE_EXEMPTION !== '') {
             $cookieToAdd = 'GOOGLE_ABUSE_EXEMPTION=' . GOOGLE_ABUSE_EXEMPTION;
+            // Can't we simplify the following code?
             if (array_key_exists('http', $opts)) {
                 $http = $opts['http'];
                 if (array_key_exists('header', $http)) {
                     $headers = $http['header'];
+                    $isThereACookieHeader = false;
                     foreach ($headers as $headerIndex => $header) {
                         if (str_starts_with($header, 'Cookie: ')) {
                             $opts['http']['header'][$headerIndex] = "$header; $cookieToAdd";
+                            $isThereACookieHeader = true;
                             break;
                         }
+                    }
+                    if (!$isThereACookieHeader) {
+                        array_push($opts['http']['header'], "Cookie: $cookieToAdd");
                     }
                 }
             } else {
