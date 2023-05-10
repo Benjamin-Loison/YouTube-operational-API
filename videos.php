@@ -13,7 +13,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'musics', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal', 'isRestricted', 'snippet']; // could load index.php from that
+    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'musics', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal', 'isRestricted', 'snippet', 'clip']; // could load index.php from that
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -211,10 +211,27 @@
             $item['musics'] = $musics;
         }
 
-        if ($options['id'] && isset($_GET['clipId'])) {
+        if(isset($_GET['clipId'])) {
             $json = getJSONFromHTML("https://www.youtube.com/clip/$id");
-            $videoId = $json['currentVideoEndpoint']['watchEndpoint']['videoId'];
-            $item['videoId'] = $videoId;
+            if ($options['id']) {
+                $videoId = $json['currentVideoEndpoint']['watchEndpoint']['videoId'];
+                $item['videoId'] = $videoId;
+            }
+            if ($options['clip']) {
+                $engagementPanels = $json['engagementPanels'];
+                $path = 'engagementPanelSectionListRenderer/onShowCommands/0/showEngagementPanelScrimAction/onClickCommands/0/commandExecutorCommand/commands/3/openPopupAction/popup/notificationActionRenderer/actionButton/buttonRenderer/command/commandExecutorCommand/commands/1/loopCommand';
+                foreach ($engagementPanels as $engagementPanel) {
+                    if (doesPathExist($engagementPanel, $path)) {
+                        $loopCommand = getValue($engagementPanel, $path);
+                        $clip = [
+                            'startTimeMs' => intval($loopCommand['startTimeMs']),
+                            'endTimeMs' => intval($loopCommand['endTimeMs'])
+                        ];
+                        $item['clip'] = $clip;
+                        break;
+                    }
+                }
+            }
         }
 
         if ($options['isPaidPromotion']) {
