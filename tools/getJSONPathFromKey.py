@@ -60,15 +60,4 @@ with open(filePath, 'w', encoding='utf-8') as f:
 pathValues = _finditem(data, key)
 for path, value in pathValues:
     print(path, value)
-    path = path[1:]
-    path = path.replace('/', "']['")
-    pathParts = path.split("][")
-    pathPartsLen = len(pathParts)
-    for pathPartsIndex in range(pathPartsLen):
-        pathPart = pathParts[pathPartsIndex][1:-1]
-        if pathPart.isdigit():
-            pathParts[pathPartsIndex] = pathPart
-    path = "][".join(pathParts)
-    newPath = "['" + path + "']"
-    print(newPath, value)
 
