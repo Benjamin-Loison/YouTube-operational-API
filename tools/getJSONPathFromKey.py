@@ -58,8 +58,9 @@ with open(filePath, 'w', encoding='utf-8') as f:
     json.dump(data, f, ensure_ascii = False, indent = 4)
 
 pathValues = _finditem(data, key)
-longestPath = len(str(max([len(path) for path, _ in pathValues])))
-for path, value in pathValues:
-    pathLength = ' ' * (longestPath - len(str(len(path)))) + str(len(path))
-    print(pathLength, path, value)
+if pathValues != []:
+    longestPath = len(str(max([len(path) for path, _ in pathValues])))
+    for path, value in pathValues:
+        pathLength = ' ' * (longestPath - len(str(len(path)))) + str(len(path))
+        print(pathLength, path, value)
 
