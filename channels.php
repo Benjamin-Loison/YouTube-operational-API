@@ -122,7 +122,8 @@
             $shorts = [];
             if (!$continuationTokenProvided) {
                 $tab = getTabByName($result, 'Shorts');
-                $reelShelfRendererItems = $tab['tabRenderer']['content']['richGridRenderer']['contents'];
+                $tabRenderer = $tab['tabRenderer'];
+                $reelShelfRendererItems = $tabRenderer['content']['richGridRenderer']['contents'];
             }
             else {
                 $reelShelfRendererItems = $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
@@ -130,13 +131,9 @@
             foreach($reelShelfRendererItems as $reelShelfRendererItem) {
                 if(!array_key_exists('richItemRenderer', $reelShelfRendererItem))
                     continue;
-                $reelShelfRendererItem = $reelShelfRendererItem['richItemRenderer']['content'];
-                $reelItemRenderer = $reelShelfRendererItem['reelItemRenderer'];
+                $reelItemRenderer = $reelShelfRendererItem['richItemRenderer']['content']['reelItemRenderer'];
                 $viewCount = getIntValue($reelItemRenderer['viewCountText']['simpleText'], 'view');
-                $reelWatchEndpoint = $reelItemRenderer['navigationEndpoint']['reelWatchEndpoint'];
-                $frame0Thumbnails = $reelWatchEndpoint['thumbnail']['thumbnails'];
-                $reelPlayerHeaderRenderer = $reelWatchEndpoint['overlay']['reelPlayerOverlayRenderer']['reelPlayerHeaderSupportedRenderers']['reelPlayerHeaderRenderer'];
-                $browseEndpoint = $reelPlayerHeaderRenderer['channelNavigationEndpoint']['browseEndpoint'];
+                $frame0Thumbnails = $reelItemRenderer['navigationEndpoint']['reelWatchEndpoint']['thumbnail']['thumbnails'];
                 $durationParts = explode(' - ', $reelItemRenderer['accessibility']['accessibilityData']['label']);
                 end($durationParts);
                 // Can be `n seconds` or `1 minute` it seems.
@@ -149,13 +146,13 @@
                     'thumbnails' => $reelItemRenderer['thumbnail']['thumbnails'],
                     'viewCount' => $viewCount,
                     'frame0Thumbnails' => $frame0Thumbnails,
-                    'timestamp' => $reelPlayerHeaderRenderer['timestampText']['simpleText'],
-                    'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 1),
-                    'channelId' => $browseEndpoint['browseId'],
-                    'channelTitle' => $reelPlayerHeaderRenderer['channelTitleText']['runs'][0]['text'],
-                    'channelThumbnails' => $reelPlayerHeaderRenderer['channelThumbnail']['thumbnails'],
                     'duration' => $duration
                 ];
+                if (!$continuationTokenProvided) {
+                    $browseEndpoint = $tabRenderer['endpoint']['browseEndpoint'];
+                    $short['channelHandle'] = substr($browseEndpoint['canonicalBaseUrl'], 1);
+                    $short['channelId'] = $browseEndpoint['browseId'];
+                }
                 array_push($shorts, $short);
             }
             $item['shorts'] = $shorts;

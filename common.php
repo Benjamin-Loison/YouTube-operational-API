@@ -404,7 +404,7 @@
 
     function getTabByName($result, $tabName) {
         if (array_key_exists('contents', $result)) {
-            return array_values(array_filter($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], fn($tab) => $tab['tabRenderer']['title'] === $tabName))[0];
+            return array_values(array_filter($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], fn($tab) => (array_key_exists('tabRenderer', $tab) && $tab['tabRenderer']['title'] === $tabName)))[0];
         } else {
             return null;
         }
