@@ -42,7 +42,11 @@ ytVariableName = sys.argv[3] if len(sys.argv) >= 4 else 'ytInitialData'
 # that way could find easily shortest path to get the value as sometimes the value is repeated multiple times
 
 with open(filePath) as f:
-    isJSON = f.read(1) == '{'
+    try:
+        json.load(f)
+        isJSON = True
+    except:
+        isJSON = False
 
 if not isJSON:
     with open(filePath) as f:
