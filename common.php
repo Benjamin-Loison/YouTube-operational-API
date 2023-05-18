@@ -308,18 +308,12 @@
             }
         }
 
-        $videoId = null;
-        if (array_key_exists('publishedTimeText', $common)) {
-            $date = $common['publishedTimeText']['runs'][0]['text'];
-        } else {
-            $videoRenderer = $backstageAttachment['videoRenderer'];
-            $videoId = $videoRenderer['videoId'];
-            $date = $videoRenderer['publishedTimeText']['simpleText'];
-        }
+        $videoId = array_key_exists('videoRenderer', $backstageAttachment) ? $backstageAttachment['videoRenderer']['videoId'] : null;
+        $date = $common['publishedTimeText']['runs'][0]['text'];
         $edited = str_ends_with($date, ' (edited)');
         $date = str_replace(' (edited)', '', $date);
         $date = str_replace('shared ', '', $date);
-        $sharedPostId = $common['originalPost']['backstagePostRenderer']['postId'];
+        $sharedPostId = array_key_exists('originalPost', $common) ? $common['originalPost']['backstagePostRenderer']['postId'] : null;
 
         $poll = null;
         if (array_key_exists('pollRenderer', $backstageAttachment)) {
@@ -339,7 +333,7 @@
             ];
         }
 
-        $likes = intval($common['voteCount']['simpleText']);
+        $likes = intval(array_key_exists('voteCount', $common) ? $common['voteCount']['simpleText'] : 0);
 
         // Retrieving comments when using `community?part=snippet` requires another HTTPS request to `browse` YouTube UI endpoint.
         // sharedPosts do not have 'actionButtons' so this next line will end up defaulting to 0 $comments

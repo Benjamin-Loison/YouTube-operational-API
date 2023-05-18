@@ -194,7 +194,7 @@
                 array_push($community, $post);
             }
             $item['community'] = $community;
-            if ($contents !== null) {
+            if ($contents !== null && array_key_exists('continuationItemRenderer', end($contents))) {
                 $item['nextPageToken'] = urldecode(end($contents)['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
             }
         }
