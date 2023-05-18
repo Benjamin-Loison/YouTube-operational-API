@@ -63,7 +63,7 @@
         ];
         $http_response_header = getHeadersFromOpts($url, $opts);
         $code = intval(explode(' ', $http_response_header[0])[1]);
-        if ($code == HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC) {
+        if (in_array($code, HTTP_CODES_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC)) {
             detectedAsSendingUnusualTraffic();
         }
         return $code == 303;
@@ -72,8 +72,10 @@
     function getRemote($url, $opts = [])
     {
         [$result, $headers] = fileGetContentsAndHeadersFromOpts($url, $opts);
-        if (str_contains($headers[0], strval(HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC))) {
-            detectedAsSendingUnusualTraffic();
+        foreach (HTTP_CODES_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC as $HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC) {
+            if (str_contains($headers[0], strval($HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC))) {
+                detectedAsSendingUnusualTraffic();
+            }
         }
         return $result;
     }
