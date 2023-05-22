@@ -5,6 +5,21 @@
 
     ini_set('display_errors', 0);
 
+    if(RESTRICT_USAGE_TO_KEY !== '')
+    {
+        if(isset($_GET['instanceKey']))
+        {
+            if($_GET['instanceKey'] !== RESTRICT_USAGE_TO_KEY)
+            {
+                die("The provided `instanceKey` isn't correct!");
+            }
+        }
+        else
+        {
+            die('This instance requires that you provide the appropriate `instanceKey` parameter!');
+        }
+    }
+
     function getContextFromOpts($opts)
     {
         if (GOOGLE_ABUSE_EXEMPTION !== '') {
