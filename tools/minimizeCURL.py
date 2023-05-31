@@ -3,10 +3,13 @@
 ## /!\ Assume that the content of `curl.txt` is trusted /!\
 
 '''
-For the moment this algorithm only removes unnecessary headers.
+For the moment this algorithm only:
+- removes unnecessary headers
+- removes unnecessary URL parameters
 '''
 
-import shlex, subprocess, json
+import shlex, subprocess, json, copy
+from urllib.parse import urlparse, parse_qs, quote_plus
 
 wantedOutput = '1714'
 
@@ -30,7 +33,9 @@ def isCommandStillFine(command):
 
 print(len(command))
 
-# Should try to minimize the number of requests done.
+print('Removing headers')
+
+# Should try to minimize the number of requests done, by testing half of parameters at each request.
 while True:
     changedSomething = False
     arguments = shlex.split(command)
@@ -38,10 +43,8 @@ while True:
         argument, nextArgument = arguments[argumentsIndex : argumentsIndex + 2]
         if argument == '-H':
             previousCommand = command
-            #print(arguments[argumentsIndex : argumentsIndex + 2])
             del arguments[argumentsIndex : argumentsIndex + 2]
             command = shlex.join(arguments)
-            #print(len(command))
             if isCommandStillFine(command):
                 print(len(command), 'still fine')
                 changedSomething = True
@@ -52,7 +55,42 @@ while True:
     if not changedSomething:
         break
 
-print(len(command))
+print('Removing URL parameters')
+
+arguments = shlex.split(command)
+for argumentsIndex, argument in enumerate(arguments):
+    if argument.startswith('http'):
+        urlIndex = argumentsIndex
+        break
+
+url = arguments[urlIndex]
+while True:
+    changedSomething = False
+    #print(url)
+    urlParsed = urlparse(url)
+    query = parse_qs(urlParsed.query)
+    #print(query)
+    for key in list(query):
+        previousQuery = copy.deepcopy(query)
+        #print(key)
+        #print(key, query[key])
+        del query[key]
+        url = urlParsed._replace(query = '&'.join([f'{parameter}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
+        #print(url)
+        arguments[urlIndex] = url
+        command = shlex.join(arguments)
+        if isCommandStillFine(command):
+            print(len(command), 'still fine')
+            changedSomething = True
+            break
+        else:
+            #print(len(command), 'not fine')
+            query = previousQuery
+            url = urlParsed._replace(query = '&'.join([f'{parameter}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
+            arguments[urlIndex] = url
+            command = shlex.join(arguments)
+    if not changedSomething:
+        break
 
 with open('minimizedCurl.txt', 'w') as f:
     f.write(command)
