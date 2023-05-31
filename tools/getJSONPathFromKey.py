@@ -51,7 +51,9 @@ with open(filePath) as f:
 if not isJSON:
     with open(filePath) as f:
         content = f.read()
-    newContent = '{' + content.split(ytVariableName + ' = {')[1].split('};')[0] + '}'
+    # Should use a HTML and JavaScript parser instead of proceeding that way.
+    # Same comment concerning `getJSONStringFromHTMLScriptPrefix`, note that both parsing methods should be identical.
+    newContent = content.split(ytVariableName + ' = ')[1].split(';<')[0]
     with open(filePath, 'w') as f:
         f.write(newContent)
 
