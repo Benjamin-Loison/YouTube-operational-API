@@ -6,7 +6,10 @@
 For the moment this algorithm only:
 - removes unnecessary headers
 - removes unnecessary URL parameters
+- removes unnecessary cookies
 '''
+
+# TODO: add booleans switches
 
 import shlex, subprocess, json, copy, sys
 from urllib.parse import urlparse, parse_qs, quote_plus
@@ -89,6 +92,38 @@ while True:
             command = shlex.join(arguments)
     if not changedSomething:
         break
+
+print('Removing cookies')
+
+COOKIES_PREFIX = 'Cookie: '
+
+arguments = shlex.split(command)
+for argumentsIndex, argument in enumerate(arguments):
+    if argument.startswith(COOKIES_PREFIX):
+        cookiesIndex = argumentsIndex
+        break
+
+cookies = arguments[cookiesIndex]
+while True:
+    changedSomething = False
+    cookiesParsed = cookies.replace(COOKIES_PREFIX, '').split('; ')
+    for cookiesParsedIndex, cookie in enumerate(cookiesParsed):
+        cookiesParsedCopy = cookiesParsed[:]
+        del cookiesParsedCopy[cookiesParsedIndex]
+        arguments[cookiesIndex] = COOKIES_PREFIX + '; '.join(cookiesParsedCopy)
+        command = shlex.join(arguments)
+        if isCommandStillFine(command):
+            print(len(command), 'still fine')
+            changedSomething = True
+            cookies = '; '.join(cookiesParsedCopy)
+            break
+        else:
+            arguments[cookiesIndex] = COOKIES_PREFIX + '; '.join(cookiesParsed)
+            command = shlex.join(arguments)
+    if not changedSomething:
+        break
+
+command = command.replace(' --compressed', '')
 
 with open('minimizedCurl.txt', 'w') as f:
     f.write(command)
