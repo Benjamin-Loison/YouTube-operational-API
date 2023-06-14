@@ -8,10 +8,14 @@ For the moment this algorithm only:
 - removes unnecessary URL parameters
 '''
 
-import shlex, subprocess, json, copy
+import shlex, subprocess, json, copy, sys
 from urllib.parse import urlparse, parse_qs, quote_plus
 
-wantedOutput = '1714'
+if len(sys.argv) < 2:
+    print('Usage: ./minimizeCURL "Wanted output"')
+    exit(1)
+
+wantedOutput = sys.argv[1]
 
 # Pay attention to provide a command giving plaintext output, so might required to remove `Accept-Encoding` HTTPS header.
 with open('curl.txt') as f:
@@ -27,7 +31,7 @@ def isCommandStillFine(command):
     return wantedOutput in result
     '''data = json.loads(result)
     accessToken = data['access_token']
-    command = f"curl https://URL -H 'Authorization: Bearer {accessToken}'"
+    command = f"curl URL -H 'Authorization: Bearer {accessToken}'"
     result = executeCommand(command)
     return wantedOutput in result'''
 
@@ -66,17 +70,12 @@ for argumentsIndex, argument in enumerate(arguments):
 url = arguments[urlIndex]
 while True:
     changedSomething = False
-    #print(url)
     urlParsed = urlparse(url)
     query = parse_qs(urlParsed.query)
-    #print(query)
     for key in list(query):
         previousQuery = copy.deepcopy(query)
-        #print(key)
-        #print(key, query[key])
         del query[key]
         url = urlParsed._replace(query = '&'.join([f'{parameter}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
-        #print(url)
         arguments[urlIndex] = url
         command = shlex.join(arguments)
         if isCommandStillFine(command):
@@ -84,7 +83,6 @@ while True:
             changedSomething = True
             break
         else:
-            #print(len(command), 'not fine')
             query = previousQuery
             url = urlParsed._replace(query = '&'.join([f'{parameter}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
             arguments[urlIndex] = url
