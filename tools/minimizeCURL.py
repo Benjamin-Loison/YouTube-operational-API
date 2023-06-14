@@ -184,5 +184,13 @@ if removeRawData:
 
 command = command.replace(' --compressed', '')
 
+HTTP_METHOD = ' -X POST'
+
+if HTTP_METHOD in command:
+    previousCommand = command
+    command = command.replace(HTTP_METHOD, '')
+    if not isCommandStillFine(command):
+        command = previousCommand
+
 with open('minimizedCurl.txt', 'w') as f:
     f.write(command)
