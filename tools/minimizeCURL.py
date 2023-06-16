@@ -2,6 +2,7 @@
 
 ## /!\ Assume that the content of `curlCommandFilePath` is trusted /!\
 # TODO: precising or/and lowering this trust level would be interesting
+# Note that this algorithm doesn't currently minimize specifically YouTube requests (like `--data-raw/context/client/clientVersion`), should potentially add in the future useless character removal which would be a more general but incomplete approach.
 
 '''
 For the moment this algorithm only removes unnecessary:
@@ -180,8 +181,8 @@ if removeRawData:
 
                 elif isinstance(d, list):
                     for i, value in enumerate(d):
-                        yield f'[{i}]'
-                        yield from (f'[{i}]{p}' for p in getPaths(value))
+                        yield f'/{i}'
+                        yield from (f'/{i}{p}' for p in getPaths(value))
 
             while True:
                 changedSomething = False
@@ -193,8 +194,11 @@ if removeRawData:
                     entry = rawDataParsedCopy
                     pathParts = path[1:].split('/')
                     for pathPart in pathParts[:-1]:
+                        pathPart = pathPart if not pathPart.isdigit() else int(pathPart)
                         entry = entry[pathPart]
-                    del entry[pathParts[-1]]
+                    lastPathPart = pathParts[-1]
+                    lastPathPart = lastPathPart if not lastPathPart.isdigit() else int(lastPathPart)
+                    del entry[lastPathPart]
                     arguments[rawDataIndex] = json.dumps(rawDataParsedCopy)
                     command = shlex.join(arguments)
                     if isCommandStillFine(command):
@@ -218,5 +222,7 @@ if HTTP_METHOD in command:
     if not isCommandStillFine(command):
         command = previousCommand
 
+# First test `print`ing, before potentially removing `minimizedCurl` writing.
+print(command)
 with open('minimizedCurl.txt', 'w') as f:
     f.write(command)
