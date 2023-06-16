@@ -41,11 +41,6 @@ def executeCommand(command):
 def isCommandStillFine(command):
     result = executeCommand(command)
     return wantedOutput in result
-    '''data = json.loads(result)
-    accessToken = data['access_token']
-    command = f"curl URL -H 'Authorization: Bearer {accessToken}'"
-    result = executeCommand(command)
-    return wantedOutput in result'''
 
 print(len(command))
 
