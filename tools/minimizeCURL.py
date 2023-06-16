@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-## /!\ Assume that the content of `curl.txt` is trusted /!\
-# TODO:  precising or/and lowering this trust level would be interesting
+## /!\ Assume that the content of `curlCommandFilePath` is trusted /!\
+# TODO: precising or/and lowering this trust level would be interesting
 
 '''
 For the moment this algorithm only removes unnecessary:
@@ -15,11 +15,12 @@ import shlex, subprocess, json, copy, sys
 from urllib.parse import urlparse, parse_qs, quote_plus
 
 # Could precise the input file and possibly remove the output one as the minimized requests start to be short.
-if len(sys.argv) < 2:
-    print('Usage: ./minimizeCURL "Wanted output"')
+if len(sys.argv) < 3:
+    print('Usage: ./minimizeCURL curlCommand.txt "Wanted output"')
     exit(1)
 
-wantedOutput = sys.argv[1]
+curlCommandFilePath = sys.argv[1]
+wantedOutput = sys.argv[2]
 
 # The purpose of these parameters is to reduce requests done when developing this script:
 removeHeaders = True
@@ -28,11 +29,12 @@ removeCookies = True
 removeRawData = True
 
 # Pay attention to provide a command giving plaintext output, so might required to remove `Accept-Encoding` HTTPS header.
-with open('curl.txt') as f:
+with open(curlCommandFilePath) as f:
     command = f.read()
 
 def executeCommand(command):
     # `stderr = subprocess.DEVNULL` is used to get rid of curl progress.
+    # Could also add `-s` curl argument.
     result = subprocess.check_output(f'{command}', shell = True, stderr = subprocess.DEVNULL).decode('utf-8')
     return result
 
