@@ -141,52 +141,77 @@ if removeRawData:
     print('Removing raw data')
 
     rawDataIndex = None
+    isJson = False
     arguments = shlex.split(command)
     for argumentsIndex, argument in enumerate(arguments):
-        try:
-            json.loads(argument)
+        if argumentsIndex > 0 and arguments[argumentsIndex - 1] == '--data-raw':
             rawDataIndex = argumentsIndex
+            try:
+                json.loads(argument)
+                isJson = True
+            except:
+                pass
             break
-        except:
-            pass
 
     if rawDataIndex != None:
-        def getPaths(d):
-            if isinstance(d, dict):
-                for key, value in d.items():
-                    yield f'/{key}'
-                    yield from (f'/{key}{p}' for p in getPaths(value))
-
-            elif isinstance(d, list):
-                for i, value in enumerate(d):
-                    yield f'[{i}]'
-                    yield from (f'[{i}]{p}' for p in getPaths(value))
-
         rawData = arguments[rawDataIndex]
-        while True:
-            changedSomething = False
-            rawDataParsed = json.loads(rawData)
-            # Note that the path goes from parents to children which is quite a wanted behavior to quickly remove useless chunks.
-            paths = getPaths(rawDataParsed)
-            for pathsIndex, path in enumerate(paths):
-                rawDataParsedCopy = copy.deepcopy(rawDataParsed)
-                entry = rawDataParsedCopy
-                pathParts = path[1:].split('/')
-                for pathPart in pathParts[:-1]:
-                    entry = entry[pathPart]
-                del entry[pathParts[-1]]
-                arguments[rawDataIndex] = json.dumps(rawDataParsedCopy)
-                command = shlex.join(arguments)
-                if isCommandStillFine(command):
-                    print(len(command), 'still fine')
-                    changedSomething = True
-                    rawData = json.dumps(rawDataParsedCopy)
-                    break
-                else:
-                    arguments[rawDataIndex] = json.dumps(rawDataParsed)
+        # Could interwine both cases but don't seem to clean much the code due to `getPaths` notably.
+        # Just firstly making a common function to all parts minimizer would make sense.
+        if not isJson:
+            while True:
+                changedSomething = False
+                rawDataParts = rawData.split('&')
+                for rawDataPartsIndex, rawDataPart in enumerate(rawDataParts):
+                    rawDataPartsCopy = copy.deepcopy(rawDataParts)
+                    del rawDataPartsCopy[rawDataPartsIndex]
+                    arguments[rawDataIndex] = '&'.join(rawDataPartsCopy)
                     command = shlex.join(arguments)
-            if not changedSomething:
-                break
+                    if isCommandStillFine(command):
+                        print(len(command), 'still fine')
+                        changedSomething = True
+                        rawData = '&'.join(rawDataPartsCopy)
+                        break
+                    else:
+                        arguments[rawDataIndex] = '&'.join(rawDataParts)
+                        command = shlex.join(arguments)
+                if not changedSomething:
+                    break
+        else:
+            def getPaths(d):
+                if isinstance(d, dict):
+                    for key, value in d.items():
+                        yield f'/{key}'
+                        yield from (f'/{key}{p}' for p in getPaths(value))
+
+                elif isinstance(d, list):
+                    for i, value in enumerate(d):
+                        yield f'[{i}]'
+                        yield from (f'[{i}]{p}' for p in getPaths(value))
+
+            while True:
+                changedSomething = False
+                rawDataParsed = json.loads(rawData)
+                # Note that the path goes from parents to children which is quite a wanted behavior to quickly remove useless chunks.
+                paths = getPaths(rawDataParsed)
+                for pathsIndex, path in enumerate(paths):
+                    rawDataParsedCopy = copy.deepcopy(rawDataParsed)
+                    entry = rawDataParsedCopy
+                    pathParts = path[1:].split('/')
+                    for pathPart in pathParts[:-1]:
+                        entry = entry[pathPart]
+                    del entry[pathParts[-1]]
+                    arguments[rawDataIndex] = json.dumps(rawDataParsedCopy)
+                    command = shlex.join(arguments)
+                    if isCommandStillFine(command):
+                        print(len(command), 'still fine')
+                        changedSomething = True
+                        rawData = json.dumps(rawDataParsedCopy)
+                        break
+                    else:
+                        arguments[rawDataIndex] = json.dumps(rawDataParsed)
+                        command = shlex.join(arguments)
+                if not changedSomething:
+                    break
 
 command = command.replace(' --compressed', '')
 
