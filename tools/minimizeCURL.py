@@ -109,35 +109,38 @@ if removeCookies:
 
     COOKIES_PREFIX = 'Cookie: '
 
+    cookiesIndex = None
     arguments = shlex.split(command)
     for argumentsIndex, argument in enumerate(arguments):
         if argument.startswith(COOKIES_PREFIX):
             cookiesIndex = argumentsIndex
             break
 
-    cookies = arguments[cookiesIndex]
-    while True:
-        changedSomething = False
-        cookiesParsed = cookies.replace(COOKIES_PREFIX, '').split('; ')
-        for cookiesParsedIndex, cookie in enumerate(cookiesParsed):
-            cookiesParsedCopy = cookiesParsed[:]
-            del cookiesParsedCopy[cookiesParsedIndex]
-            arguments[cookiesIndex] = COOKIES_PREFIX + '; '.join(cookiesParsedCopy)
-            command = shlex.join(arguments)
-            if isCommandStillFine(command):
-                print(len(command), 'still fine')
-                changedSomething = True
-                cookies = '; '.join(cookiesParsedCopy)
-                break
-            else:
-                arguments[cookiesIndex] = COOKIES_PREFIX + '; '.join(cookiesParsed)
+    if cookiesIndex != None:
+        cookies = arguments[cookiesIndex]
+        while True:
+            changedSomething = False
+            cookiesParsed = cookies.replace(COOKIES_PREFIX, '').split('; ')
+            for cookiesParsedIndex, cookie in enumerate(cookiesParsed):
+                cookiesParsedCopy = cookiesParsed[:]
+                del cookiesParsedCopy[cookiesParsedIndex]
+                arguments[cookiesIndex] = COOKIES_PREFIX + '; '.join(cookiesParsedCopy)
                 command = shlex.join(arguments)
-        if not changedSomething:
-            break
+                if isCommandStillFine(command):
+                    print(len(command), 'still fine')
+                    changedSomething = True
+                    cookies = '; '.join(cookiesParsedCopy)
+                    break
+                else:
+                    arguments[cookiesIndex] = COOKIES_PREFIX + '; '.join(cookiesParsed)
+                    command = shlex.join(arguments)
+            if not changedSomething:
+                break
 
 if removeRawData:
     print('Removing raw data')
 
+    rawDataIndex = None
     arguments = shlex.split(command)
     for argumentsIndex, argument in enumerate(arguments):
         try:
@@ -147,42 +150,43 @@ if removeRawData:
         except:
             pass
 
-    def getPaths(d):
-        if isinstance(d, dict):
-            for key, value in d.items():
-                yield f'/{key}'
-                yield from (f'/{key}{p}' for p in getPaths(value))
+    if rawDataIndex != None:
+        def getPaths(d):
+            if isinstance(d, dict):
+                for key, value in d.items():
+                    yield f'/{key}'
+                    yield from (f'/{key}{p}' for p in getPaths(value))
 
-        elif isinstance(d, list):
-            for i, value in enumerate(d):
-                yield f'[{i}]'
-                yield from (f'[{i}]{p}' for p in getPaths(value))
+            elif isinstance(d, list):
+                for i, value in enumerate(d):
+                    yield f'[{i}]'
+                    yield from (f'[{i}]{p}' for p in getPaths(value))
 
-    rawData = arguments[rawDataIndex]
-    while True:
-        changedSomething = False
-        rawDataParsed = json.loads(rawData)
-        # Note that the path goes from parents to children which is quite a wanted behavior to quickly remove useless chunks.
-        paths = getPaths(rawDataParsed)
-        for pathsIndex, path in enumerate(paths):
-            rawDataParsedCopy = copy.deepcopy(rawDataParsed)
-            entry = rawDataParsedCopy
-            pathParts = path[1:].split('/')
-            for pathPart in pathParts[:-1]:
-                entry = entry[pathPart]
-            del entry[pathParts[-1]]
-            arguments[rawDataIndex] = json.dumps(rawDataParsedCopy)
-            command = shlex.join(arguments)
-            if isCommandStillFine(command):
-                print(len(command), 'still fine')
-                changedSomething = True
-                rawData = json.dumps(rawDataParsedCopy)
-                break
-            else:
-                arguments[rawDataIndex] = json.dumps(rawDataParsed)
+        rawData = arguments[rawDataIndex]
+        while True:
+            changedSomething = False
+            rawDataParsed = json.loads(rawData)
+            # Note that the path goes from parents to children which is quite a wanted behavior to quickly remove useless chunks.
+            paths = getPaths(rawDataParsed)
+            for pathsIndex, path in enumerate(paths):
+                rawDataParsedCopy = copy.deepcopy(rawDataParsed)
+                entry = rawDataParsedCopy
+                pathParts = path[1:].split('/')
+                for pathPart in pathParts[:-1]:
+                    entry = entry[pathPart]
+                del entry[pathParts[-1]]
+                arguments[rawDataIndex] = json.dumps(rawDataParsedCopy)
                 command = shlex.join(arguments)
-        if not changedSomething:
-            break
+                if isCommandStillFine(command):
+                    print(len(command), 'still fine')
+                    changedSomething = True
+                    rawData = json.dumps(rawDataParsedCopy)
+                    break
+                else:
+                    arguments[rawDataIndex] = json.dumps(rawDataParsed)
+                    command = shlex.join(arguments)
+            if not changedSomething:
+                break
 
 command = command.replace(' --compressed', '')
 
