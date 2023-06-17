@@ -154,7 +154,7 @@ if removeRawData:
         # Could interwine both cases but don't seem to clean much the code due to `getPaths` notably.
         # Just firstly making a common function to all parts minimizer would make sense.
         if not isJson:
-            while True:
+            while rawData != '':
                 changedSomething = False
                 rawDataParts = rawData.split('&')
                 for rawDataPartsIndex, rawDataPart in enumerate(rawDataParts):
@@ -213,6 +213,7 @@ if removeRawData:
                     break
 
 command = command.replace(' --compressed', '')
+command = command.replace(" --data-raw ''", '')
 
 HTTP_METHOD = ' -X POST'
 
