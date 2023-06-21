@@ -85,11 +85,10 @@ function getAPI($playlistId, $continuationToken)
         $publishedAtStr = substr($publishedAtStr, 0, strlen($publishedAtStr) - 2);
         $publishedAtStr = str_replace(' ', '', $publishedAtStr); // "security"
         $publishedAtStr = str_replace(',', '', $publishedAtStr);
-        $publishedAtStr = preg_replace('/[[:^print:]]/', '', $publishedAtStr);
         $publishedAtStrLen = strlen($publishedAtStr);
         for ($publishedAtStrIndex = $publishedAtStrLen - 1; $publishedAtStrIndex >= 0; $publishedAtStrIndex--) {
             $publishedAtChar = $publishedAtStr[$publishedAtStrIndex];
-            if (!(strpos('+*0123456789', $publishedAtChar) !== false)) {
+            if (!str_contains('+*0123456789', $publishedAtChar)) {
                 $publishedAtStr = substr($publishedAtStr, $publishedAtStrIndex + 1, $publishedAtStrLen - $publishedAtStrIndex - 1);
                 break;
             }
