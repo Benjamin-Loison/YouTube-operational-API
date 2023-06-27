@@ -192,6 +192,11 @@
         return checkRegex('[a-zA-Z0-9]+', $cId);
     }
 
+    function isUsername($username)
+    {
+        return checkRegex('[a-zA-Z0-9]+', $username);
+    }
+
     function isChannelId($channelId)
     {
         return checkRegex('[a-zA-Z0-9-_]{24}', $channelId);

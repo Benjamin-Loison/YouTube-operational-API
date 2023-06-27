@@ -15,7 +15,7 @@
     }
 
     // Forbidding URL with no `part` and using `id` filter is debatable.
-    if (isset($_GET['cId']) || isset($_GET['id']) || isset($_GET['handle'])) {
+    if (isset($_GET['cId']) || isset($_GET['id']) || isset($_GET['handle']) || isset($_GET['forUsername'])) {
         if(isset($_GET['part'])) {
             $part = $_GET['part'];
             $parts = explode(',', $part, count($realOptions));
@@ -40,13 +40,21 @@
             if (!isChannelId($id)) {
                 dieWithJsonMessage('Invalid id'); // could directly die within the function
             }
-        } else { // if (isset($_GET['handle']))
+        } else if (isset($_GET['handle'])) {
             $handle = $_GET['handle'];
             if (!isHandle($handle)) {
                 dieWithJsonMessage('Invalid handle');
             }
             $result = getJSONFromHTML("https://www.youtube.com/$handle");
             $id = $result['responseContext']['serviceTrackingParams'][0]['params'][6]['value'];
+        }
+        else /*if (isset($_GET['forUsername']))*/ {
+            $username = $_GET['forUsername'];
+            if (!isUsername($username)) {
+                dieWithJsonMessage('Invalid forUsername');
+            }
+            $result = getJSONFromHTML("https://www.youtube.com/user/$username");
+            $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
         }
         $continuationToken = '';
         if (isset($_GET['pageToken'])) {
