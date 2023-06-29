@@ -84,11 +84,11 @@
         return $code == 303;
     }
 
-    function getRemote($url, $opts = [])
+    function getRemote($url, $opts = [], $verifyTrafficIfForbidden = true)
     {
         [$result, $headers] = fileGetContentsAndHeadersFromOpts($url, $opts);
         foreach (HTTP_CODES_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC as $HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC) {
-            if (str_contains($headers[0], strval($HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC))) {
+            if (str_contains($headers[0], strval($HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC)) && ($HTTP_CODE_DETECTED_AS_SENDING_UNUSUAL_TRAFFIC != 403 || $verifyTrafficIfForbidden)) {
                 detectedAsSendingUnusualTraffic();
             }
         }
@@ -112,9 +112,9 @@
         dieWithJsonMessage('YouTube has detected unusual traffic from this YouTube operational API instance. Please try your request again later or see alternatives at https://github.com/Benjamin-Loison/YouTube-operational-API/issues/11');
     }
 
-    function getJSON($url, $opts = [])
+    function getJSON($url, $opts = [], $verifyTrafficIfForbidden = true)
     {
-        return json_decode(getRemote($url, $opts), true);
+        return json_decode(getRemote($url, $opts, $verifyTrafficIfForbidden), true);
     }
 
     function getJSONStringFromHTMLScriptPrefix($html, $scriptPrefix)
