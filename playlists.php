@@ -42,13 +42,6 @@
     {
         global $options;
         $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/playlist?list=$id");
-        if ($options['snippet']) {
-            $title = $result['metadata']['playlistMetadataRenderer']['title'];
-        }
-        if ($options['statistics']) {
-            $viewCount = $result['sidebar']['playlistSidebarRenderer']['items'][0]['playlistSidebarPrimaryInfoRenderer']['stats'][1]['simpleText'];
-            $viewCount = getIntFromViewCount($viewCount);
-        }
 
         $item = [
             'kind' => 'youtube#playlist',
@@ -56,11 +49,20 @@
         ];
 
         if ($options['snippet']) {
-            $item['snippet'] = ['title' => $title];
+            $title = $result['metadata']['playlistMetadataRenderer']['title'];
+            $item['snippet'] = [
+                'title' => $title
+            ];
         }
 
         if ($options['statistics']) {
-            $item['statistics'] = ['viewCount' => $viewCount];
+            $viewCount = $result['sidebar']['playlistSidebarRenderer']['items'][0]['playlistSidebarPrimaryInfoRenderer']['stats'][1]['simpleText'];
+            $viewCount = getIntFromViewCount($viewCount);
+            $videoCount = intval(str_replace(',', '', $result['header']['playlistHeaderRenderer']['numVideosText']['runs'][0]['text']));
+            $item['statistics'] = [
+                'viewCount' => $viewCount,
+                'videoCount' => $videoCount
+            ];
         }
 
         return $item;
