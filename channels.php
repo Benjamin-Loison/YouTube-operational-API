@@ -7,7 +7,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['status', 'upcomingEvents', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists'];
+    $realOptions = ['status', 'upcomingEvents', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists', 'snippet'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -340,6 +340,15 @@
             $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id", true);
             $badgeTooltipPath = 'header/c4TabbedHeaderRenderer/badges/0/metadataBadgeRenderer/tooltip';
             $item['approval'] = doesPathExist($result, $badgeTooltipPath) ? getValue($result, $badgeTooltipPath) : '';
+        }
+
+        if ($options['snippet']) {
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", [], '', 'var ', false, true);
+            $thumbnails = $result['header']['c4TabbedHeaderRenderer']['avatar']['thumbnails'];
+            $snippet = [
+                'thumbnails' => $thumbnails
+            ];
+            $item['snippet'] = $snippet;
         }
 
         if ($options['playlists']) {
