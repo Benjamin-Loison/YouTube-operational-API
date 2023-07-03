@@ -332,10 +332,13 @@
 
         if ($options['snippet']) {
             $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
+            $contents = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'];
             // Note that `publishedAt` has a day only precision.
-            $publishedAt = strtotime($json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']['dateText']['simpleText']);
+            $publishedAt = strtotime($contents[0]['videoPrimaryInfoRenderer']['dateText']['simpleText']);
+            $description = $contents[1]['videoSecondaryInfoRenderer']['attributedDescription']['content'];
             $snippet = [
-                'publishedAt' => $publishedAt
+                'publishedAt' => $publishedAt,
+                'description' => $description
             ];
             $item['snippet'] = $snippet;
         }
