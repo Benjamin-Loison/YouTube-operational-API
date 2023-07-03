@@ -61,9 +61,9 @@ function getAPI($playlistId, $continuationToken)
     $itemsCount = count($items);
     for ($itemsIndex = 0; $itemsIndex < $itemsCount - 1; $itemsIndex++) {
         $item = $items[$itemsIndex];
-        $gridVideoRenderer = $item['playlistVideoRenderer'];
-        $videoId = $gridVideoRenderer['videoId'];
-        $titleObject = $gridVideoRenderer['title'];
+        $playlistVideoRenderer = $item['playlistVideoRenderer'];
+        $videoId = $playlistVideoRenderer['videoId'];
+        $titleObject = $playlistVideoRenderer['title'];
         $title = $titleObject['runs'][0]['text'];
         $publishedAtRaw = $titleObject['accessibility']['accessibilityData']['label'];
 
@@ -95,12 +95,14 @@ function getAPI($playlistId, $continuationToken)
         }
         $publishedAt = time() - eval("return $publishedAtStr;");
         // the time is not perfectly accurate this way
+        $thumbnails = $playlistVideoRenderer['thumbnail']['thumbnails'];
         $answerItem = [
             'kind' => 'youtube#playlistItem',
             'etag' => 'NotImplemented',
             'snippet' => [
                 'publishedAt' => $publishedAt,
                 'title' => $title,
+                'thumbnails' => $thumbnails,
                 'resourceId' => [
                     'kind' => 'youtube#video',
                     'videoId' => $videoId
