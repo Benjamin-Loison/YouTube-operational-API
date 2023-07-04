@@ -11,6 +11,7 @@ RewriteRule ^webhooks$ webhooks.php
 RewriteRule ^commentThreads$ commentThreads.php
 RewriteRule ^lives$ lives.php
 RewriteRule ^liveChats$ liveChats.php
+RewriteRule ^meta$ meta.php
 
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
