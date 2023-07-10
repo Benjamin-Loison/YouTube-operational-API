@@ -45,13 +45,22 @@ function getAPI($postId, $order)
     $continuationToken = urldecode($contents[1]['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
 
    if ($order === 'time') {
-       $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+        $rawData = [
+            'context' => [
+                'client' => [
+                    'clientName' => 'WEB',
+                    'clientVersion' => MUSIC_VERSION
+                ]
+            ],
+            'continuation' => $continuationToken
+        ];
+
         $http = [
                 'header' => [
                 'Content-Type: application/json'
             ],
             'method' => 'POST',
-            'content' => $rawData
+            'content' => json_encode($rawData)
         ];
 
         $httpOptions = [

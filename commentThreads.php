@@ -55,12 +55,20 @@ function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = f
 {
     $continuationTokenProvided = $continuationToken != '';
     if ($continuationTokenProvided) {
-        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+        $rawData = [
+            'context' => [
+                'client' => [
+                    'clientName' => 'WEB',
+                    'clientVersion' => MUSIC_VERSION
+                ]
+            ],
+            'continuation' => $continuationToken
+        ];
         $opts = [
             "http" => [
                 "method" => "POST",
                 "header" => "Content-Type: application/json",
-                "content" => $rawData,
+                "content" => json_encode($rawData),
             ]
         ];
         $result = getJSON('https://www.youtube.com/youtubei/v1/' . ($videoId !== null ? 'next' : 'browse') . '?key=' . UI_KEY, $opts);

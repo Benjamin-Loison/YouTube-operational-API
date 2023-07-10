@@ -36,10 +36,18 @@ function getAPI($playlistId, $continuationToken)
     $url = '';
     if ($continuationTokenProvided) {
         $url = 'https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY;
-        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+        $rawData = [
+            'context' => [
+                'client' => [
+                    'clientName' => 'WEB',
+                    'clientVersion' => MUSIC_VERSION
+                ]
+            ],
+            'continuation' => $continuationToken
+        ];
         $http['method'] = 'POST';
         $http['header'] = 'Content-Type: application/json';
-        $http['content'] = $rawData;
+        $http['content'] = json_encode($rawData);
     } else {
         $url = "https://www.youtube.com/playlist?list=$playlistId";
         $http['header'] = ['Accept-Language: en'];

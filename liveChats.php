@@ -50,13 +50,24 @@
         $result = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
         $continuation = $result['contents']['twoColumnWatchNextResults']['conversationBar']['liveChatRenderer']['continuations'][0]['reloadContinuationData']['continuation'];
         
-        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuation . '","currentPlayerState":{"playerOffsetMs":"' . $_GET['time'] . '"}}';
+        $rawData = [
+            'context' => [
+                'client' => [
+                    'clientName' => 'WEB',
+                    'clientVersion' => MUSIC_VERSION
+                ]
+            ],
+            'continuation' => strval($continuation),
+            'currentPlayerState' => [
+                'playerOffsetMs' => $_GET['time']
+            ]
+        ];
 
         $opts = [
             "http" => [
                 "header" => "Content-Type: application/json",
                 'method'  => 'POST',
-                "content" => $rawData,
+                "content" => json_encode($rawData),
             ]
         ];
         $result = getJSON('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat_replay?key=' . UI_KEY, $opts);

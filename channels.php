@@ -125,7 +125,15 @@
                 $continuationParts = explode(',', $continuationToken);
                 $continuationToken = $continuationParts[0];
                 $visitorData = $continuationParts[1];
-                $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+                $rawData = [
+                    'context' => [
+                        'client' => [
+                            'clientName' => 'WEB',
+                            'clientVersion' => MUSIC_VERSION
+                        ]
+                    ],
+                    'continuation' => $continuationToken
+                ];
                 $http = [
                     'header' => [
                         'Content-Type: application/json',
@@ -134,7 +142,7 @@
                         "X-Goog-EOM-Visitor-Id: $visitorData"
                     ],
                     'method' => 'POST',
-                    'content' => $rawData
+                    'content' => json_encode($rawData)
                 ];
 
                 $httpOptions = [
@@ -190,11 +198,19 @@
             if (!$continuationTokenProvided) {
                 $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/community", true);
             } else {
-                $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+                $rawData = [
+                    'context' => [
+                        'client' => [
+                            'clientName' => 'WEB',
+                            'clientVersion' => MUSIC_VERSION
+                        ]
+                    ],
+                    'continuation' => $continuationToken
+                ];
                 $http = [
                     'header' => ['Content-Type: application/json'],
                     'method' => 'POST',
-                    'content' => $rawData
+                    'content' => json_encode($rawData)
                 ];
 
                 $httpOptions = [
@@ -246,13 +262,21 @@
                     array_push($itemsArray, [$sectionTitle, $content['items']]);
                 }
             } else {
-                $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+                $rawData = [
+                    'context' => [
+                        'client' => [
+                            'clientName' => 'WEB',
+                            'clientVersion' => MUSIC_VERSION
+                        ]
+                    ],
+                    'continuation' => $continuationToken
+                ];
                 $http = [
                     'header' => [
                         'Content-Type: application/json'
                     ],
                     'method' => 'POST',
-                    'content' => $rawData
+                    'content' => json_encode($rawData)
                 ];
 
                 $httpOptions = [
@@ -393,13 +417,21 @@
                     array_push($itemsArray, [$sectionTitle, $content['items']]);
                 }
             } else {
-                $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+                $rawData = [
+                    'context' => [
+                        'client' => [
+                            'clientName' => 'WEB',
+                            'clientVersion' => MUSIC_VERSION
+                        ]
+                    ],
+                    'continuation' => $continuationToken
+                ];
                 $http = [
                     'header' => [
                         'Content-Type: application/json'
                     ],
                     'method' => 'POST',
-                    'content' => $rawData
+                    'content' => json_encode($rawData)
                 ];
 
                 $httpOptions = [

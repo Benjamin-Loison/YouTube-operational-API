@@ -76,9 +76,17 @@
         global $options;
         $result = '';
         if ($options['status'] || $options['contentDetails']) {
-            $rawData = '{"videoId":"' . $id . '","context":{"client":{"clientName":"WEB_EMBEDDED_PLAYER","clientVersion":"' . CLIENT_VERSION . '"}}}';
+            $rawData = [
+                'videoId' => $id,
+                'context' => [
+                    'client' => [
+                        'clientName' => 'WEB_EMBEDDED_PLAYER',
+                        'clientVersion' => CLIENT_VERSION
+                    ]
+                ]
+            ];
 
-            $result = getJSONFunc($rawData);
+            $result = getJSONFunc(json_encode($rawData));
         }
 
         $item = [
@@ -104,8 +112,16 @@
 
         if ($options['music']) {
             // music request doesn't provide embeddable info - could not make a request if only music and contentDetails
-            $rawData = '{"videoId":"' . $id . '","context":{"client":{"clientName":"WEB_REMIX","clientVersion":"' . CLIENT_VERSION . '"}}}';
-            $resultMusic = getJSONFunc($rawData, true);
+            $rawData = [
+                'videoId' => $id,
+                'context' => [
+                    'client' => [
+                        'clientName' => 'WEB_REMIX',
+                        'clientVersion' => CLIENT_VERSION
+                    ]
+                ]
+            ];
+            $resultMusic = getJSONFunc(json_encode($rawData), true);
             $music = [
                 'available' => $resultMusic['playabilityStatus']['status'] === "OK"
             ];
@@ -126,12 +142,22 @@
                 "Content-Type:",
                 "Cookie: HSID=A4BqSu4moNA0Be1N9; SSID=AA0tycmNyGWo-Z_5v; APISID=a; SAPISID=zRbK-_14V7wIAieP/Ab_wY1sjLVrKQUM2c; SID=HwhYm6rJKOn_3R9oOrTNDJjpHIiq9Uos0F5fv4LPdMRSqyVHA1EDZwbLXo0kuUYAIN_MUQ."
             ];
-            $rawData = '{"screenConfig":{"entity":{"videoId":"' . $id . '"}},"desktopState":{"tabId":"ANALYTICS_TAB_ID_REACH"}}';
+            $rawData = [
+                'screenConfig' => [
+                    'entity' => [
+                        'videoId' => $id
+                    ]
+                ],
+                'desktopState' => [
+                    'tabId' => 'ANALYTICS_TAB_ID_REACH'
+                ]
+            ];
+
             $opts = [
                 "http" => [
                     "method" => "POST",
                     "header" => $headers,
-                    "content" => $rawData,
+                    "content" => json_encode($rawData),
                 ]
             ];
             $json = getJSON('https://studio.youtube.com/youtubei/v1/analytics_data/get_screen?key=' . UI_KEY, $opts);

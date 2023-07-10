@@ -90,12 +90,20 @@ function getAPI($id, $order, $continuationToken)
     $continuationTokenProvided = $continuationToken != '';
     if (isset($_GET['hashtag'])) {
         if ($continuationTokenProvided) {
-            $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}},"continuation":"' . $continuationToken . '"}';
+            $rawData = [
+                'context' => [
+                    'client' => [
+                        'clientName' => 'WEB',
+                        'clientVersion' => MUSIC_VERSION
+                    ]
+                ],
+                'continuation' => $continuationToken
+            ];
             $opts = [
                 "http" => [
                     "method" => "POST",
                     "header" => "Content-Type: application/json",
-                    "content" => $rawData
+                    "content" => json_encode($rawData)
                 ]
             ];
             $json = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $opts);
@@ -108,24 +116,51 @@ function getAPI($id, $order, $continuationToken)
         $items = $json['contents']['twoColumnBrowseResultsRenderer']['tabs'][1]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
     } elseif (isset($_GET['q'])) {
         $typeBase64 = $order === 'relevance' ? '' : 'EgIQAQ==';
-        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . MUSIC_VERSION . '"}}' . ($continuationTokenProvided ? ',"continuation":"' . $continuationToken . '"' : ',"query":"' . str_replace('"', '\"', $_GET['q']) . '"' . ($typeBase64 !== '' ? ',"params":"' . $typeBase64 . '"' : '')) . '}';
+        $rawData = [
+            'context' => [
+                'client' => [
+                    'clientName' => 'WEB',
+                    'clientVersion' => MUSIC_VERSION
+                ]
+            ],
+            'query' => str_replace('"', '\"', $_GET['q'])
+        ];
+        if($continuationTokenProvided) {
+            $rawData['continuation'] = $continuationToken;
+        }
+        if($typeBase64 !== '') {
+            $rawData['params'] = $typeBase64;
+        }
         $opts = [
                "http" => [
                    "method" => "POST",
                    "header" => "Content-Type: application/json",
-                   "content" => $rawData,
+                   "content" => json_encode($rawData),
                ]
         ];
         $json = getJSON('https://www.youtube.com/youtubei/v1/search?key=' . UI_KEY, $opts);
         $items = ($continuationTokenProvided ? $json['onResponseReceivedCommands'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'])[0]['itemSectionRenderer']['contents'];
-    } else { // should precise case to make it more readable
+    } else { // if (isset($_GET['channelId']))
         $orderBase64 = 'EgZ2aWRlb3MYASAAMAE=';
-        $rawData = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"' . ($continuationTokenProvided ? 'continuation":"' . $continuationToken : 'browseId":"' . $_GET['channelId'] . '","params":"' . $orderBase64) . '"}';
+        $rawDataStr = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"' . ($continuationTokenProvided ? 'continuation":"' . $continuationToken : 'browseId":"' . $_GET['channelId'] . '","params":"' . $orderBase64) . '"}';
+        $rawData = [
+            'context' => [
+                'client' => [
+                    'clientName' => 'WEB',
+                    'clientVersion' => CLIENT_VERSION
+                ]
+            ],
+            'browseId' => $_GET['channelId'],
+            'params' => $orderBase64
+        ];
+        if($continuationTokenProvided) {
+            $rawData['continuation'] = $continuationToken;
+        }
         $opts = [
             "http" => [
                 "method" => "POST",
                 "header" => "Content-Type: application/json",
-                "content" => $rawData,
+                "content" => json_encode($rawData),
             ]
         ];
     
