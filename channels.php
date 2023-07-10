@@ -56,6 +56,13 @@
             $result = getJSONFromHTML("https://www.youtube.com/user/$username");
             $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
         }
+        $order = 'time';
+        if (isset($_GET['order'])) {
+            $order = $_GET['order'];
+            if (!in_array($order, ['time', 'viewCount'])) {
+                dieWithJsonMessage('Invalid order');
+            }
+        }
         $continuationToken = '';
         if (isset($_GET['pageToken'])) {
             $continuationToken = $_GET['pageToken'];
@@ -63,12 +70,12 @@
                 dieWithJsonMessage('Invalid pageToken');
             }
         }
-        echo getAPI($id, $continuationToken);
+        echo getAPI($id, $order, $continuationToken);
     } else {
         dieWithJsonMessage("Required parameters not provided");
     }
 
-    function getItem($id, $continuationToken)
+    function getItem($id, $order, $continuationToken)
     {
         global $options;
 
@@ -106,6 +113,14 @@
             if (!$continuationTokenProvided) {
                 $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/shorts", true);
                 $visitorData = $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
+                $tab = getTabByName($result, 'Shorts');
+                $tabRenderer = $tab['tabRenderer'];
+                $richGridRenderer = $tabRenderer['content']['richGridRenderer'];
+                if ($order === 'viewCount') {
+                    $nextPageToken = $richGridRenderer['header']['feedFilterChipBarRenderer']['contents'][1]['chipCloudChipRenderer']['navigationEndpoint']['continuationCommand']['token'];
+                    $continuationToken = urldecode("$nextPageToken,$visitorData");
+                    return getItem($id, $order, $continuationToken);
+                }
             } else {
                 $continuationParts = explode(',', $continuationToken);
                 $continuationToken = $continuationParts[0];
@@ -115,6 +130,7 @@
                     'header' => [
                         'Content-Type: application/json',
                         // Isn't it always the same `$visitorData`?
+                        // I confirm that as of July 10, 2023 this parameter is still required.
                         "X-Goog-EOM-Visitor-Id: $visitorData"
                     ],
                     'method' => 'POST',
@@ -129,12 +145,13 @@
             }
             $shorts = [];
             if (!$continuationTokenProvided) {
-                $tab = getTabByName($result, 'Shorts');
-                $tabRenderer = $tab['tabRenderer'];
-                $reelShelfRendererItems = $tabRenderer['content']['richGridRenderer']['contents'];
+                $reelShelfRendererItems = $richGridRenderer['contents'];
             }
             else {
-                $reelShelfRendererItems = $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+                $onResponseReceivedActions = $result['onResponseReceivedActions'];
+                $onResponseReceivedAction = $onResponseReceivedActions[count($onResponseReceivedActions) - 1];
+                $continuationItems = array_key_exists('appendContinuationItemsAction', $onResponseReceivedAction) ? $onResponseReceivedAction['appendContinuationItemsAction'] : $onResponseReceivedAction['reloadContinuationItemsCommand'];
+                $reelShelfRendererItems = $continuationItems['continuationItems'];
             }
             foreach($reelShelfRendererItems as $reelShelfRendererItem) {
                 if(!array_key_exists('richItemRenderer', $reelShelfRendererItem))
@@ -165,7 +182,8 @@
             }
             $item['shorts'] = $shorts;
             if($reelShelfRendererItems != null && count($reelShelfRendererItems) > 48)
-                $item['nextPageToken'] = urldecode($reelShelfRendererItems[48]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ",$visitorData");
+                $nextPageToken = $reelShelfRendererItems[48]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
+                $item['nextPageToken'] = urldecode("$nextPageToken,$visitorData");
         }
 
         if ($options['community']) {
@@ -516,9 +534,9 @@
         return json_encode($answer, JSON_PRETTY_PRINT);
     }
 
-    function getAPI($id, $continuationToken)
+    function getAPI($id, $order, $continuationToken)
     {
         $items = [];
-        array_push($items, getItem($id, $continuationToken));
+        array_push($items, getItem($id, $order, $continuationToken));
         return returnItems($items);
     }
