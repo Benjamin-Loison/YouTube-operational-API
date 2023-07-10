@@ -80,7 +80,7 @@ if (isset($_GET['part']) &&
     }
     echo getAPI($id, $order, $continuationToken);
 } else {
-    dieWithJsonMessage("Required parameters not provided");
+    dieWithJsonMessage('Required parameters not provided');
 }
 
 function getAPI($id, $order, $continuationToken)
@@ -100,10 +100,10 @@ function getAPI($id, $order, $continuationToken)
                 'continuation' => $continuationToken
             ];
             $opts = [
-                "http" => [
-                    "method" => "POST",
-                    "header" => "Content-Type: application/json",
-                    "content" => json_encode($rawData)
+                'http' => [
+                    'method' => 'POST',
+                    'header' => 'Content-Type: application/json',
+                    'content' => json_encode($rawData)
                 ]
             ];
             $json = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $opts);
@@ -132,17 +132,16 @@ function getAPI($id, $order, $continuationToken)
             $rawData['params'] = $typeBase64;
         }
         $opts = [
-               "http" => [
-                   "method" => "POST",
-                   "header" => "Content-Type: application/json",
-                   "content" => json_encode($rawData),
+               'http' => [
+                   'method' => 'POST',
+                   'header' => 'Content-Type: application/json',
+                   'content' => json_encode($rawData),
                ]
         ];
         $json = getJSON('https://www.youtube.com/youtubei/v1/search?key=' . UI_KEY, $opts);
         $items = ($continuationTokenProvided ? $json['onResponseReceivedCommands'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'])[0]['itemSectionRenderer']['contents'];
     } else { // if (isset($_GET['channelId']))
         $orderBase64 = 'EgZ2aWRlb3MYASAAMAE=';
-        $rawDataStr = '{"context":{"client":{"clientName":"WEB","clientVersion":"' . CLIENT_VERSION . '"}},"' . ($continuationTokenProvided ? 'continuation":"' . $continuationToken : 'browseId":"' . $_GET['channelId'] . '","params":"' . $orderBase64) . '"}';
         $rawData = [
             'context' => [
                 'client' => [
@@ -157,10 +156,10 @@ function getAPI($id, $order, $continuationToken)
             $rawData['continuation'] = $continuationToken;
         }
         $opts = [
-            "http" => [
-                "method" => "POST",
-                "header" => "Content-Type: application/json",
-                "content" => json_encode($rawData),
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-Type: application/json',
+                'content' => json_encode($rawData),
             ]
         ];
     

@@ -72,7 +72,7 @@
         }
         echo getAPI($id, $order, $continuationToken);
     } else {
-        dieWithJsonMessage("Required parameters not provided");
+        dieWithJsonMessage('Required parameters not provided');
     }
 
     function getItem($id, $order, $continuationToken)

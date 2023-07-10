@@ -36,7 +36,7 @@
 
         echo getAPI($realIds);
     } else {
-        dieWithJsonMessage("Required parameters not provided");
+        dieWithJsonMessage('Required parameters not provided');
     }
 
     function getItem($id)
@@ -47,8 +47,8 @@
         $continuation = $result['contents']['twoColumnWatchNextResults']['conversationBar']['liveChatRenderer']['continuations'][0]['reloadContinuationData']['continuation'];
 
         $opts = [
-            "http" => [
-                "user_agent" => USER_AGENT,
+            'http' => [
+                'user_agent' => USER_AGENT,
             ]
         ];
         $html = getJSONFromHTML("https://www.youtube.com/live_chat?continuation=$continuation", $opts, 'window["ytInitialData"]', '');

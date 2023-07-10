@@ -26,7 +26,7 @@ if (isset($_GET['part'], $_GET['playlistId'])) {
     }
     echo getAPI($playlistId, $continuationToken);
 } else {
-    dieWithJsonMessage("Required parameters not provided");
+    dieWithJsonMessage('Required parameters not provided');
 }
 
 function getAPI($playlistId, $continuationToken)

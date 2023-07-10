@@ -40,7 +40,7 @@
 
         echo getAPI($realIds);
     } else {
-        dieWithJsonMessage("Required parameters not provided");
+        dieWithJsonMessage('Required parameters not provided');
     }
 
     function getItem($id)
@@ -64,10 +64,10 @@
         ];
 
         $opts = [
-            "http" => [
-                "header" => "Content-Type: application/json",
+            'http' => [
+                'header' => 'Content-Type: application/json',
                 'method'  => 'POST',
-                "content" => json_encode($rawData),
+                'content' => json_encode($rawData),
             ]
         ];
         $result = getJSON('https://www.youtube.com/youtubei/v1/live_chat/get_live_chat_replay?key=' . UI_KEY, $opts);

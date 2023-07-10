@@ -48,7 +48,7 @@ if (isset($_GET['part'])) {
     }
     echo getAPI($videoId, $order, $continuationToken);
 } else {
-    dieWithJsonMessage("Required parameters not provided");
+    dieWithJsonMessage('Required parameters not provided');
 }
 
 function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = false)
@@ -65,10 +65,10 @@ function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = f
             'continuation' => $continuationToken
         ];
         $opts = [
-            "http" => [
-                "method" => "POST",
-                "header" => "Content-Type: application/json",
-                "content" => json_encode($rawData),
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-Type: application/json',
+                'content' => json_encode($rawData),
             ]
         ];
         $result = getJSON('https://www.youtube.com/youtubei/v1/' . ($videoId !== null ? 'next' : 'browse') . '?key=' . UI_KEY, $opts);

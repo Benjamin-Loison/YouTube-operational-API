@@ -98,7 +98,7 @@
     $keysCount = file_exists(KEYS_FILE) ? substr_count(file_get_contents(KEYS_FILE), "\n") + 1 : 0;
 
 ?>
-<p>Currently this service is <a href="keys.php">powered by <?php echo $keysCount; ?> keys</a>.</p>
+<p>Currently this service is <a href='keys.php'>powered by <?php echo $keysCount; ?> keys</a>.</p>
 <script>
 
 function share() {
@@ -106,12 +106,12 @@ function share() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             alert(xhttp.responseText);
-            youtubeDataAPIV3KeyInput.value = "";
+            youtubeDataAPIV3KeyInput.value = '';
         }
     };
-    var youtubeDataAPIV3KeyInput = document.getElementById("youtubeDataAPIV3Key");
+    var youtubeDataAPIV3KeyInput = document.getElementById('youtubeDataAPIV3Key');
     const key = youtubeDataAPIV3KeyInput.value;
-    xhttp.open("GET", "addKey.php?key=" + key);
+    xhttp.open('GET', `addKey.php?key=${key}`);
     xhttp.send();
 }
 

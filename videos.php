@@ -49,23 +49,23 @@
         }
         echo getAPI($realIds);
     } else {
-        dieWithJsonMessage("Required parameters not provided");
+        dieWithJsonMessage('Required parameters not provided');
     }
 
     function getJSONFunc($rawData, $music = false)
     {
         $headers = [
-            "Content-Type: application/json",
+            'Content-Type: application/json',
             'Accept-Language: en'
         ];
         if ($music) {
             array_push($headers, 'Referer: https://music.youtube.com');
         }
         $opts = [
-            "http" => [
-                "method" => "POST",
-                "header" => $headers,
-                "content" => $rawData,
+            'http' => [
+                'method' => 'POST',
+                'header' => $headers,
+                'content' => $rawData,
             ]
         ];
         return getJSON('https://' . ($music ? 'music' : 'www') . '.youtube.com/youtubei/v1/player?key=' . UI_KEY, $opts);
@@ -123,7 +123,7 @@
             ];
             $resultMusic = getJSONFunc(json_encode($rawData), true);
             $music = [
-                'available' => $resultMusic['playabilityStatus']['status'] === "OK"
+                'available' => $resultMusic['playabilityStatus']['status'] === 'OK'
             ];
             $item['music'] = $music;
         }
@@ -137,10 +137,10 @@
 
         if ($options['impressions']) {
             $headers = [
-                "x-origin: https://studio.youtube.com",
+                'x-origin: https://studio.youtube.com',
                 "authorization: SAPISIDHASH {$_GET['SAPISIDHASH']}",
-                "Content-Type:",
-                "Cookie: HSID=A4BqSu4moNA0Be1N9; SSID=AA0tycmNyGWo-Z_5v; APISID=a; SAPISID=zRbK-_14V7wIAieP/Ab_wY1sjLVrKQUM2c; SID=HwhYm6rJKOn_3R9oOrTNDJjpHIiq9Uos0F5fv4LPdMRSqyVHA1EDZwbLXo0kuUYAIN_MUQ."
+                'Content-Type:',
+                'Cookie: HSID=A4BqSu4moNA0Be1N9; SSID=AA0tycmNyGWo-Z_5v; APISID=a; SAPISID=zRbK-_14V7wIAieP/Ab_wY1sjLVrKQUM2c; SID=HwhYm6rJKOn_3R9oOrTNDJjpHIiq9Uos0F5fv4LPdMRSqyVHA1EDZwbLXo0kuUYAIN_MUQ.'
             ];
             $rawData = [
                 'screenConfig' => [
@@ -154,10 +154,10 @@
             ];
 
             $opts = [
-                "http" => [
-                    "method" => "POST",
-                    "header" => $headers,
-                    "content" => json_encode($rawData),
+                'http' => [
+                    'method' => 'POST',
+                    'header' => $headers,
+                    'content' => json_encode($rawData),
                 ]
             ];
             $json = getJSON('https://studio.youtube.com/youtubei/v1/analytics_data/get_screen?key=' . UI_KEY, $opts);
@@ -344,8 +344,8 @@
 
         if ($options['isRestricted']) {
             $opts = [
-                "http" => [
-                    "header" => ["Cookie: PREF=f2=8000000"],
+                'http' => [
+                    'header' => ['Cookie: PREF=f2=8000000'],
                 ]
             ];
             $html = getRemote("https://www.youtube.com/watch?v=$id", $opts);
