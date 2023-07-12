@@ -250,6 +250,7 @@
                     if (doesPathExist($engagementPanel, $path)) {
                         $loopCommand = getValue($engagementPanel, $path);
                         $clip = [
+                            'title' => $engagementPanel['engagementPanelSectionListRenderer']['content']['clipSectionRenderer']['contents'][0]['clipAttributionRenderer']['title']['runs'][0]['text'],
                             'startTimeMs' => intval($loopCommand['startTimeMs']),
                             'endTimeMs' => intval($loopCommand['endTimeMs'])
                         ];
