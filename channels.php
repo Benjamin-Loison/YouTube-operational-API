@@ -189,9 +189,10 @@
                 array_push($shorts, $short);
             }
             $item['shorts'] = $shorts;
-            if($reelShelfRendererItems != null && count($reelShelfRendererItems) > 48)
+            if($reelShelfRendererItems != null && count($reelShelfRendererItems) > 48) {
                 $nextPageToken = $reelShelfRendererItems[48]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
                 $item['nextPageToken'] = urldecode("$nextPageToken,$visitorData");
+            }
         }
 
         if ($options['community']) {
