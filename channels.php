@@ -118,8 +118,10 @@
                 $richGridRenderer = $tabRenderer['content']['richGridRenderer'];
                 if ($order === 'viewCount') {
                     $nextPageToken = $richGridRenderer['header']['feedFilterChipBarRenderer']['contents'][1]['chipCloudChipRenderer']['navigationEndpoint']['continuationCommand']['token'];
-                    $continuationToken = urldecode("$nextPageToken,$visitorData");
-                    return getItem($id, $order, $continuationToken);
+                    if($continuationToken !== '') {
+                        $continuationToken = urldecode("$nextPageToken,$visitorData");
+                        return getItem($id, $order, $continuationToken);
+                    }
                 }
             } else {
                 $continuationParts = explode(',', $continuationToken);
