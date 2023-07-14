@@ -277,9 +277,13 @@
     {
         $unitCount = str_replace(" {$unit}s", '', $unitCount);
         $unitCount = str_replace(" $unit", '', $unitCount);
-        $unitCount = str_replace('K', '*1000', $unitCount);
-        $unitCount = str_replace('M', '*1000000', $unitCount);
-        if(checkRegex('[0-9.*KM]+', $unitCount)) {
+        if($unitCount === 'No') {
+            $unitCount = '0';
+        }
+        $unitCount = str_replace('K', '*1_000', $unitCount);
+        $unitCount = str_replace('M', '*1_000_000', $unitCount);
+        $unitCount = str_replace('B', '*1_000_000_000', $unitCount);
+        if(checkRegex('[0-9_.*KMB]+', $unitCount)) {
             $unitCount = eval("return round($unitCount);");
         }
         return $unitCount;
