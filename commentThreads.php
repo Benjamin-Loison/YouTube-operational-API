@@ -116,7 +116,7 @@ function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = f
             'authorHandle' => $isAuthorAHandle ? $author : null,
             'authorProfileImageUrls' => $comment['authorThumbnail']['thumbnails'],
             'authorChannelId' => ['value' => $comment['authorEndpoint']['browseEndpoint']['browseId']],
-            'likeCount' => getIntValue($comment['voteCount']['simpleText']),
+            'likeCount' => array_key_exists('voteCount', $comment) ? getIntValue($comment['voteCount']['simpleText']) : 0,
             'publishedAt' => $publishedAt,
             'wasEdited' => $wasEdited,
             'isPinned' => array_key_exists('pinnedCommentBadge', $comment),
