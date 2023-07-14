@@ -118,7 +118,7 @@
                 $richGridRenderer = $tabRenderer['content']['richGridRenderer'];
                 if ($order === 'viewCount') {
                     $nextPageToken = $richGridRenderer['header']['feedFilterChipBarRenderer']['contents'][1]['chipCloudChipRenderer']['navigationEndpoint']['continuationCommand']['token'];
-                    if($continuationToken !== '') {
+                    if($nextPageToken !== null) {
                         $continuationToken = urldecode("$nextPageToken,$visitorData");
                         return getItem($id, $order, $continuationToken);
                     }
