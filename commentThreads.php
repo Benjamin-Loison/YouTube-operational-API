@@ -79,7 +79,9 @@ function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = f
     } else {
         $result = getJSONFromHTML("https://www.youtube.com/watch?v=$videoId");
         $continuationToken = end($result['contents']['twoColumnWatchNextResults']['results']['results']['contents'])['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
-        return getAPI($videoId, $order, $continuationToken, true);
+        if($continuationToken != '') {
+            return getAPI($videoId, $order, $continuationToken, true);
+        }
     }
 
     $answerItems = [];
