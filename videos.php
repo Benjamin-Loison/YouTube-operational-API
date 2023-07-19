@@ -13,7 +13,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'musics', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal', 'isRestricted', 'snippet', 'clip']; // could load index.php from that
+    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'musics', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal', 'isRestricted', 'snippet', 'clip', 'activity']; // could load index.php from that
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -368,6 +368,22 @@
                 'description' => $description
             ];
             $item['snippet'] = $snippet;
+        }
+
+        if ($options['activity']) {
+            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
+            $activity = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][1]['videoSecondaryInfoRenderer']['metadataRowContainer']['metadataRowContainerRenderer']['rows'][0]['richMetadataRowRenderer']['contents'][0]['richMetadataRenderer'];
+            $name = $activity['title']['simpleText'];
+            $year = $activity['subtitle']['simpleText'];
+            $thumbnails = $activity['thumbnail']['thumbnails'];
+            $channelId = $activity['endpoint']['browseEndpoint']['browseId'];
+            $activity = [
+                'name' => $name,
+                'year' => $year,
+                'thumbnails' => $thumbnails,
+                'channelId' => $channelId
+            ];
+            $item['activity'] = $activity;
         }
 
         return $item;
