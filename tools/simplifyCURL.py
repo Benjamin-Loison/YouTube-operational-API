@@ -14,7 +14,7 @@ path = getPath('C:\\Users\\Benjamin\\Desktop\\BensFolder\\DEV\\StackOverflow\\Yo
 os.chdir(path)
 
 def exec(cmd):
-    return subprocess.check_output(cmd, shell=True)
+    return subprocess.check_output(cmd, shell=True).decode('utf-8')
 
 with open('curlCommand.txt') as f:
     line = f.readline()
@@ -83,7 +83,7 @@ def treat(line):
 
 cmd = treat(line)
 print(cmd)
-res = exec(cmd).decode('utf-8')
+res = exec(cmd)
 if needle in res:
     print('working')
 else:
