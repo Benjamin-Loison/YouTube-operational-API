@@ -46,7 +46,7 @@ def isCommandStillFine(command):
 print(len(command))
 # To verify that the user provided the correct `wantedOutput` to keep during the minimization.
 if not isCommandStillFine(command):
-    print("The wanted output isn't contained in the result of the original curl command!")
+    print('The wanted output isn\'t contained in the result of the original curl command!')
     exit(1)
 
 if removeHeaders:
@@ -217,7 +217,7 @@ if removeRawData:
                     break
 
 command = command.replace(' --compressed', '')
-command = command.replace(" --data-raw ''", '')
+command = command.replace(' --data-raw \'\'', '')
 
 HTTP_METHOD = ' -X POST'
 
