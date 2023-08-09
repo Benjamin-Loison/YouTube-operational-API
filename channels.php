@@ -7,7 +7,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['status', 'upcomingEvents', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists', 'snippet'];
+    $realOptions = ['status', 'upcomingEvents', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists', 'snippet', 'membership'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -394,6 +394,11 @@
                 'thumbnails' => $thumbnails
             ];
             $item['snippet'] = $snippet;
+        }
+
+        if ($options['membership']) {
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id");
+            $item['isMembershipEnabled'] = array_key_exists('sponsorButton', $result['header']['c4TabbedHeaderRenderer']);
         }
 
         if ($options['playlists']) {

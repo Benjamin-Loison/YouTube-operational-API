@@ -5,7 +5,7 @@ YouTube operational API works when [YouTube Data API v3](https://developers.goog
 
 ## Install your own instance of the API:
 
-1. If not already hosting a website ([click here](https://github.com/Benjamin-Loison/YouTube-operational-API/wiki#install-your-own-instance-of-the-api-on-a-nginx-web-server) if you prefer nginx), run in a terminal:
+1. If not already hosting a website ([click here](https://github.com/Benjamin-Loison/YouTube-operational-API/wiki/Home/1c7139f68af217d41d0a201a97eaecf87c139a8b#install-your-own-instance-of-the-api-on-a-nginx-web-server) if you prefer nginx), run in a terminal:
 
 ### On Linux (Ubuntu, Debian and Mint):
 
