@@ -7,7 +7,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['status', 'upcomingEvents', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists', 'snippet', 'membership'];
+    $realOptions = ['status', 'upcomingEvents', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists', 'snippet', 'membership', 'monetization'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -399,6 +399,20 @@
         if ($options['membership']) {
             $result = getJSONFromHTML("https://www.youtube.com/channel/$id");
             $item['isMembershipEnabled'] = array_key_exists('sponsorButton', $result['header']['c4TabbedHeaderRenderer']);
+        }
+
+        if ($options['monetization']) {
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id");
+            foreach($result['responseContext']['serviceTrackingParams'][0]['params'] as $param)
+            {
+                if($param['key'] == 'is_monetization_enabled')
+                {
+                    // Don't use `boolval` as it returns `true` for `"false"`.
+                    $isMonetizationEnabled = $param['value'] === 'true';
+                    break;
+                }
+            }
+            $item['isMonetizationEnabled'] = $isMonetizationEnabled;
         }
 
         if ($options['playlists']) {
