@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: YouTube operational API
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file. Please let me know if you cite
+  this software.
+type: software
+authors:
+  - given-names: Benjamin
+    family-names: Loison
+repository-code: 'https://github.com/Benjamin-Loison/YouTube-operational-API'
+url: 'https://yt.lemnoslife.com'
+abstract: >-
+  YouTube operational API works when YouTube Data API v3
+  fails.
+keywords:
+  - YouTube
+  - YouTube Data API v3
+  - YouTube operational API
