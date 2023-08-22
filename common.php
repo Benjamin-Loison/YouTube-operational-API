@@ -252,6 +252,11 @@
         return (checkRegex('Ug[w-z][a-zA-Z0-9-_]{16}4AaABCQ', $postId) || checkRegex('Ugkx[a-zA-Z0-9-_]{32}', $postId));
     }
 
+    function isCommentId($commentId)
+    {
+        return checkRegex('Ug[w-z][a-zA-Z0-9-_]{16}4AaABAg', $commentId);
+    }
+
     function doesPathExist($json, $path)
     {
         $parts = explode('/', $path);

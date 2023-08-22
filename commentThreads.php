@@ -34,6 +34,14 @@ if (isset($_GET['part'])) {
         }
     }
 
+    $commentId = null;
+    if (isset($_GET['id'])) {
+        $commentId = $_GET['id'];
+        if (!isCommentId($commentId)) {
+            dieWithJsonMessage('Invalid id');
+        }
+    }
+
     $order = isset($_GET['order']) ? $_GET['order'] : 'relevance';
     if (!in_array($order, ['relevance', 'time'])) {
         dieWithJsonMessage('Invalid order');
@@ -46,13 +54,18 @@ if (isset($_GET['part'])) {
             dieWithJsonMessage('Invalid pageToken');
         }
     }
-    echo getAPI($videoId, $order, $continuationToken);
+    echo getAPI($videoId, $commentId, $order, $continuationToken);
 } else {
     dieWithJsonMessage('Required parameters not provided');
 }
 
-function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = false)
+function getAPI($videoId, $commentId, $order, $continuationToken, $simulatedContinuation = false)
 {
+    if($commentId !== null)
+    {
+        $result = getJSONFromHTML("https://www.youtube.com/watch?v=$videoId&lc=$commentId");
+        $continuationToken = $result['contents']['twoColumnWatchNextResults']['results']['results']['contents']['3']['itemSectionRenderer']['contents']['0']['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
+    }
     $continuationTokenProvided = $continuationToken != '';
     if ($continuationTokenProvided) {
         $rawData = [
@@ -74,13 +87,13 @@ function getAPI($videoId, $order, $continuationToken, $simulatedContinuation = f
         $result = getJSON('https://www.youtube.com/youtubei/v1/' . ($videoId !== null ? 'next' : 'browse') . '?key=' . UI_KEY, $opts);
         if ($order === 'time' && $simulatedContinuation) {
             $continuationToken = $result['onResponseReceivedEndpoints'][0]['reloadContinuationItemsCommand']['continuationItems'][0]['commentsHeaderRenderer']['sortMenu']['sortFilterSubMenuRenderer']['subMenuItems'][1]['serviceEndpoint']['continuationCommand']['token'];
-            return getAPI($videoId, null, $continuationToken);
+            return getAPI($videoId, $commentId, null, $continuationToken);
         }
     } else {
         $result = getJSONFromHTML("https://www.youtube.com/watch?v=$videoId");
         $continuationToken = end($result['contents']['twoColumnWatchNextResults']['results']['results']['contents'])['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
         if($continuationToken != '') {
-            return getAPI($videoId, $order, $continuationToken, true);
+            return getAPI($videoId, $commentId, $order, $continuationToken, true);
         }
     }
 

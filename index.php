@@ -61,7 +61,7 @@
     }
 
     $features = [['channels', 'status,upcomingEvents,shorts,community,channels,about,approval,playlists,snippet,membership,monetization&cId=C_ID&id=CHANNEL_ID&handle=HANDLE&forUsername=USERNAME&order=viewCount(&pageToken=PAGE_TOKEN)'],
-                 ['commentThreads', 'snippet,replies&videoId=VIDEO_ID&order=relevance,time(&pageToken=PAGE_TOKEN)'],
+                 ['commentThreads', 'snippet,replies&id=COMMENT_ID&videoId=VIDEO_ID&order=relevance,time(&pageToken=PAGE_TOKEN)'],
                  ['playlists', 'snippet,statistics&id=PLAYLIST_ID'],
                  ['playlistItems', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
                  ['search', 'id,snippet&q=QUERY&channelId=CHANNEL_ID&eventType=upcoming&hashtag=HASH_TAG&type=video&order=viewCount,relevance(&pageToken=PAGE_TOKEN)'],
