@@ -19,7 +19,7 @@ Replace `AllowOverride None` with `AllowOverride All` in `<Directory /var/www/>`
 Then run:
 
 ```
-sudo service apache2 start
+sudo service apache2 restart
 ```
 
 ### On Windows:
