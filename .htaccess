@@ -15,3 +15,10 @@ RewriteRule ^liveChats$ liveChats.php
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
 </IfModule>
+
+# For official instances:
+Redirect /matrix https://matrix.to/#/#youtube-operational-api:matrix.org
+Redirect /discord https://discord.gg/pDzafhGWzf
+Redirect /code https://github.com/Benjamin-Loison/YouTube-operational-API
+Redirect /host-your-own-instance https://github.com/Benjamin-Loison/YouTube-operational-API/blob/main/README.md#install-your-own-instance-of-the-api
+Redirect /issues https://github.com/Benjamin-Loison/YouTube-operational-API/issues
