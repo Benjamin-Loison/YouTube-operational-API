@@ -363,20 +363,20 @@
             $details['location'] = $resultCommon['country']['simpleText'];
             $about['details'] = $details;
 
-            $linksObjects = $resultCommon['primaryLinks'];
+            $linksObjects = $resultCommon['links'];
             $links = [];
             foreach ($linksObjects as $linkObject) {
                 $link = [];
-                $url = $linkObject['navigationEndpoint']['urlEndpoint']['url'];
+                $linkObject = $linkObject['channelExternalLinkViewModel'];
+                $url = $linkObject['link']['commandRuns'][0]['onTap']['innertubeCommand']['urlEndpoint']['url'];
                 $urlComponents = parse_url($url);
                 parse_str($urlComponents['query'], $params);
                 $link['url'] = array_key_exists('q', $params) ? $params['q'] : $url;
-                $link['thumbnail'] = $linkObject['icon']['thumbnails'][0]['url'];
-                $link['title'] = $linkObject['title']['simpleText'];
+                $link['title'] = $linkObject['title']['content'];
                 array_push($links, $link);
             }
             $about['links'] = $links;
-            $about['handle'] = $result['header']['c4TabbedHeaderRenderer']['channelHandleText']['runs'][0]['text'];
+            $about['handle'] = $c4TabbedHeaderRenderer['channelHandleText']['runs'][0]['text'];
 
             $item['about'] = $about;
         }
