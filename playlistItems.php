@@ -71,9 +71,8 @@ function getAPI($playlistId, $continuationToken)
         $item = $items[$itemsIndex];
         $playlistVideoRenderer = $item['playlistVideoRenderer'];
         $videoId = $playlistVideoRenderer['videoId'];
-        $titleObject = $playlistVideoRenderer['title'];
-        $title = $titleObject['runs'][0]['text'];
-        $publishedAtRaw = $titleObject['accessibility']['accessibilityData']['label'];
+        $title = $playlistVideoRenderer['title']['runs'][0]['text'];
+        $publishedAtRaw = $playlistVideoRenderer['videoInfo']['runs'][2]['text'];
 
         $publishedAtStr = str_replace('ago', '', $publishedAtRaw);
         $publishedAtStr = str_replace('seconds', '* 1 +', $publishedAtStr);
@@ -90,10 +89,12 @@ function getAPI($playlistId, $continuationToken)
         $publishedAtStr = str_replace('month', '* 2592000 +', $publishedAtStr);
         $publishedAtStr = str_replace('years', '* 31104000 +', $publishedAtStr); // not sure
         $publishedAtStr = str_replace('year', '* 31104000 +', $publishedAtStr);
+        // To remove last ` +`.
         $publishedAtStr = substr($publishedAtStr, 0, strlen($publishedAtStr) - 2);
         $publishedAtStr = str_replace(' ', '', $publishedAtStr); // "security"
         $publishedAtStr = str_replace(',', '', $publishedAtStr);
         $publishedAtStrLen = strlen($publishedAtStr);
+        // "security"
         for ($publishedAtStrIndex = $publishedAtStrLen - 1; $publishedAtStrIndex >= 0; $publishedAtStrIndex--) {
             $publishedAtChar = $publishedAtStr[$publishedAtStrIndex];
             if (!str_contains('+*0123456789', $publishedAtChar)) {
