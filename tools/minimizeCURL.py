@@ -116,7 +116,7 @@ if removeCookies:
             cookiesIndex = argumentsIndex
             break
 
-    if cookiesIndex != None:
+    if cookiesIndex is not None:
         cookies = arguments[cookiesIndex]
         while True:
             changedSomething = False
@@ -153,7 +153,7 @@ if removeRawData:
                 pass
             break
 
-    if rawDataIndex != None:
+    if rawDataIndex is not None:
         rawData = arguments[rawDataIndex]
         # Could interwine both cases but don't seem to clean much the code due to `getPaths` notably.
         # Just firstly making a common function to all parts minimizer would make sense.
