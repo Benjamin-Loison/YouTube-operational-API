@@ -281,9 +281,26 @@
 
         if ($options['mostReplayed']) {
             $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
-            $markersMap = $json['playerOverlays']['playerOverlayRenderer']['decoratedPlayerBarRenderer']['decoratedPlayerBarRenderer']['playerBar']['multiMarkersPlayerBarRenderer']['markersMap'];
-            $mostReplayed = $markersMap !== null ? end($markersMap)['value']['heatmap']['heatmapRenderer'] : null;
-            // What is `Dp` in `maxHeightDp` and `minHeightDp` ? If not relevant could add ['heatMarkers'] to the JSON path above.
+            $mostReplayed = $json['frameworkUpdates']['entityBatchUpdate']['mutations'][0]['payload']['macroMarkersListEntity']['markersList'];
+            foreach(array_keys($mostReplayed['markers']) as $markerIndex)
+            {
+                unset($mostReplayed['markers'][$markerIndex]['durationMillis']);
+                $mostReplayed['markers'][$markerIndex]['startMillis'] = intval($mostReplayed['markers'][$markerIndex]['startMillis']);
+            }
+            $timedMarkerDecorations = $mostReplayed['markersDecoration']['timedMarkerDecorations'];
+            foreach(array_keys($timedMarkerDecorations) as $timedMarkerDecorationIndex)
+            {
+                foreach(['label', 'icon', 'decorationTimeMillis'] as $timedMarkerDecorationKey)
+                {
+                    unset($timedMarkerDecorations[$timedMarkerDecorationIndex][$timedMarkerDecorationKey]);
+                }
+            }
+            $mostReplayed['timedMarkerDecorations'] = $timedMarkerDecorations;
+            foreach(['markerType', 'markersMetadata', 'markersDecoration'] as $mostReplayedKey)
+            {
+                unset($mostReplayed[$mostReplayedKey]);
+            }
+
             $item['mostReplayed'] = $mostReplayed;
         }
 
