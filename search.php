@@ -2,7 +2,7 @@
 
     header('Content-Type: application/json; charset=UTF-8');
 
-    // StackOverflow source: https://stackoverflow.com/a/70793047
+    // Stack Overflow source: https://stackoverflow.com/a/70793047
     $searchTests = [['snippet&channelId=UC4QobU6STFB0P71PMvOGN5A&order=viewCount', 'items/0/id/videoId', 'jNQXAC9IVRw']];
 
 // copy YT perfectly (answers and arguments) - slower because not always everything from answer in one request for me

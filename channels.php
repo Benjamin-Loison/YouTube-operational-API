@@ -2,7 +2,7 @@
 
     header('Content-Type: application/json; charset=UTF-8');
 
-    // StackOverflow source: https://stackoverflow.com/a/71067222
+    // Stack Overflow source: https://stackoverflow.com/a/71067222
     $channelsTests = [['cId=FolkartTr', 'items/0/id', 'UCnS--2e1yzQCm5r4ClrMJBg']];
 
     include_once 'common.php';

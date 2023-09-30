@@ -2,9 +2,9 @@
 
     header('Content-Type: application/json; charset=UTF-8');
 
-    // StackOverflow contentDetails source: https://stackoverflow.com/a/70908689
-    // StackOverflow status source: https://stackoverflow.com/a/70894799
-    // StackOverflow music source: https://stackoverflow.com/a/71012426
+    // Stack Overflow contentDetails source: https://stackoverflow.com/a/70908689
+    // Stack Overflow status source: https://stackoverflow.com/a/70894799
+    // Stack Overflow music source: https://stackoverflow.com/a/71012426
     $videosTests = [['contentDetails&id=g5xNzUA5Qf8', 'items/0/contentDetails/duration', '213'],
                     ['status&id=J8ZVxDK11Jo', 'items/0/status/embeddable', false],
                     ['status&id=g5xNzUA5Qf8', 'items/0/status/embeddable', true], // could allow subarray for JSON check in response likewise in a single request can check several features

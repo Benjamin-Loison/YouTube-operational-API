@@ -3,8 +3,8 @@
     header('Content-Type: application/json; charset=UTF-8');
 
     // should make the unit tests not based on my personal channels
-    // StackOverflow source: https://stackoverflow.com/a/70961128
-    $playlistItemsTests = [['snippet&playlistId=PLKAl8tt2R8OfMnDRnEABZ2M-tI7yJYvl1', 'items/0/snippet/publishedAt', '1520963713']]; // not precise :S
+    // Stack Overflow source: https://stackoverflow.com/a/70961128
+    $playlistItemsTests = [['snippet&playlistId=PLKAl8tt2R8OfMnDRnEABZ2M-tI7yJYvl1', 'items/0/snippet/publishedAt', '1520963713']]; // not precise...
 
 include_once 'common.php';
 
