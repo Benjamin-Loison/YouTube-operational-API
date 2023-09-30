@@ -139,7 +139,22 @@ function getAPI($id, $order, $continuationToken)
                ]
         ];
         $json = getJSON('https://www.youtube.com/youtubei/v1/search?key=' . UI_KEY, $opts);
-        $items = ($continuationTokenProvided ? $json['onResponseReceivedCommands'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'])[0]['itemSectionRenderer']['contents'];
+        if(isset($_GET['type']) && $_GET['type'] === 'short')
+        {
+            $contents = $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'];
+            foreach($contents as $content)
+            {
+                if(array_key_exists('reelShelfRenderer', $content))
+                {
+                    $items = $content['reelShelfRenderer']['items'];
+                    break;
+                }
+            }
+        }
+        else
+        {
+            $items = ($continuationTokenProvided ? $json['onResponseReceivedCommands'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'])[0]['itemSectionRenderer']['contents'];
+        }
     } else { // if (isset($_GET['channelId']))
         $orderBase64 = 'EgZ2aWRlb3MYASAAMAE=';
         $rawData = [
@@ -174,10 +189,11 @@ function getAPI($id, $order, $continuationToken)
     for ($itemsIndex = 0; $itemsIndex < $itemsCount - ($continuationTokenProvided || $_GET['hashtag'] ? 1 : 0); $itemsIndex++) { // check upper bound for hashtags
         $item = $items[$itemsIndex];
         $path = '';
+        $isShort = isset($_GET['type']) && $_GET['type'] === 'short';
         if (isset($_GET['hashtag'])) {
             $path = 'richItemRenderer/content/videoRenderer';
         } elseif (isset($_GET['q'])) {
-            $path = 'videoRenderer';
+            $path = $isShort ? 'reelItemRenderer' : 'videoRenderer';
         } else {
             $path = 'gridVideoRenderer';
         }
@@ -194,11 +210,11 @@ function getAPI($id, $order, $continuationToken)
             ];
         }
         if ($options['snippet']) {
-            $title = $gridVideoRenderer['title']['runs'][0]['text'];
+            $title = $isShort ? $gridVideoRenderer['headline']['simpleText'] : $gridVideoRenderer['title']['runs'][0]['text'];
             $run = $gridVideoRenderer['ownerText']['runs'][0];
             $browseEndpoint = $run['navigationEndpoint']['browseEndpoint'];
             $channelId = $browseEndpoint['browseId'];
-            $views = getIntFromViewCount($gridVideoRenderer['viewCountText']['simpleText']);
+            $views = call_user_func($isShort ? 'getIntValue' : 'getIntFromViewCount', $gridVideoRenderer['viewCountText']['simpleText'], 'view');
             $badges = $gridVideoRenderer['badges'];
             $badges = !empty($badges) ? array_map(fn($badge) => $badge['metadataBadgeRenderer']['label'], $badges) : [];
             $chapters = $gridVideoRenderer['expandableMetadata']['expandableMetadataRenderer']['expandedContent']['horizontalCardListRenderer']['cards'];
@@ -217,7 +233,7 @@ function getAPI($id, $order, $continuationToken)
                 'channelTitle' => $run['text'],
                 'channelHandle' => $channelHandle[0] === '@' ? $channelHandle : null,
                 'timestamp' => $gridVideoRenderer['publishedTimeText']['simpleText'],
-                'duration' => getIntFromDuration($gridVideoRenderer['lengthText']['simpleText']),
+                'duration' => $isShort ? getIntValue(end(explode('- ', str_replace(' - play video', '', $gridVideoRenderer['accessibility']['accessibilityData']['label']))), 'second') : getIntFromDuration($gridVideoRenderer['lengthText']['simpleText']),
                 'views' => $views,
                 'badges' => $badges,
                 'channelApproval' => $gridVideoRenderer['ownerBadges'][0]['metadataBadgeRenderer']['tooltip'],
