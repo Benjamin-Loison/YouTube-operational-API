@@ -281,24 +281,40 @@
 
         if ($options['mostReplayed']) {
             $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
-            $mostReplayed = $json['frameworkUpdates']['entityBatchUpdate']['mutations'][0]['payload']['macroMarkersListEntity']['markersList'];
-            foreach(array_keys($mostReplayed['markers']) as $markerIndex)
+            $mutations = $json['frameworkUpdates']['entityBatchUpdate']['mutations'];
+            $jsonPath = 'payload/macroMarkersListEntity/markersList';
+            foreach($mutations as $mutation)
             {
-                unset($mostReplayed['markers'][$markerIndex]['durationMillis']);
-                $mostReplayed['markers'][$markerIndex]['startMillis'] = intval($mostReplayed['markers'][$markerIndex]['startMillis']);
-            }
-            $timedMarkerDecorations = $mostReplayed['markersDecoration']['timedMarkerDecorations'];
-            foreach(array_keys($timedMarkerDecorations) as $timedMarkerDecorationIndex)
-            {
-                foreach(['label', 'icon', 'decorationTimeMillis'] as $timedMarkerDecorationKey)
+                if(doesPathExist($mutation, $jsonPath))
                 {
-                    unset($timedMarkerDecorations[$timedMarkerDecorationIndex][$timedMarkerDecorationKey]);
+                    break;
                 }
             }
-            $mostReplayed['timedMarkerDecorations'] = $timedMarkerDecorations;
-            foreach(['markerType', 'markersMetadata', 'markersDecoration'] as $mostReplayedKey)
+            if(doesPathExist($mutation, $jsonPath))
             {
-                unset($mostReplayed[$mostReplayedKey]);
+                $mostReplayed = getValue($mutation, $jsonPath);
+                foreach(array_keys($mostReplayed['markers']) as $markerIndex)
+                {
+                    unset($mostReplayed['markers'][$markerIndex]['durationMillis']);
+                    $mostReplayed['markers'][$markerIndex]['startMillis'] = intval($mostReplayed['markers'][$markerIndex]['startMillis']);
+                }
+                $timedMarkerDecorations = $mostReplayed['markersDecoration']['timedMarkerDecorations'];
+                foreach(array_keys($timedMarkerDecorations) as $timedMarkerDecorationIndex)
+                {
+                    foreach(['label', 'icon', 'decorationTimeMillis'] as $timedMarkerDecorationKey)
+                    {
+                        unset($timedMarkerDecorations[$timedMarkerDecorationIndex][$timedMarkerDecorationKey]);
+                    }
+                }
+                $mostReplayed['timedMarkerDecorations'] = $timedMarkerDecorations;
+                foreach(['markerType', 'markersMetadata', 'markersDecoration'] as $mostReplayedKey)
+                {
+                    unset($mostReplayed[$mostReplayedKey]);
+                }
+            }
+            else
+            {
+                $mostReplayed = null;
             }
 
             $item['mostReplayed'] = $mostReplayed;
