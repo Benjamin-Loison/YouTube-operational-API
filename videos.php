@@ -282,7 +282,8 @@
         if ($options['mostReplayed']) {
             $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
             $mutations = $json['frameworkUpdates']['entityBatchUpdate']['mutations'];
-            $jsonPath = 'payload/macroMarkersListEntity/markersList';
+            $commonJsonPath = 'payload/macroMarkersListEntity/markersList';
+            $jsonPath = "$commonJsonPath/markersDecoration";
             foreach($mutations as $mutation)
             {
                 if(doesPathExist($mutation, $jsonPath))
@@ -292,7 +293,7 @@
             }
             if(doesPathExist($mutation, $jsonPath))
             {
-                $mostReplayed = getValue($mutation, $jsonPath);
+                $mostReplayed = getValue($mutation, $commonJsonPath);
                 foreach(array_keys($mostReplayed['markers']) as $markerIndex)
                 {
                     unset($mostReplayed['markers'][$markerIndex]['durationMillis']);
