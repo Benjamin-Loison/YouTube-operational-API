@@ -49,7 +49,7 @@
             $params = $result['responseContext']['serviceTrackingParams'][0]['params'];
             foreach($params as $param)
             {
-                if($param['key'] == 'browse_id')
+                if($param['key'] === 'browse_id')
                 {
                     $id = $param['value'];
                     break;
