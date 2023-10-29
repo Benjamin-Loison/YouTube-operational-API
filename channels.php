@@ -46,7 +46,15 @@
                 dieWithJsonMessage('Invalid handle');
             }
             $result = getJSONFromHTML("https://www.youtube.com/$handle");
-            $id = $result['responseContext']['serviceTrackingParams'][0]['params'][6]['value'];
+            $params = $result['responseContext']['serviceTrackingParams'][0]['params'];
+            foreach($params as $param)
+            {
+                if($param['key'] == 'browse_id')
+                {
+                    $id = $param['value'];
+                    break;
+                }
+            }
         }
         else /*if (isset($_GET['forUsername']))*/ {
             $username = $_GET['forUsername'];
