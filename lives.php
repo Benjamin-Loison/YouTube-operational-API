@@ -6,7 +6,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['donations', 'sponsorshipGifts'];
+    $realOptions = ['donations', 'sponsorshipGifts', 'memberships'];
 
     foreach ($realOptions as $realOption) {
         $options[$realOption] = false;
@@ -70,39 +70,57 @@
             $item['donations'] = $donations;
         }
 
+        function cleanMembershipOrSponsorship($raw, $isMembership) {
+            $common = $isMembership ? $raw : $sponsorshipGiftRaw['header']['liveChatSponsorshipsHeaderRenderer'];
+            $primaryText = implode('', array_map(fn($run) => $run['text'], $common[$isMembership ? 'headerPrimaryText' : 'primaryText']['runs']));
+            $subText = $raw['headerSubtext']['simpleText'];
+
+            function getCleanAuthorBadge($authorBadgeRaw)
+            {
+                $liveChatAuthorBadgeRenderer = $authorBadgeRaw['liveChatAuthorBadgeRenderer'];
+                $authorBadge = [
+                    'tooltip' => $liveChatAuthorBadgeRenderer['tooltip'],
+                    'customThumbnail' => $liveChatAuthorBadgeRenderer['customThumbnail']['thumbnails']
+                ];
+                return $authorBadge;
+            }
+            $authorBadges = array_map('getCleanAuthorBadge', $common['authorBadges']);
+
+            $clean = [
+                'id' => $raw['id'],
+                'timestamp' => intval($raw['timestampUsec']),
+                'authorChannelId' => $raw['authorExternalChannelId'],
+                'authorName' => $common['authorName']['simpleText'],
+                'authorPhoto' => $common['authorPhoto']['thumbnails'],
+                'primaryText' => $primaryText,
+                'subText' => $subText,
+                'authorBadges' => $authorBadges,
+            ];
+            return $clean;
+        }
+
         if ($options['sponsorshipGifts']) {
             $sponsorshipGifts = [];
             foreach ($actions as $action) {
-                $sponsorshipGiftRaw = $action['addChatItemAction']['item']['liveChatSponsorshipsGiftPurchaseAnnouncementRenderer'];
-                if ($sponsorshipGiftRaw != null)
+                $sponsorshipGift = $action['addChatItemAction']['item']['liveChatSponsorshipsGiftPurchaseAnnouncementRenderer'];
+                if ($sponsorshipGift != null)
                 {
-                    $liveChatSponsorshipsHeaderRenderer = $sponsorshipGiftRaw['header']['liveChatSponsorshipsHeaderRenderer'];
-                    $text = implode('', array_map(fn($run) => $run['text'], $liveChatSponsorshipsHeaderRenderer['primaryText']['runs']));
-
-                    function getCleanAuthorBadge($authorBadgeRaw)
-                    {
-                        $liveChatAuthorBadgeRenderer = $authorBadgeRaw['liveChatAuthorBadgeRenderer'];
-                        $authorBadge = [
-                            'tooltip' => $liveChatAuthorBadgeRenderer['tooltip'],
-                            'customThumbnail' => $liveChatAuthorBadgeRenderer['customThumbnail']['thumbnails']
-                        ];
-                        return $authorBadge;
-                    }
-                    $authorBadges = array_map('getCleanAuthorBadge', $liveChatSponsorshipsHeaderRenderer['authorBadges']);
-
-                    $sponsorshipGift = [
-                        'id' => $sponsorshipGiftRaw['id'],
-                        'timestamp' => intval($sponsorshipGiftRaw['timestampUsec']),
-                        'authorChannelId' => $sponsorshipGiftRaw['authorExternalChannelId'],
-                        'authorName' => $liveChatSponsorshipsHeaderRenderer['authorName']['simpleText'],
-                        'authorPhoto' => $liveChatSponsorshipsHeaderRenderer['authorPhoto']['thumbnails'],
-                        'text' => $text,
-                        'authorBadges' => $authorBadges,
-                    ];
-                    array_push($sponsorshipGifts, $sponsorshipGift);
+                    array_push($sponsorshipGifts, cleanMembershipOrSponsorship($sponsorshipGift, false));
                 }
             }
             $item['sponsorshipGifts'] = $sponsorshipGifts;
+        }
+
+        if ($options['memberships']) {
+            $memberships = [];
+            foreach ($actions as $action) {
+                $membership = $action['addChatItemAction']['item']['liveChatMembershipItemRenderer'];
+                if ($membership != null)
+                {
+                    array_push($memberships, cleanMembershipOrSponsorship($membership, true));
+                }
+            }
+            $item['memberships'] = $memberships;
         }
 
         return $item;
