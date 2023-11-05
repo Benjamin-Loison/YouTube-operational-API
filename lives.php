@@ -6,7 +6,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['donations'];
+    $realOptions = ['donations', 'sponsorshipGifts'];
 
     foreach ($realOptions as $realOption) {
         $options[$realOption] = false;
@@ -43,15 +43,13 @@
     {
         global $options;
 
-        $result = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
-        $continuation = $result['contents']['twoColumnWatchNextResults']['conversationBar']['liveChatRenderer']['continuations'][0]['reloadContinuationData']['continuation'];
-
         $opts = [
             'http' => [
                 'user_agent' => USER_AGENT,
+                'header' => ['Accept-Language: en'],
             ]
         ];
-        $html = getJSONFromHTML("https://www.youtube.com/live_chat?continuation=$continuation", $opts, 'window["ytInitialData"]', '');
+        $result = getJSONFromHTML("https://www.youtube.com/live_chat?v=$id", $opts, 'window["ytInitialData"]', '');
 
         $item = [
             'kind' => 'youtube#video',
@@ -59,9 +57,10 @@
             'id' => $id
         ];
 
+        $actions = $result['contents']['liveChatRenderer']['actions'];
+
         if ($options['donations']) {
             $donations = [];
-            $actions = $result['continuationContents']['liveChatContinuation']['actions'];
             foreach ($actions as $action) {
                 $donation = $action['addLiveChatTickerItemAction']['item']['liveChatTickerPaidMessageItemRenderer']['showItemEndpoint']['showLiveChatItemEndpoint']['renderer']['liveChatPaidMessageRenderer'];
                 if ($donation != null) {
@@ -69,6 +68,41 @@
                 }
             }
             $item['donations'] = $donations;
+        }
+
+        if ($options['sponsorshipGifts']) {
+            $sponsorshipGifts = [];
+            foreach ($actions as $action) {
+                $sponsorshipGiftRaw = $action['addChatItemAction']['item']['liveChatSponsorshipsGiftPurchaseAnnouncementRenderer'];
+                if ($sponsorshipGiftRaw != null)
+                {
+                    $liveChatSponsorshipsHeaderRenderer = $sponsorshipGiftRaw['header']['liveChatSponsorshipsHeaderRenderer'];
+                    $text = implode('', array_map(fn($run) => $run['text'], $liveChatSponsorshipsHeaderRenderer['primaryText']['runs']));
+
+                    function getCleanAuthorBadge($authorBadgeRaw)
+                    {
+                        $liveChatAuthorBadgeRenderer = $authorBadgeRaw['liveChatAuthorBadgeRenderer'];
+                        $authorBadge = [
+                            'tooltip' => $liveChatAuthorBadgeRenderer['tooltip'],
+                            'customThumbnail' => $liveChatAuthorBadgeRenderer['customThumbnail']['thumbnails']
+                        ];
+                        return $authorBadge;
+                    }
+                    $authorBadges = array_map('getCleanAuthorBadge', $liveChatSponsorshipsHeaderRenderer['authorBadges']);
+
+                    $sponsorshipGift = [
+                        'id' => $sponsorshipGiftRaw['id'],
+                        'timestamp' => intval($sponsorshipGiftRaw['timestampUsec']),
+                        'authorChannelId' => $sponsorshipGiftRaw['authorExternalChannelId'],
+                        'authorName' => $liveChatSponsorshipsHeaderRenderer['authorName']['simpleText'],
+                        'authorPhoto' => $liveChatSponsorshipsHeaderRenderer['authorPhoto']['thumbnails'],
+                        'text' => $text,
+                        'authorBadges' => $authorBadges,
+                    ];
+                    array_push($sponsorshipGifts, $sponsorshipGift);
+                }
+            }
+            $item['sponsorshipGifts'] = $sponsorshipGifts;
         }
 
         return $item;

@@ -79,7 +79,7 @@
     }
 
     $features = [['community', 'snippet&id=POST_ID&order=relevance,time'],
-                 ['lives', 'donations&id=VIDEO_ID'],
+                 ['lives', 'donations,sponsorshipGifts&id=VIDEO_ID'],
                  ['liveChats', 'snippet,participants&id=VIDEO_ID&time=TIME_MS']];
 
     foreach ($features as $feature) {
