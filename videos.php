@@ -170,69 +170,50 @@
             $musics = [];
 
             $engagementPanels = $json['engagementPanels'];
-            $carouselLockupsPath = 'engagementPanelSectionListRenderer/content/structuredDescriptionContentRenderer/items/2/videoDescriptionMusicSectionRenderer/carouselLockups';
-            $carouselLockupsEngagementPanels1 = getValue($engagementPanels[1], $carouselLockupsPath);
-            $multipleMusics = $carouselLockupsEngagementPanels1 !== null ? (count($carouselLockupsEngagementPanels1) > 1) : false;
-            $carouselLockups = getValue(($engagementPanels[1]['engagementPanelSectionListRenderer']['panelIdentifier'] === 'engagement-panel-structured-description') ? $engagementPanels[1] : $engagementPanels[2], $carouselLockupsPath);
-
-            foreach ($carouselLockups as $carouselLockup) {
-                $carouselLockupRenderer = $carouselLockup['carouselLockupRenderer'];
-                $compactVideoRenderer = $carouselLockupRenderer['videoLockup']['compactVideoRenderer'];
-                $infoRows = $carouselLockupRenderer['infoRows'];
-
-                $title = $compactVideoRenderer['title'];
-                $song = [
-                    'title' => $multipleMusics ? (array_key_exists('runs', $title) ? $title['runs'][0]['text'] : $title['simpleText']) : $infoRows[0]['infoRowRenderer']['defaultMetadata']['simpleText'],
-                    'videoId' => $compactVideoRenderer['navigationEndpoint']['watchEndpoint']['videoId']
-                ];
-
-                $defaultMetadata = $infoRows[$multipleMusics ? 0 : 1]['infoRowRenderer']['defaultMetadata'];
-                if ($defaultMetadata !== null && array_key_exists('runs', $defaultMetadata)) {
-                    $artistsCommon = $defaultMetadata['runs'][0];
-                    $artists = [
-                        [
-                            'title' => $artistsCommon['text'],
-                            'channelId' => $artistsCommon['navigationEndpoint']['browseEndpoint']['browseId']
-                        ]
-                    ];
-                } else {
-                    $artists = array_map(function($title) { return ['title' => $title, 'channelId' => null]; }, explode(', ', $defaultMetadata['simpleText']));
-                }
-
-                $album = null;
-                foreach(array_slice($infoRows, 1, 2) as $infoRow)
-                {
-                    $infoRowRenderer = $infoRow['infoRowRenderer'];
-                    $infoRowTitle = $infoRowRenderer['title']['simpleText'];
-                    if ($infoRowTitle === 'ALBUM') {
-                        $album = $infoRowRenderer['defaultMetadata']['simpleText'];
-                        break;
-                    }
-
-                }
-
-                $writers = null;
-                foreach(array_slice($infoRows, 1, 3) as $infoRow)
-                {
-                    $infoRowRenderer = $infoRow['infoRowRenderer'];
-                    $infoRowTitle = $infoRowRenderer['title']['simpleText'];
-                    if ($infoRowTitle === 'WRITERS') {
-                        if (array_key_exists('expandedMetadata', $infoRowRenderer)) {
-                            $writers = $infoRowRenderer['expandedMetadata']['runs'];
-                            $writers = array_values(array_filter(array_map(function($run) { $text = $run['text']; return $text !== ', ' ? $run['text'] : false; }, $writers)));
-                        } else {
-                            $writers = [$infoRowRenderer['defaultMetadata']['simpleText']];
+            foreach($engagementPanels as $engagementPanel) {
+                $engagementPanelSectionListRenderer = $engagementPanel['engagementPanelSectionListRenderer'];
+                if($engagementPanelSectionListRenderer['panelIdentifier'] === 'engagement-panel-structured-description') {
+                    $structuredDescriptionContentRendererItems = $engagementPanelSectionListRenderer['content']['structuredDescriptionContentRenderer']['items'];
+                    foreach($structuredDescriptionContentRendererItems as $structuredDescriptionContentRendererItem) {
+                        if (array_key_exists('horizontalCardListRenderer', $structuredDescriptionContentRendererItem)) {
+                            $horizontalCardListRenderer = $structuredDescriptionContentRendererItem['horizontalCardListRenderer'];
+                            $channelId = $horizontalCardListRenderer['footerButton']['buttonViewModel']['onTap']['innertubeCommand']['browseEndpoint']['browseId'];
+                            foreach($structuredDescriptionContentRendererItem['horizontalCardListRenderer']['cards'] as $card) {
+                                $videoAttributeViewModel = $card['videoAttributeViewModel'];
+                                $runs = $videoAttributeViewModel['overflowMenuOnTap']['innertubeCommand']['confirmDialogEndpoint']['content']['confirmDialogRenderer']['dialogMessages'][0]['runs'];
+                                for($runIndex = 0; $runIndex < count($runs) - 2; $runIndex++) {
+                                    $key = $runs[$runIndex]['text'];
+                                    $value = $runs[$runIndex + 2]['text'];
+                                    switch($key) {
+                                        case 'Song':
+                                            $song = $value;
+                                            break;
+                                        case 'Artist':
+                                            $artist = $value;
+                                            break;
+                                        case 'Album':
+                                            $album = $value;
+                                            break;
+                                        case 'Writers':
+                                            $writers = $value;
+                                    }
+                                }
+                                $music = [
+                                    'channelId' => $channelId,
+                                    'image' => $videoAttributeViewModel['image']['sources'][0]['url'],
+                                    'videoId' => $videoAttributeViewModel['onTap']['innertubeCommand']['watchEndpoint']['videoId'],
+                                    'song' => $song,
+                                    'artist' => $artist,
+                                    'album' => $album,
+                                    'writers' => $writers,
+                                ];
+                                array_push($musics, $music);
+                            }
+                            break;
                         }
                     }
+                    break;
                 }
-                $music = [
-                    'song' => $song,
-                    'artists' => $artists,
-                    'album' => $album,
-                    'writers' => $writers,
-                    'licenses' => end($infoRows)['infoRowRenderer']['expandedMetadata']['simpleText']
-                ];
-                array_push($musics, $music);
             }
             $item['musics'] = $musics;
         }
