@@ -166,7 +166,15 @@
         }
 
         if ($options['musics']) {
-            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
+            $opts = [
+                'http' => [
+                    'header' => [
+                        'Accept-Language: en',
+                        'Cookie: __Secure-YEC=CgtGcWc1SmhiQk9FTSid2qqqBjIICgJGUhICEgA='
+                    ]
+                ]
+            ];
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", $opts);
             $musics = [];
 
             $engagementPanels = $json['engagementPanels'];
