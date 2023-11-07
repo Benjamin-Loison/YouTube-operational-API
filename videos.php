@@ -170,7 +170,7 @@
                 'http' => [
                     'header' => [
                         'Accept-Language: en',
-                        'Cookie: __Secure-YEC=CgtGcWc1SmhiQk9FTSid2qqqBjIICgJGUhICEgA='
+                        'Cookie: __Secure-YEC=CgtGcWc1SmhiQk9FTSid2qqqBjIICgJGUhICEgA=; VISITOR_INFO1_LIVE=Rg7SOFJXAvA'
                     ]
                 ]
             ];
