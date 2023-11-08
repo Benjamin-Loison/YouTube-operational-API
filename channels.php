@@ -397,10 +397,10 @@
 
         if ($options['snippet']) {
             $result = getJSONFromHTML("https://www.youtube.com/channel/$id", [], '', 'var ', false, true);
-            $thumbnails = $result['header']['c4TabbedHeaderRenderer']['avatar']['thumbnails'];
-            $snippet = [
-                'thumbnails' => $thumbnails
-            ];
+            $c4TabbedHeaderRenderer = $result['header']['c4TabbedHeaderRenderer'];
+            $c4TabbedHeaderRendererKeys = ['avatar', 'banner', 'tvBanner', 'mobileBanner'];
+            $c4TabbedHeaderRendererItems = array_map(fn($c4TabbedHeaderRendererKey) => $c4TabbedHeaderRenderer[$c4TabbedHeaderRendererKey]['thumbnails'], $c4TabbedHeaderRendererKeys);
+            $snippet = array_combine($c4TabbedHeaderRendererKeys, array_map(fn($c4TabbedHeaderRendererKey) => $c4TabbedHeaderRenderer[$c4TabbedHeaderRendererKey]['thumbnails'], $c4TabbedHeaderRendererKeys));
             $item['snippet'] = $snippet;
         }
 
