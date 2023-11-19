@@ -71,7 +71,7 @@
         }
 
         function cleanMembershipOrSponsorship($raw, $isMembership) {
-            $common = $isMembership ? $raw : $sponsorshipGiftRaw['header']['liveChatSponsorshipsHeaderRenderer'];
+            $common = $isMembership ? $raw : $raw['header']['liveChatSponsorshipsHeaderRenderer'];
             $primaryText = implode('', array_map(fn($run) => $run['text'], $common[$isMembership ? 'headerPrimaryText' : 'primaryText']['runs']));
             $subText = $raw['headerSubtext']['simpleText'];
 
