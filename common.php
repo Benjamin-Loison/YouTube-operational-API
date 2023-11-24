@@ -280,6 +280,7 @@
 
     function getIntValue($unitCount, $unit = '')
     {
+        $unitCount = str_replace(',', '', $unitCount);
         $unitCount = str_replace(" {$unit}s", '', $unitCount);
         $unitCount = str_replace(" $unit", '', $unitCount);
         if($unitCount === 'No') {

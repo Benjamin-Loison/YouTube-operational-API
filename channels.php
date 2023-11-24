@@ -346,41 +346,34 @@
             $item['countryChannelId'] = $c4TabbedHeaderRenderer['channelId'];
 
             $tab = getTabByName($result, 'About');
-            $resultCommon = $tab['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['channelAboutFullMetadataRenderer'];
+            $resultCommon = $result['onResponseReceivedEndpoints'][0]['showEngagementPanelEndpoint']['engagementPanel']['engagementPanelSectionListRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['aboutChannelRenderer']['metadata']['aboutChannelViewModel'];
 
-            $stats = [];
+            $about['stats'] = [
+                'joinedDate' => strtotime(str_replace('Joined ', '', $resultCommon['joinedDateText']['content'])),
+                // Could try to find a YouTube channel with a single view to make sure it displays "view" and not "views".
+                'viewCount' => getIntValue($resultCommon['viewCountText'], 'view'),
+                'subscriberCount' => getIntValue($c4TabbedHeaderRenderer['subscriberCountText']['simpleText'], 'subscriber'),
+                'videoCount' => getIntValue($resultCommon['videoCountText'], 'video')
+            ];
 
-            $stats['joinedDate'] = strtotime($resultCommon['joinedDateText']['runs'][1]['text']);
+            $about['description'] = $resultCommon['description'];
 
-            $viewCount = $resultCommon['viewCountText']['simpleText'];
-            // Could try to find a YouTube channel with a single view to make sure it displays "view" and not "views".
-            $viewCount = str_replace(' view', '', str_replace(' views', '', str_replace(',', '', $viewCount)));
-            $stats['viewCount'] = intval($viewCount);
-
-            $subscriberCount = getIntValue($c4TabbedHeaderRenderer['subscriberCountText']['simpleText'], 'subscriber');
-            $stats['subscriberCount'] = $subscriberCount;
-
-            $about['stats'] = $stats;
-
-            $description = $resultCommon['description']['simpleText'];
-            $title = $resultCommon['title']['simpleText'];
-            $about['description'] = $description;
-            $about['title'] = $title;
-
-            $details = [];
-            $details['location'] = $resultCommon['country']['simpleText'];
-            $about['details'] = $details;
+            $about['details'] = [
+                'location' => $resultCommon['country']
+            ];
 
             $linksObjects = $resultCommon['links'];
             $links = [];
             foreach ($linksObjects as $linkObject) {
-                $link = [];
                 $linkObject = $linkObject['channelExternalLinkViewModel'];
                 $url = $linkObject['link']['commandRuns'][0]['onTap']['innertubeCommand']['urlEndpoint']['url'];
                 $urlComponents = parse_url($url);
                 parse_str($urlComponents['query'], $params);
-                $link['url'] = array_key_exists('q', $params) ? $params['q'] : $url;
-                $link['title'] = $linkObject['title']['content'];
+                $link = [
+                    'url' => array_key_exists('q', $params) ? $params['q'] : $url,
+                    'title' => $linkObject['title']['content'],
+                    'favicon' => $linkObject['favicon']['sources']
+                ];
                 array_push($links, $link);
             }
             $about['links'] = $links;
