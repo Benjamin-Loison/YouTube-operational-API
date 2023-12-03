@@ -292,7 +292,7 @@
         if(checkRegex('[0-9_.*KMB]+', $unitCount)) {
             $unitCount = eval("return round($unitCount);");
         }
-        return $unitCount;
+        return intval($unitCount);
     }
 
     function getCommunityPostFromContent($content)
