@@ -227,7 +227,7 @@ if HTTP_METHOD in command:
     if not isCommandStillFine(command):
         command = previousCommand
 
-# First test `print`ing, before potentially removing `minimizedCurl` writing.
+# First test `print`ing, before potentially removing `minimized_curl` writing.
 print(command)
-with open('minimizedCurl.txt', 'w') as f:
+with open('minimized_curl.sh', 'w') as f:
     f.write(command)
