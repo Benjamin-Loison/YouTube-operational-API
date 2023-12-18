@@ -199,7 +199,7 @@
 
     function isChannelId($channelId)
     {
-        return checkRegex('[a-zA-Z0-9-_]{24}', $channelId);
+        return checkRegex('UC[a-zA-Z0-9-_]{22}', $channelId);
     }
 
     function isVideoId($videoId)
