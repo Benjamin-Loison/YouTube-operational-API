@@ -95,10 +95,10 @@
         return $result;
     }
 
-    function dieWithJsonMessage($message)
+    function dieWithJsonMessage($message, $code = 400)
     {
         $error = [
-            'code' => 400,
+            'code' => $code,
             'message' => $message
         ];
         $result = [
@@ -109,7 +109,7 @@
 
     function detectedAsSendingUnusualTraffic()
     {
-        dieWithJsonMessage('YouTube has detected unusual traffic from this YouTube operational API instance. Please try your request again later or see alternatives at https://github.com/Benjamin-Loison/YouTube-operational-API/issues/11');
+        dieWithJsonMessage('YouTube has detected unusual traffic from this YouTube operational API instance. Please try your request again later or see alternatives at https://github.com/Benjamin-Loison/YouTube-operational-API/issues/11', 403);
     }
 
     function getJSON($url, $opts = [], $verifyTrafficIfForbidden = true)
