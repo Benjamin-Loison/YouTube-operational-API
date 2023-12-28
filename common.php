@@ -371,7 +371,6 @@
         // sharedPosts do not have 'actionButtons' so this next line will end up defaulting to 0 $comments
         $commentsPath = 'actionButtons/commentActionButtonsRenderer/replyButton/buttonRenderer';
         $commentsCommon = doesPathExist($common, $commentsPath) ? getValue($common, $commentsPath) : $common;
-        $commentsCount = array_key_exists('text', $commentsCommon) ? getIntValue($commentsCommon['text']['simpleText']) : 0;
 
         $post = [
             'id' => $id,
@@ -379,13 +378,17 @@
             'date' => $date,
             'contentText' => $contentText,
             'likes' => $likes,
-            'commentsCount' => $commentsCount,
             'videoId' => $videoId,
             'images' => $images,
             'poll' => $poll,
             'edited' => $edited,
             'sharedPostId' => $sharedPostId,
         ];
+        if(array_key_exists('text', $commentsCommon))
+        {
+            $commentsCount = getIntValue($commentsCommon['text']['simpleText']);
+            $post['commentsCount'] = $commentsCount;
+        }
         return $post;
     }
 
