@@ -365,13 +365,13 @@
             ];
         }
 
-        $likes = intval(array_key_exists('voteCount', $common) ? $common['voteCount']['simpleText'] : 0);
+        $likes = getIntValue(array_key_exists('voteCount', $common) ? $common['voteCount']['simpleText'] : 0);
 
         // Retrieving comments when using `community?part=snippet` requires another HTTPS request to `browse` YouTube UI endpoint.
         // sharedPosts do not have 'actionButtons' so this next line will end up defaulting to 0 $comments
         $commentsPath = 'actionButtons/commentActionButtonsRenderer/replyButton/buttonRenderer';
         $commentsCommon = doesPathExist($common, $commentsPath) ? getValue($common, $commentsPath) : $common;
-        $commentsCount = array_key_exists('text', $commentsCommon) ? intval($commentsCommon['text']['simpleText']) : 0;
+        $commentsCount = array_key_exists('text', $commentsCommon) ? getIntValue($commentsCommon['text']['simpleText']) : 0;
 
         $post = [
             'id' => $id,
