@@ -439,4 +439,38 @@
         }
     }
 
+    function getPublishedAt($publishedAtRaw) {
+        $publishedAtStr = str_replace('ago', '', $publishedAtRaw);
+        $publishedAtStr = str_replace('seconds', '* 1 +', $publishedAtStr);
+        $publishedAtStr = str_replace('second', '* 1 +', $publishedAtStr);
+        $publishedAtStr = str_replace('minutes', '* 60 +', $publishedAtStr);
+        $publishedAtStr = str_replace('minute', '* 60 +', $publishedAtStr);
+        $publishedAtStr = str_replace('hours', '* 3600 +', $publishedAtStr);
+        $publishedAtStr = str_replace('hour', '* 3600 +', $publishedAtStr);
+        $publishedAtStr = str_replace('days', '* 86400 +', $publishedAtStr);
+        $publishedAtStr = str_replace('day', '* 86400 +', $publishedAtStr);
+        $publishedAtStr = str_replace('weeks', '* 604800 +', $publishedAtStr);
+        $publishedAtStr = str_replace('week', '* 604800 +', $publishedAtStr);
+        $publishedAtStr = str_replace('months', '* 2592000 +', $publishedAtStr); // not sure
+        $publishedAtStr = str_replace('month', '* 2592000 +', $publishedAtStr);
+        $publishedAtStr = str_replace('years', '* 31104000 +', $publishedAtStr); // not sure
+        $publishedAtStr = str_replace('year', '* 31104000 +', $publishedAtStr);
+        // To remove last ` +`.
+        $publishedAtStr = substr($publishedAtStr, 0, strlen($publishedAtStr) - 2);
+        $publishedAtStr = str_replace(' ', '', $publishedAtStr); // "security"
+        $publishedAtStr = str_replace(',', '', $publishedAtStr);
+        $publishedAtStrLen = strlen($publishedAtStr);
+        // "security"
+        for ($publishedAtStrIndex = $publishedAtStrLen - 1; $publishedAtStrIndex >= 0; $publishedAtStrIndex--) {
+            $publishedAtChar = $publishedAtStr[$publishedAtStrIndex];
+            if (!str_contains('+*0123456789', $publishedAtChar)) {
+                $publishedAtStr = substr($publishedAtStr, $publishedAtStrIndex + 1, $publishedAtStrLen - $publishedAtStrIndex - 1);
+                break;
+            }
+        }
+        $publishedAt = time() - eval("return $publishedAtStr;");
+        // the time is not perfectly accurate this way
+        return $publishedAt;
+    }
+
 ?>

@@ -7,7 +7,7 @@
 
     include_once 'common.php';
 
-    $realOptions = ['status', 'upcomingEvents', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists', 'snippet', 'membership'];
+    $realOptions = ['status', 'upcomingEvents', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists', 'snippet', 'membership', 'popular'];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {
@@ -558,6 +558,45 @@
                 ]);
             }
             $item['playlistSections'] = $playlistSections;
+        }
+
+        if ($options['popular'])
+        {
+            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id");
+            $contents = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'];
+            $shelfRendererPath = 'itemSectionRenderer/contents/0/shelfRenderer';
+            $content = array_values(array_filter($contents, fn($content) => getValue($content, $shelfRendererPath)['title']['runs'][0]['text'] == 'Popular'))[0];
+            $shelfRenderer = getValue($content, $shelfRendererPath);
+
+            $popular = [];
+            foreach($shelfRenderer['content']['gridRenderer']['items'] as $gridRendererItem)
+            {
+                if(!array_key_exists('continuationItemRenderer', $gridRendererItem))
+                {
+                    $gridVideoRenderer = $gridRendererItem['gridVideoRenderer'];
+                    $run = $gridVideoRenderer['shortBylineText']['runs'][0];
+                    $browseEndpoint = $run['navigationEndpoint']['browseEndpoint'];
+                    $title = $gridVideoRenderer['title'];
+                    $publishedAt = getPublishedAt(end(explode('views', $title['accessibility']['accessibilityData']['label'])));
+                    array_push($popular, [
+                        'videoId' => $gridVideoRenderer['videoId'],
+                        'thumbnails' => $gridVideoRenderer['thumbnail']['thumbnails'],
+                        'title' => $title['runs'][0]['text'],
+                        'publishedAt' => $publishedAt,
+                        'views' => getIntFromViewCount($gridVideoRenderer['viewCountText']['simpleText']),
+                        'channelTitle' => $run['text'],
+                        'channelId' => $browseEndpoint['browseId'],
+                        'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 1),
+                        'duration' => getIntFromDuration($gridVideoRenderer['thumbnailOverlays'][0]['thumbnailOverlayTimeStatusRenderer']['text']['simpleText']),
+                        'approval' => $gridVideoRenderer['ownerBadges'][0]['metadataBadgeRenderer']['tooltip'],
+                    ]);
+                }
+            }
+            if(array_key_exists('continuationItemRenderer', $gridRendererItem))
+            {
+                $item['nextPageToken'] = $gridRendererItem['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
+            }
+            $item['popular'] = $popular;
         }
 
         return $item;
