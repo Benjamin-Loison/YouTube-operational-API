@@ -74,7 +74,8 @@
         $continuationToken = '';
         if (isset($_GET['pageToken'])) {
             $continuationToken = $_GET['pageToken'];
-            if (($options['shorts'] && !isContinuationTokenAndVisitorData($continuationToken)) || (!$options['shorts'] && !isContinuationToken($continuationToken))) {
+            $hasVisitorData = $options['shorts'] || $options['popular'];
+            if (($hasVisitorData && !isContinuationTokenAndVisitorData($continuationToken)) || (!$hasVisitorData && !isContinuationToken($continuationToken))) {
                 dieWithJsonMessage('Invalid pageToken');
             }
         }
@@ -562,14 +563,44 @@
 
         if ($options['popular'])
         {
-            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id");
-            $contents = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'];
-            $shelfRendererPath = 'itemSectionRenderer/contents/0/shelfRenderer';
-            $content = array_values(array_filter($contents, fn($content) => getValue($content, $shelfRendererPath)['title']['runs'][0]['text'] == 'Popular'))[0];
-            $shelfRenderer = getValue($content, $shelfRendererPath);
-
             $popular = [];
-            foreach($shelfRenderer['content']['gridRenderer']['items'] as $gridRendererItem)
+            if (!$continuationTokenProvided) {
+                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id");
+                $contents = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'];
+                $shelfRendererPath = 'itemSectionRenderer/contents/0/shelfRenderer';
+                $content = array_values(array_filter($contents, fn($content) => getValue($content, $shelfRendererPath)['title']['runs'][0]['text'] == 'Popular'))[0];
+                $shelfRenderer = getValue($content, $shelfRendererPath);
+                $gridRendererItems = $shelfRenderer['content']['gridRenderer']['items'];
+                $visitorData = $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
+            }
+            else
+            {
+                $continuationTokenParts = explode(',', $continuationToken);
+                $visitorData = $continuationTokenParts[1];
+                $rawData = [
+                    'context' => [
+                        'client' => [
+                            'clientName' => 'WEB',
+                            'clientVersion' => MUSIC_VERSION,
+                            'visitorData' => $visitorData,
+                        ]
+                    ],
+                    'continuation' => $continuationTokenParts[0],
+                ];
+                $http = [
+                    'header' => ['Content-Type: application/json'],
+                    'method' => 'POST',
+                    'content' => json_encode($rawData)
+                ];
+
+                $httpOptions = [
+                    'http' => $http
+                ];
+
+                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
+                $gridRendererItems = $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+            }
+            foreach($gridRendererItems as $gridRendererItem)
             {
                 if(!array_key_exists('continuationItemRenderer', $gridRendererItem))
                 {
@@ -594,7 +625,7 @@
             }
             if(array_key_exists('continuationItemRenderer', $gridRendererItem))
             {
-                $item['nextPageToken'] = $gridRendererItem['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
+                $item['nextPageToken'] = $gridRendererItem['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ',' . $visitorData;
             }
             $item['popular'] = $popular;
         }
