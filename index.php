@@ -60,7 +60,7 @@
         echo "<p>Based on <a href=\"https://developers.google.com/youtube/v3/docs/$suburl\">$name</a>: " . url(WEBSITE_URL . "$webpage?part=$url") . '</p>';
     }
 
-    $features = [['channels', 'status,upcomingEvents,shorts,community,channels,about,approval,playlists,snippet,membership,popular&cId=C_ID&id=CHANNEL_ID&handle=HANDLE&forUsername=USERNAME&order=viewCount(&pageToken=PAGE_TOKEN)'],
+    $features = [['channels', 'status,upcomingEvents,shorts,community,channels,about,approval,playlists,snippet,membership,popular&cId=C_ID&id=CHANNEL_ID&handle=HANDLE&forUsername=USERNAME&raw=RAW&order=viewCount(&pageToken=PAGE_TOKEN)'],
                  ['commentThreads', 'snippet,replies&id=COMMENT_ID&videoId=VIDEO_ID&order=relevance,time(&pageToken=PAGE_TOKEN)'],
                  ['playlists', 'snippet,statistics&id=PLAYLIST_ID'],
                  ['playlistItems', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],

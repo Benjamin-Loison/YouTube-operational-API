@@ -15,7 +15,7 @@
     }
 
     // Forbidding URL with no `part` and using `id` filter is debatable.
-    if (isset($_GET['cId']) || isset($_GET['id']) || isset($_GET['handle']) || isset($_GET['forUsername'])) {
+    if (isset($_GET['cId']) || isset($_GET['id']) || isset($_GET['handle']) || isset($_GET['forUsername']) || isset($_GET['raw'])) {
         if(isset($_GET['part'])) {
             $part = $_GET['part'];
             $parts = explode(',', $part, count($realOptions));
@@ -56,12 +56,18 @@
                 }
             }
         }
-        else /*if (isset($_GET['forUsername']))*/ {
+        else if (isset($_GET['forUsername'])) {
             $username = $_GET['forUsername'];
             if (!isUsername($username)) {
                 dieWithJsonMessage('Invalid forUsername');
             }
             $result = getJSONFromHTML("https://www.youtube.com/user/$username");
+            $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
+        }
+        else /*if (isset($_GET['raw']))*/ {
+            $raw = $_GET['raw'];
+            // Adding filter would be nice.
+            $result = getJSONFromHTML("https://www.youtube.com/$raw");
             $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
         }
         $order = 'time';
