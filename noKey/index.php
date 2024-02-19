@@ -19,6 +19,19 @@
     $url = 'https://www.googleapis.com/youtube/v3/' . end($parts) . '&key=';
     $options = ['http' => ['ignore_errors' => true]];
     $context = stream_context_create($options);
+
+    function myDie($content)
+    {
+        global $keysCount;
+        if(isset($_GET['monitoring']))
+        {
+            $data = json_decode($content, true);
+            $data['monitoring'] = $keysCount;
+            $content = json_encode($data, JSON_PRETTY_PRINT);
+        }
+        die($content);
+    }
+
     /// is there any way someone may get the keys out ? could restrict syntax with the one of the official API but that's not that much clean
     // Tries to proceed to the request with an API key and if running out of quota, then use for this and following requests the API key used the longest time ago.
     for ($keysIndex = 0; $keysIndex < $keysCount; $keysIndex++) {
@@ -48,7 +61,7 @@
                 }
                 // If such an error occur, returns it to the end-user, as made exceptions for out of quota and expired keys, should also consider transient, backend and suspension errors.
                 // As managed in YouTube-comments-graph: https://github.com/Benjamin-Loison/YouTube-comments-graph/blob/993429770417bdfa4fdf176c473ff1bfe7ed21ae/CPP/main.cpp#L55-L60
-                die($response);
+                myDie($response);
             }
         } else {
             if ($keysIndex !== 0) {
@@ -58,7 +71,7 @@
                 file_put_contents(KEYS_FILE, $toWrite);
             }
             // Returns the proceeded response to the end-user.
-            die($response);
+            myDie($response);
         }
     }
     $message = 'The request cannot be completed because the YouTube operational API run out of quota. Please try again later.';
@@ -73,4 +86,4 @@
         'errors' => [$errors]
     ];
     $json = ['error' => $error];
-    die(json_encode($json, JSON_PRETTY_PRINT));
+    myDie(json_encode($json, JSON_PRETTY_PRINT));
