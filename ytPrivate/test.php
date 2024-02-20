@@ -31,16 +31,13 @@ function array_intersect_assoc_recursive(&$value1, &$value2)
     $test = true;
     require_once "../$endpoint.php";
     $tests = $GLOBALS["{$endpoint}Tests"];
-    //define('WEBSITE_URL', 'http://localhost/');
     foreach ($tests as $test) {
         $url = $test[0];
         $jsonPath = $test[1];
         $value = $test[2];
-        //$finalUrl = WEBSITE_URL . "$endpoint?part=$url";
         // Should not use network but call the PHP files and provide arguments correctly instead.
         // Not requiring HTTP could be interesting for instance by using PHP syntax (like `include` etc) or `php-cgi`.
         $finalUrl = "http://localhost/YouTube-operational-API/$endpoint?$url";
-        //echo "finalUrl: $finalUrl\n";
         $content = file_get_contents($finalUrl);
         $json = json_decode($content, true);
         $thePathExists = doesPathExist($json, $jsonPath);
