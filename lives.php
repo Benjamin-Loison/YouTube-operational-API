@@ -35,7 +35,7 @@
         }
 
         echo getAPI($realIds);
-    } else {
+    } else if(!test()) {
         dieWithJsonMessage('Required parameters not provided');
     }
 

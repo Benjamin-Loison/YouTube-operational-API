@@ -2,14 +2,13 @@
 
     header('Content-Type: application/json; charset=UTF-8');
 
-    // Stack Overflow contentDetails source: https://stackoverflow.com/a/70908689
-    // Stack Overflow status source: https://stackoverflow.com/a/70894799
-    // Stack Overflow music source: https://stackoverflow.com/a/71012426
-    $videosTests = [['contentDetails&id=g5xNzUA5Qf8', 'items/0/contentDetails/duration', '213'],
-                    ['status&id=J8ZVxDK11Jo', 'items/0/status/embeddable', false],
-                    ['status&id=g5xNzUA5Qf8', 'items/0/status/embeddable', true], // could allow subarray for JSON check in response likewise in a single request can check several features
-                    ['music&id=Xge20AqKSRE', 'items/0/music/available', false],
-                    ['music&id=ntG3GQdY_Ok', 'items/0/music/available', true]];
+    $videosTests = [
+        ['part=contentDetails&id=g5xNzUA5Qf8', 'items/0/contentDetails/duration', 213],
+        ['part=status&id=J8ZVxDK11Jo', 'items/0/status/embeddable', false],
+        ['part=status&id=g5xNzUA5Qf8', 'items/0/status/embeddable', true], // could allow subarray for JSON check in response likewise in a single request can check several features
+        ['part=music&id=FliCdfxdtTI', 'items/0/music/available', false],
+        ['part=music&id=ntG3GQdY_Ok', 'items/0/music/available', true]
+    ];
 
     include_once 'common.php';
 
@@ -48,7 +47,7 @@
             dieWithJsonMessage('Invalid SAPISIDHASH');
         }
         echo getAPI($realIds);
-    } else {
+    } else if(!test()) {
         dieWithJsonMessage('Required parameters not provided');
     }
 
@@ -288,7 +287,11 @@
         }
 
         if ($options['mostReplayed']) {
-            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
+            $url = "https://www.youtube.com/watch?v=$id";
+            $html = getRemote($url);
+            $jsonStr = getJSONStringFromHTML($html);
+            $json = json_decode($jsonStr, true);
+            //$json = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
             $mutations = $json['frameworkUpdates']['entityBatchUpdate']['mutations'];
             $commonJsonPath = 'payload/macroMarkersListEntity/markersList';
             $jsonPath = "$commonJsonPath/markersDecoration";
@@ -327,6 +330,10 @@
             }
 
             $item['mostReplayed'] = $mostReplayed;
+            if(isset($_GET['debug']))
+            {
+                $item['debug'] = $html;//$json;
+            }
         }
 
         if ($options['qualities']) {

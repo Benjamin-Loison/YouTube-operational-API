@@ -3,7 +3,9 @@
     header('Content-Type: application/json; charset=UTF-8');
 
     // Stack Overflow source: https://stackoverflow.com/a/70793047
-    $searchTests = [['snippet&channelId=UC4QobU6STFB0P71PMvOGN5A&order=viewCount', 'items/0/id/videoId', 'jNQXAC9IVRw']];
+    $searchTests = [
+        //['part=snippet&channelId=UC4QobU6STFB0P71PMvOGN5A&order=viewCount', 'items/0/id/videoId', 'jNQXAC9IVRw']
+    ];
 
 // copy YT perfectly (answers and arguments) - slower because not always everything from answer in one request for me
 // make an API based on one request I receive involves one request on my side - more precise in terms of complexity
@@ -79,7 +81,7 @@ if (isset($_GET['part']) &&
         }
     }
     echo getAPI($id, $order, $continuationToken);
-} else {
+} else if(!test()) {
     dieWithJsonMessage('Required parameters not provided');
 }
 

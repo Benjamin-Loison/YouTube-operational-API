@@ -2,7 +2,10 @@
 
     header('Content-Type: application/json; charset=UTF-8');
 
-    // Stack Overflow source: https://stackoverflow.com/q/71457319
+    $playlistsTests = [
+        ['part=snippet&id=PL8wZFyWE1ZaI2HE7PYHvpx0_yv4oJjwAZ', 'items/0/snippet/title', '4,000 times the same video'],
+        ['part=statistics&id=PL8wZFyWE1ZaI2HE7PYHvpx0_yv4oJjwAZ', 'items/0/statistics', ['videoCount' => 4_000]],
+    ];
 
     include_once 'common.php';
 
@@ -34,7 +37,7 @@
             }
         }
         echo getAPI($realIds);
-    } else {
+    } else if(!test()) {
         dieWithJsonMessage('Required parameters not provided');
     }
 

@@ -3,7 +3,13 @@
     header('Content-Type: application/json; charset=UTF-8');
 
     // Stack Overflow source: https://stackoverflow.com/q/71186488
-    $commentThreadsTests = [['snippet&videoId=UC4QobU6STFB0P71PMvOGN5A&order=viewCount', 'items/0/id/videoId', 'jNQXAC9IVRw']];
+    // use multiple lines, or not as they are not supposed to change
+    $commentThreadsTests = [
+        // How to disable people comments?
+        // Otherwise should have a private set of tests
+        //['part=snippet&videoId=UC4QobU6STFB0P71PMvOGN5A&order=viewCount', 'items/0/id/videoId', 'jNQXAC9IVRw'],
+        //['part=snippet,replies&commentId=UgzT9BA9uQhXw05Q2Ip4AaABAg&videoId=mWdFMNQBcjs', 'items/0/id/videoId', 'jNQXAC9IVRw'],
+    ];
     // example: https://youtu.be/mrJachWLjHU
     // example: https://youtu.be/DyDfgMOUjCI
 
@@ -55,7 +61,7 @@ if (isset($_GET['part'])) {
         }
     }
     echo getAPI($videoId, $commentId, $order, $continuationToken);
-} else {
+} else if(!test()) {
     dieWithJsonMessage('Required parameters not provided');
 }
 
@@ -64,7 +70,7 @@ function getAPI($videoId, $commentId, $order, $continuationToken, $simulatedCont
     if($commentId !== null)
     {
         $result = getJSONFromHTML("https://www.youtube.com/watch?v=$videoId&lc=$commentId");
-        $continuationToken = $result['contents']['twoColumnWatchNextResults']['results']['results']['contents']['3']['itemSectionRenderer']['contents']['0']['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
+        $continuationToken = $result['contents']['twoColumnWatchNextResults']['results']['results']['contents'][3]['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
     }
     $continuationTokenProvided = $continuationToken != '';
     if ($continuationTokenProvided) {

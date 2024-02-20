@@ -1,16 +1,54 @@
 <?php
 
+/**
+ * Get array intersect assoc recursive.
+ *
+ * @param mixed $value1
+ * @param mixed $value2
+ *
+ * @return array|bool
+ */
+function array_intersect_assoc_recursive(&$value1, &$value2)
+{
+    if ((!is_array($value1) || !is_array($value2)) || ($value1 == [] && $value2 == [])) {
+        return $value1 === $value2;
+    }
+
+    $intersectKeys = array_intersect(array_keys($value1), array_keys($value2));
+
+    $intersectValues = [];
+    foreach ($intersectKeys as $key) {
+        if (array_intersect_assoc_recursive($value1[$key], $value2[$key])) {
+            $intersectValues[$key] = $value1[$key];
+        }
+    }
+
+    return $intersectValues;
+}
+
     $endpoint = $argv[1];
-    require_once "../yt/$endpoint.php";
+    // Used in endpoint.
+    $test = true;
+    require_once "../$endpoint.php";
     $tests = $GLOBALS["{$endpoint}Tests"];
+    //define('WEBSITE_URL', 'http://localhost/');
     foreach ($tests as $test) {
         $url = $test[0];
         $jsonPath = $test[1];
         $value = $test[2];
-        $content = file_get_contents(WEBSITE_URL . "$endpoint?part=$url");
+        //$finalUrl = WEBSITE_URL . "$endpoint?part=$url";
+        // Should not use network but call the PHP files and provide arguments correctly instead.
+        // Not requiring HTTP could be interesting for instance by using PHP syntax (like `include` etc) or `php-cgi`.
+        $finalUrl = "http://localhost/YouTube-operational-API/$endpoint?$url";
+        //echo "finalUrl: $finalUrl\n";
+        $content = file_get_contents($finalUrl);
         $json = json_decode($content, true);
         $thePathExists = doesPathExist($json, $jsonPath);
         $theValue = $thePathExists ? getValue($json, $jsonPath) : '';
-        $testSuccessful = $thePathExists && $theValue === $value;
-        echo($testSuccessful ? 'X' : '_') . " $endpoint $url $jsonPath $value" . ($testSuccessful ? '' : " $theValue") . "\n";
+
+        $valueInclusion = (is_array($value) && array_intersect_assoc_recursive($value, $theValue) == $value) || (!is_array($value) && $theValue === $value);
+        $testSuccessful = $thePathExists && $valueInclusion;
+        $value = is_array($value) ? 'Array' : $value;
+        $theValue = is_array($theValue) ? 'Array' : $theValue;
+        echo($testSuccessful ? 'PASS' : 'FAIL') . " $endpoint $url $jsonPath $value" . ($testSuccessful ? '' : " $theValue") . "\n";
     }

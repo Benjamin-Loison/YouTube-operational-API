@@ -473,4 +473,10 @@
         return $publishedAt;
     }
 
+    function test()
+    {
+        global $test;
+        return isset($test);
+    }
+
 ?>

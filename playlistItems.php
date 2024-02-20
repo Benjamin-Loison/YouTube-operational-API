@@ -2,9 +2,11 @@
 
     header('Content-Type: application/json; charset=UTF-8');
 
-    // should make the unit tests not based on my personal channels
-    // Stack Overflow source: https://stackoverflow.com/a/70961128
-    $playlistItemsTests = [['snippet&playlistId=PLKAl8tt2R8OfMnDRnEABZ2M-tI7yJYvl1', 'items/0/snippet/publishedAt', '1520963713']]; // not precise...
+    $playlistItemsTests = [
+        // not precise...
+        // Preferably have only more than 200 different videos but that I own would be more robust
+        //['part=snippet&playlistId=PLKAl8tt2R8OfMnDRnEABZ2M-tI7yJYvl1', 'items/0/snippet/publishedAt', 1520963713]
+    ];
 
 include_once 'common.php';
 
@@ -25,7 +27,7 @@ if (isset($_GET['part'], $_GET['playlistId'])) {
         }
     }
     echo getAPI($playlistId, $continuationToken);
-} else {
+} else if(!test()) {
     dieWithJsonMessage('Required parameters not provided');
 }
 
