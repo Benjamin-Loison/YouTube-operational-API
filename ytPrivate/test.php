@@ -35,10 +35,9 @@ function array_intersect_assoc_recursive(&$value1, &$value2)
         $url = $test[0];
         $jsonPath = $test[1];
         $value = $test[2];
-        // Should not use network but call the PHP files and provide arguments correctly instead.
-        // Not requiring HTTP could be interesting for instance by using PHP syntax (like `include` etc) or `php-cgi`.
-        $finalUrl = "http://localhost/YouTube-operational-API/$endpoint?$url";
-        $content = file_get_contents($finalUrl);
+        // Should not use network but call the PHP files thanks to `include` etc and provide arguments correctly instead.
+        $content = shell_exec("php-cgi ../$endpoint.php " . escapeshellarg($url));
+        $content = str_replace('Content-Type: application/json; charset=UTF-8', '', $content);
         $json = json_decode($content, true);
         $thePathExists = doesPathExist($json, $jsonPath);
         $theValue = $thePathExists ? getValue($json, $jsonPath) : '';
