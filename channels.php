@@ -15,6 +15,7 @@
         ['part=approval&id=UC0aMaqIs997ggjDs_Q9UYiw', 'items/0/approval', 'Official Artist Channel'],
         ['part=snippet&id=UCv_LqFI-0vMVYgNR3TeB3zQ', 'items/0/snippet', json_decode(file_get_contents('tests/part=snippet&id=UCv_LqFI-0vMVYgNR3TeB3zQ.json'), true)],
         ['part=membership&id=UCX6OQ3DkcsbYNE6H8uQQuVA', 'items/0/isMembershipEnabled', true],
+        ['part=popular&id=UCyvTYozFRVuM_mKKyT6K50g', 'items/0', []],
     ];
 
     include_once 'common.php';
@@ -641,7 +642,7 @@
                     ]);
                 }
             }
-            if(array_key_exists('continuationItemRenderer', $gridRendererItem))
+            if($gridRendererItem != null && array_key_exists('continuationItemRenderer', $gridRendererItem))
             {
                 $item['nextPageToken'] = $gridRendererItem['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ',' . $visitorData;
             }
