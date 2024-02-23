@@ -34,17 +34,17 @@ function array_intersect_assoc_recursive(&$value1, &$value2)
     foreach ($tests as $test) {
         $url = $test[0];
         $jsonPath = $test[1];
-        $value = $test[2];
+        $groundTruthValue = $test[2];
         // Should not use network but call the PHP files thanks to `include` etc and provide arguments correctly instead.
-        $content = shell_exec("php-cgi ../$endpoint.php " . escapeshellarg($url));
-        $content = str_replace('Content-Type: application/json; charset=UTF-8', '', $content);
-        $json = json_decode($content, true);
-        $thePathExists = doesPathExist($json, $jsonPath);
-        $theValue = $thePathExists ? getValue($json, $jsonPath) : '';
+        $retrievedContent = shell_exec("php-cgi ../$endpoint.php " . escapeshellarg($url));
+        $retrievedContent = str_replace('Content-Type: application/json; charset=UTF-8', '', $retrievedContent);
+        $retrievedContentJson = json_decode($retrievedContent, true);
+        $jsonPathExistsInRetrievedContentJson = doesPathExist($retrievedContentJson, $jsonPath);
+        $retrievedContentValue = $jsonPathExistsInRetrievedContentJson ? getValue($retrievedContentJson, $jsonPath) : '';
 
-        $valueInclusion = (is_array($value) && array_intersect_assoc_recursive($value, $theValue) == $value) || (!is_array($value) && $theValue === $value);
-        $testSuccessful = $thePathExists && $valueInclusion;
-        $value = is_array($value) ? 'Array' : $value;
-        $theValue = is_array($theValue) ? 'Array' : $theValue;
-        echo($testSuccessful ? 'PASS' : 'FAIL') . " $endpoint $url $jsonPath $value" . ($testSuccessful ? '' : " $theValue") . "\n";
+        $valueInclusion = (is_array($groundTruthValue) && array_intersect_assoc_recursive($groundTruthValue, $retrievedContentValue) == $groundTruthValue) || (!is_array($groundTruthValue) && $retrievedContentValue === $groundTruthValue);
+        $testSuccessful = $jsonPathExistsInRetrievedContentJson && $valueInclusion;
+        $groundTruthValue = is_array($groundTruthValue) ? 'Array' : $groundTruthValue;
+        $retrievedContentValue = is_array($retrievedContentValue) ? 'Array' : $retrievedContentValue;
+        echo($testSuccessful ? 'PASS' : 'FAIL') . " $endpoint $url $jsonPath $groundTruthValue" . ($testSuccessful ? '' : " $retrievedContentValue") . "\n";
     }
