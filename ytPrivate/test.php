@@ -2,6 +2,7 @@
 
 /**
  * Get array intersect assoc recursive.
+ * Note that this intersection is not commutative due to `$intersectValues[$key] = $value1[$key]`.
  *
  * @param mixed $value1
  * @param mixed $value2
@@ -42,7 +43,9 @@ function array_intersect_assoc_recursive(&$value1, &$value2)
         $jsonPathExistsInRetrievedContentJson = doesPathExist($retrievedContentJson, $jsonPath);
         $retrievedContentValue = $jsonPathExistsInRetrievedContentJson ? getValue($retrievedContentJson, $jsonPath) : '';
 
-        $valueInclusion = (is_array($groundTruthValue) && array_intersect_assoc_recursive($groundTruthValue, $retrievedContentValue) == $groundTruthValue) || (!is_array($groundTruthValue) && $retrievedContentValue === $groundTruthValue);
+        $isGroundTruthValueAnArrayAndEqualToRetrievedContentValue = is_array($groundTruthValue) && array_intersect_assoc_recursive($retrievedContentValue, $groundTruthValue) == $groundTruthValue;
+        $isGroundTruthValueNotAnArrayAndEqualToRetrievedContentValue = !is_array($groundTruthValue) && $retrievedContentValue === $groundTruthValue;
+        $valueInclusion = $isGroundTruthValueAnArrayAndEqualToRetrievedContentValue || $isGroundTruthValueNotAnArrayAndEqualToRetrievedContentValue;
         $testSuccessful = $jsonPathExistsInRetrievedContentJson && $valueInclusion;
         $groundTruthValue = is_array($groundTruthValue) ? 'Array' : $groundTruthValue;
         $retrievedContentValue = is_array($retrievedContentValue) ? 'Array' : $retrievedContentValue;
