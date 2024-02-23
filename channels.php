@@ -211,10 +211,6 @@
                 $reelItemRenderer = $reelShelfRendererItem['richItemRenderer']['content']['reelItemRenderer'];
                 $viewCount = getIntValue($reelItemRenderer['viewCountText']['simpleText'], 'view');
                 $frame0Thumbnails = $reelItemRenderer['navigationEndpoint']['reelWatchEndpoint']['thumbnail']['thumbnails'];
-                $durationParts = explode(' - ', $reelItemRenderer['accessibility']['accessibilityData']['label']);
-                end($durationParts);
-                // Can be `n seconds` or `1 minute` it seems.
-                $duration = prev($durationParts);
 
                 $short = [
                     'videoId' => $reelItemRenderer['videoId'],
@@ -223,7 +219,6 @@
                     'thumbnails' => $reelItemRenderer['thumbnail']['thumbnails'],
                     'viewCount' => $viewCount,
                     'frame0Thumbnails' => $frame0Thumbnails,
-                    'duration' => $duration
                 ];
                 if (!$continuationTokenProvided) {
                     $browseEndpoint = $tabRenderer['endpoint']['browseEndpoint'];
