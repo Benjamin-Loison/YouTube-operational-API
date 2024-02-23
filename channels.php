@@ -166,34 +166,7 @@
                     }
                 }
             } else {
-                $continuationParts = explode(',', $continuationToken);
-                $continuationToken = $continuationParts[0];
-                $visitorData = $continuationParts[1];
-                $rawData = [
-                    'context' => [
-                        'client' => [
-                            'clientName' => 'WEB',
-                            'clientVersion' => MUSIC_VERSION
-                        ]
-                    ],
-                    'continuation' => $continuationToken
-                ];
-                $http = [
-                    'header' => [
-                        'Content-Type: application/json',
-                        // Isn't it always the same `$visitorData`?
-                        // I confirm that as of July 10, 2023 this parameter is still required.
-                        "X-Goog-EOM-Visitor-Id: $visitorData"
-                    ],
-                    'method' => 'POST',
-                    'content' => json_encode($rawData)
-                ];
-
-                $httpOptions = [
-                    'http' => $http
-                ];
-
-                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
+                $result = getVisitorDataResult($continuationToken);
             }
             $shorts = [];
             if (!$continuationTokenProvided) {
@@ -603,29 +576,7 @@
             }
             else
             {
-                $continuationTokenParts = explode(',', $continuationToken);
-                $visitorData = $continuationTokenParts[1];
-                $rawData = [
-                    'context' => [
-                        'client' => [
-                            'clientName' => 'WEB',
-                            'clientVersion' => MUSIC_VERSION,
-                            'visitorData' => $visitorData,
-                        ]
-                    ],
-                    'continuation' => $continuationTokenParts[0],
-                ];
-                $http = [
-                    'header' => ['Content-Type: application/json'],
-                    'method' => 'POST',
-                    'content' => json_encode($rawData)
-                ];
-
-                $httpOptions = [
-                    'http' => $http
-                ];
-
-                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
+                $result = getVisitorDataResult($continuationToken);
                 $gridRendererItems = getContinuationItems($result);
             }
             foreach($gridRendererItems as $gridRendererItem)
@@ -683,4 +634,30 @@
     function getVisitorData($result)
     {
         return $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
+    }
+
+    function getVisitorDataResult($continuationToken)
+    {
+        $continuationTokenParts = explode(',', $continuationToken);
+        $visitorData = $continuationTokenParts[1];
+        $rawData = [
+            'context' => [
+                'client' => [
+                    'clientName' => 'WEB',
+                    'clientVersion' => MUSIC_VERSION,
+                    'visitorData' => $visitorData,
+                ]
+            ],
+            'continuation' => $continuationTokenParts[0],
+        ];
+        $http = [
+            'header' => ['Content-Type: application/json'],
+            'method' => 'POST',
+            'content' => json_encode($rawData)
+        ];
+        $httpOptions = [
+            'http' => $http
+        ];
+        $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
+        return $result;
     }
