@@ -4,7 +4,9 @@ header('Content-Type: application/json; charset=UTF-8');
 
 include_once 'common.php';
 
-$realOptions = ['snippet'];
+$realOptions = [
+    'snippet',
+];
 
 foreach ($realOptions as $realOption) {
     $options[$realOption] = false;

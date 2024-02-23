@@ -12,7 +12,27 @@
 
     include_once 'common.php';
 
-    $realOptions = ['id', 'status', 'contentDetails', 'music', 'short', 'impressions', 'musics', 'isPaidPromotion', 'isPremium', 'isMemberOnly', 'mostReplayed', 'qualities', 'location', 'chapters', 'isOriginal', 'isRestricted', 'snippet', 'clip', 'activity']; // could load index.php from that
+    $realOptions = [
+        'id',
+        'status',
+        'contentDetails',
+        'music',
+        'short',
+        'impressions',
+        'musics',
+        'isPaidPromotion',
+        'isPremium',
+        'isMemberOnly',
+        'mostReplayed',
+        'qualities',
+        'location',
+        'chapters',
+        'isOriginal',
+        'isRestricted',
+        'snippet',
+        'clip',
+        'activity',
+    ];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {

@@ -9,7 +9,10 @@
 
     include_once 'common.php';
 
-    $realOptions = ['snippet', 'statistics'];
+	$realOptions = [
+		'snippet',
+		'statistics',
+	];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {

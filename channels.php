@@ -20,7 +20,19 @@
 
     include_once 'common.php';
 
-    $realOptions = ['status', 'upcomingEvents', 'shorts', 'community', 'channels', 'about', 'approval', 'playlists', 'snippet', 'membership', 'popular'];
+    $realOptions = [
+        'status',
+        'upcomingEvents',
+        'shorts',
+        'community',
+        'channels',
+        'about',
+        'approval',
+        'playlists',
+        'snippet',
+        'membership',
+        'popular',
+    ];
 
     // really necessary ?
     foreach ($realOptions as $realOption) {

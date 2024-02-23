@@ -15,7 +15,10 @@
 
 include_once 'common.php';
 
-$realOptions = ['snippet', 'replies'];
+$realOptions = [
+    'snippet',
+    'replies',
+];
 
 foreach ($realOptions as $realOption) {
     $options[$realOption] = false;

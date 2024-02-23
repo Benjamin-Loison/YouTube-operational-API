@@ -13,7 +13,10 @@
 
 include_once 'common.php';
 
-$realOptions = ['id', 'snippet'];
+$realOptions = [
+    'id',
+    'snippet',
+];
 
 // really necessary ?
 foreach ($realOptions as $realOption) {

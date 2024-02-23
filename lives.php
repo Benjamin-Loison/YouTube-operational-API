@@ -6,7 +6,11 @@
 
     include_once 'common.php';
 
-    $realOptions = ['donations', 'sponsorshipGifts', 'memberships'];
+    $realOptions = [
+        'donations',
+        'sponsorshipGifts',
+        'memberships',
+    ];
 
     foreach ($realOptions as $realOption) {
         $options[$realOption] = false;
