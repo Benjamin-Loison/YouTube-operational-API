@@ -51,22 +51,140 @@
         echo '<a href="https://developers.google.com/youtube/v3">YouTube Data API v3</a>';
     }
 
+    function getUrl($parameters)
+    {
+        return urldecode(http_build_query(array_combine(array_keys($parameters), array_map(fn($parameterValue) => gettype($parameterValue) === 'string' ? $parameterValue : implode(',', $parameterValue), array_values($parameters)))));
+    }
+
     function feature($feature)
     {
         $suburl = "$feature[0]/list";
         $webpage = explode('/', $suburl, 2)[0];
-        $url = $feature[1];
+        $url = getUrl($feature[1]) . (count($feature) >= 3 ? '(&' . getUrl($feature[2]) . ')' : '');
         $name = ucfirst(str_replace('/', ': ', $suburl));
-        echo "<p>Based on <a href=\"https://developers.google.com/youtube/v3/docs/$suburl\">$name</a>: " . url(WEBSITE_URL . "$webpage?part=$url") . '</p>';
+        echo "<p>Based on <a href=\"https://developers.google.com/youtube/v3/docs/$suburl\">$name</a>: " . url(WEBSITE_URL . "$webpage?$url") . '</p>';
     }
 
     $features = [
-        ['channels', 'status,upcomingEvents,shorts,community,channels,about,approval,playlists,snippet,membership,popular&cId=C_ID&id=CHANNEL_ID&handle=HANDLE&forUsername=USERNAME&raw=RAW&order=viewCount(&pageToken=PAGE_TOKEN)'],
-        ['commentThreads', 'snippet,replies&id=COMMENT_ID&videoId=VIDEO_ID&order=relevance,time(&pageToken=PAGE_TOKEN)'],
-        ['playlists', 'snippet,statistics&id=PLAYLIST_ID'],
-        ['playlistItems', 'snippet&playlistId=PLAYLIST_ID(&pageToken=PAGE_TOKEN)'],
-        ['search', 'id,snippet&q=QUERY&channelId=CHANNEL_ID&eventType=upcoming&hashtag=HASH_TAG&type=video,short&order=viewCount,relevance(&pageToken=PAGE_TOKEN)'],
-        ['videos', 'id,status,contentDetails,music,short,impressions,musics,isPaidPromotion,isPremium,isMemberOnly,mostReplayed,qualities,chapters,isOriginal,isRestricted,snippet,clip,activity&id=VIDEO_ID&clipId=CLIP_ID&SAPISIDHASH=YOUR_SAPISIDHASH'],
+        [
+            'channels',
+            [
+                'part' => [
+                    'status',
+                    'upcomingEvents',
+                    'shorts',
+                    'community',
+                    'channels',
+                    'about',
+                    'approval',
+                    'playlists',
+                    'snippet',
+                    'membership',
+                    'popular',
+                ],
+                'cId' => 'C_ID',
+                'id' => 'CHANNEL_ID',
+                'handle' => 'HANDLE',
+                'forUsername' => 'USERNAME',
+                'raw' => 'RAW',
+                'order' => 'viewCount',
+            ],
+            [
+                'pageToken' => 'PAGE_TOKEN',
+            ],
+        ],
+        [
+            'commentThreads',
+            [
+                'part' => [
+                    'snippet',
+                    'replies',
+                ],
+                'id' => 'COMMENT_ID',
+                'videoId' => 'VIDEO_ID',
+                'order' => [
+                    'relevance',
+                    'time',
+                ],
+            ],
+            [
+                'pageToken' => 'PAGE_TOKEN',
+            ],
+        ],
+        [
+            'playlists',
+            [
+                'part' => [
+                    'snippet',
+                    'statistics',
+                ],
+                'id' => 'PLAYLIST_ID',
+            ],
+        ],
+        [
+            'playlistItems',
+            [
+                'part' => [
+                    'snippet',
+                ],
+                'playlistId' => 'PLAYLIST_ID',
+            ],
+            [
+                'pageToken' => 'PAGE_TOKEN',
+            ],
+        ],
+        [
+            'search',
+            [
+                'part' => [
+                    'id',
+                    'snippet',
+                ],
+                'q' => 'QUERY',
+                'channelId' => 'CHANNEL_ID',
+                'eventType' => 'upcoming',
+                'hashtag' => 'HASH_TAG',
+                'type' => [
+                    'video',
+                    'short',
+                ],
+                'order' => [
+                    'viewCount',
+                    'relevance',
+                ],
+            ],
+            [
+                'pageToken' => 'PAGE_TOKEN',
+            ],
+        ],
+        [
+            'videos',
+            [
+                'part' => [
+                    'id',
+                    'status',
+                    'contentDetails',
+                    'music',
+                    'short',
+                    'impressions',
+                    'musics',
+                    'isPaidPromotion',
+                    'isPremium',
+                    'isMemberOnly',
+                    'mostReplayed',
+                    'qualities',
+                    'chapters',
+                    'isOriginal',
+                    'isRestricted',
+                    'snippet',
+                    'clip',
+                    'activity',
+                ],
+                'id' => 'VIDEO_ID',
+                'clipId' => 'CLIP_ID',
+                'SAPISIDHASH' => 'YOUR_SAPISIDHASH',
+            ],
+        ]
     ];
 
 ?>
@@ -81,13 +199,45 @@
     }
 
     $features = [
-        ['community', 'snippet&id=POST_ID&order=relevance,time'],
-        ['lives', 'donations,sponsorshipGifts,memberships&id=VIDEO_ID'],
-        ['liveChats', 'snippet,participants&id=VIDEO_ID&time=TIME_MS'],
+        [
+            'community',
+            [
+                'part' => [
+                    'snippet',
+                ],
+                'id' => 'POST_ID',
+                'order' => [
+                    'relevance',
+                    'time',
+                ],
+            ],
+        ],
+        [
+            'lives',
+            [
+                'part' => [
+                    'donations',
+                    'sponsorshipGifts',
+                    'memberships',
+                ],
+                'id' => 'VIDEO_ID',
+            ],
+        ],
+        [
+            'liveChats',
+            [
+                'part' => [
+                    'snippet',
+                    'participants',
+                ],
+                'id' => 'VIDEO_ID',
+                'time' => 'TIME_MS',
+            ],
+        ],
     ];
 
     foreach ($features as $feature) {
-        echo "<p>" . url(WEBSITE_URL . "$feature[0]?part=$feature[1]") . "</p>";
+        echo "<p>" . url(WEBSITE_URL . "$feature[0]?" . getUrl($feature[1])) . "</p>";
     }
 
 ?>
