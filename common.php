@@ -433,7 +433,7 @@
 
     function getTabByName($result, $tabName) {
         if (array_key_exists('contents', $result)) {
-            return array_values(array_filter($result['contents']['twoColumnBrowseResultsRenderer']['tabs'], fn($tab) => (array_key_exists('tabRenderer', $tab) && $tab['tabRenderer']['title'] === $tabName)))[0];
+            return array_values(array_filter(getTabs($result), fn($tab) => (array_key_exists('tabRenderer', $tab) && $tab['tabRenderer']['title'] === $tabName)))[0];
         } else {
             return null;
         }
@@ -482,6 +482,11 @@
     function getContinuationItems($result)
     {
         return $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+    }
+
+    function getTabs($result)
+    {
+        return $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
     }
 
 ?>

@@ -115,10 +115,10 @@ function getAPI($id, $order, $continuationToken)
         } else {
             $json = getJSONFromHTML('https://www.youtube.com/hashtag/' . urlencode($id));
         }
-        $items = $continuationTokenProvided ? getContinuationItems($json) : $json['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['richGridRenderer']['contents'];
+        $items = $continuationTokenProvided ? getContinuationItems($json) : getTabs($json)[0]['tabRenderer']['content']['richGridRenderer']['contents'];
     } elseif (isset($_GET['eventType'])) {
         $json = getJSONFromHTML("https://www.youtube.com/channel/{$_GET['channelId']}/videos?view=2&live_view=502");
-        $items = $json['contents']['twoColumnBrowseResultsRenderer']['tabs'][1]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
+        $items = getTabs($json)[1]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
     } elseif (isset($_GET['q'])) {
         $typeBase64 = $order === 'relevance' ? '' : 'EgIQAQ==';
         $rawData = [
@@ -187,7 +187,7 @@ function getAPI($id, $order, $continuationToken)
         // repeated on official API but not in UI requests
         //if(!$continuationTokenProvided)
         //     $regionCode = $result['topbar']['desktopTopbarRenderer']['countryCode'];
-        $items = $continuationTokenProvided ? getContinuationItems($result) : $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][1]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
+        $items = $continuationTokenProvided ? getContinuationItems($result) : getTabs($result)[1]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'];
     }
     $answerItems = [];
     $itemsCount = count($items);

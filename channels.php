@@ -137,7 +137,7 @@
         if ($options['upcomingEvents']) {
             $upcomingEvents = [];
             $result = getJSONFromHTML("https://www.youtube.com/channel/$id", [], '', 'var ', false, true);
-            $subItems = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['shelfRenderer']['content']['horizontalListRenderer']['items'];
+            $subItems = getTabs($result)[0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['shelfRenderer']['content']['horizontalListRenderer']['items'];
             foreach ($subItems as $subItem) {
                 $path = 'gridVideoRenderer/upcomingEventData';
                 if (doesPathExist($subItem, $path)) {
@@ -567,7 +567,7 @@
             $popular = [];
             if (!$continuationTokenProvided) {
                 $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id");
-                $contents = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'];
+                $contents = getTabs($result)[0]['tabRenderer']['content']['sectionListRenderer']['contents'];
                 $shelfRendererPath = 'itemSectionRenderer/contents/0/shelfRenderer';
                 $content = array_values(array_filter($contents, fn($content) => getValue($content, $shelfRendererPath)['title']['runs'][0]['text'] == 'Popular'))[0];
                 $shelfRenderer = getValue($content, $shelfRendererPath);

@@ -67,7 +67,7 @@ function getAPI($playlistId, $continuationToken)
 
     $result = json_decode($res, true);
     $answerItems = [];
-    $items = $continuationTokenProvided ? getContinuationItems($result) : $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['playlistVideoListRenderer']['contents'];
+    $items = $continuationTokenProvided ? getContinuationItems($result) : getTabs($result)[0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['playlistVideoListRenderer']['contents'];
     $itemsCount = count($items);
     for ($itemsIndex = 0; $itemsIndex < $itemsCount - 1; $itemsIndex++) {
         $item = $items[$itemsIndex];

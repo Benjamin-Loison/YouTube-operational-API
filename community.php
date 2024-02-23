@@ -41,7 +41,7 @@ if (isset($_GET['part'], $_GET['id'])) {
 function getAPI($postId, $order)
 {
     $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/post/$postId");
-    $contents = $result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['content']['sectionListRenderer']['contents'];
+    $contents = getTabs($result)[0]['tabRenderer']['content']['sectionListRenderer']['contents'];
     $content = $contents[0]['itemSectionRenderer']['contents'][0];
     $post = getCommunityPostFromContent($content);
     $continuationToken = urldecode($contents[1]['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
