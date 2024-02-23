@@ -1,26 +1,20 @@
 <?php
 
-/**
- * Get array intersect assoc recursive.
- * Note that this intersection is not commutative due to `$intersectValues[$key] = $value1[$key]`.
- *
- * @param mixed $value1
- * @param mixed $value2
- *
- * @return array|bool
- */
-function array_intersect_assoc_recursive(&$value1, &$value2)
+function array_intersect_recursive(&$value1, &$value2)
 {
-    if ((!is_array($value1) || !is_array($value2)) || ($value1 == [] && $value2 == [])) {
-        return $value1 === $value2;
-    }
-
     $intersectKeys = array_intersect(array_keys($value1), array_keys($value2));
 
     $intersectValues = [];
     foreach ($intersectKeys as $key) {
-        if (array_intersect_assoc_recursive($value1[$key], $value2[$key])) {
-            $intersectValues[$key] = $value1[$key];
+        $element1 = $value1[$key];
+        $element2 = $value2[$key];
+        if(is_array($element1) && is_array($element2))
+        {
+            $intersectValues[$key] = array_intersect_recursive($element1, $element2);
+        }
+        else if(!is_array($element1) && !is_array($element2) && $element1 === $element2)
+        {
+            $intersectValues[$key] = $element1;
         }
     }
 
@@ -43,7 +37,7 @@ function array_intersect_assoc_recursive(&$value1, &$value2)
         $jsonPathExistsInRetrievedContentJson = doesPathExist($retrievedContentJson, $jsonPath);
         $retrievedContentValue = $jsonPathExistsInRetrievedContentJson ? getValue($retrievedContentJson, $jsonPath) : '';
 
-        $isGroundTruthValueAnArrayAndEqualToRetrievedContentValue = is_array($groundTruthValue) && array_intersect_assoc_recursive($retrievedContentValue, $groundTruthValue) == $groundTruthValue;
+        $isGroundTruthValueAnArrayAndEqualToRetrievedContentValue = is_array($groundTruthValue) && array_intersect_recursive($retrievedContentValue, $groundTruthValue) == $groundTruthValue;
         $isGroundTruthValueNotAnArrayAndEqualToRetrievedContentValue = !is_array($groundTruthValue) && $retrievedContentValue === $groundTruthValue;
         $valueInclusion = $isGroundTruthValueAnArrayAndEqualToRetrievedContentValue || $isGroundTruthValueNotAnArrayAndEqualToRetrievedContentValue;
         $testSuccessful = $jsonPathExistsInRetrievedContentJson && $valueInclusion;
