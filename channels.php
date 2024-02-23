@@ -324,7 +324,7 @@
                 ];
 
                 $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
-                $itemsArray = [[null, $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems']]];
+                $itemsArray = [[null, getContinuationItems($result)]];
             }
             $channelSections = [];
             foreach($itemsArray as [$sectionTitle, $items]) {
@@ -477,7 +477,7 @@
                 ];
 
                 $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
-                $itemsArray = [[null, $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems']]];
+                $itemsArray = [[null, getContinuationItems($result)]];
             }
 
             function getVideoFromItsThumbnails($videoThumbnails, $isVideo = true) {
@@ -626,7 +626,7 @@
                 ];
 
                 $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
-                $gridRendererItems = $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+                $gridRendererItems = getContinuationItems($result);
             }
             foreach($gridRendererItems as $gridRendererItem)
             {

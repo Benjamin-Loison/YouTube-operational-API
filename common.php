@@ -479,4 +479,9 @@
         return isset($test);
     }
 
+    function getContinuationItems($result)
+    {
+        return $result['onResponseReceivedActions'][0]['appendContinuationItemsAction']['continuationItems'];
+    }
+
 ?>
