@@ -32,6 +32,8 @@
         'snippet',
         'membership',
         'popular',
+        'recent',
+        'letsPlay',
     ];
 
     // really necessary ?
@@ -152,7 +154,7 @@
         if ($options['shorts']) {
             if (!$continuationTokenProvided) {
                 $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/shorts", true);
-                $visitorData = $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
+                $visitorData = getVisitorData($result);
                 $tab = getTabByName($result, 'Shorts');
                 $tabRenderer = $tab['tabRenderer'];
                 $richGridRenderer = $tabRenderer['content']['richGridRenderer'];
@@ -602,7 +604,7 @@
                 $content = array_values(array_filter($contents, fn($content) => getValue($content, $shelfRendererPath)['title']['runs'][0]['text'] == 'Popular'))[0];
                 $shelfRenderer = getValue($content, $shelfRendererPath);
                 $gridRendererItems = $shelfRenderer['content']['gridRenderer']['items'];
-                $visitorData = $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
+                $visitorData = getVisitorData($result);
             }
             else
             {
@@ -681,4 +683,9 @@
         $items = [];
         array_push($items, getItem($id, $order, $continuationToken));
         return returnItems($items);
+    }
+
+    function getVisitorData($result)
+    {
+        return $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
     }

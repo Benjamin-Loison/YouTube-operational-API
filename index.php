@@ -81,6 +81,8 @@
                     'snippet',
                     'membership',
                     'popular',
+                    'recent',
+                    'letsPlay',
                 ],
                 'cId' => 'C_ID',
                 'id' => 'CHANNEL_ID',
