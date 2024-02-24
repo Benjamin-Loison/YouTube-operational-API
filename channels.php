@@ -16,6 +16,7 @@
         ['part=snippet&id=UCv_LqFI-0vMVYgNR3TeB3zQ', 'items/0/snippet', json_decode(file_get_contents('tests/part=snippet&id=UCv_LqFI-0vMVYgNR3TeB3zQ.json'), true)],
         ['part=membership&id=UCX6OQ3DkcsbYNE6H8uQQuVA', 'items/0/isMembershipEnabled', true],
         ['part=popular&id=UCyvTYozFRVuM_mKKyT6K50g', 'items/0', []],
+        ['part=recent&id=UCyvTYozFRVuM_mKKyT6K50g', 'items/0', []],
     ];
 
     include_once 'common.php';
@@ -107,7 +108,7 @@
         $continuationToken = '';
         if (isset($_GET['pageToken'])) {
             $continuationToken = $_GET['pageToken'];
-            $hasVisitorData = $options['shorts'] || $options['popular'];
+            $hasVisitorData = $options['shorts'] || $options['popular'] || $options['recent'];
             if (($hasVisitorData && !isContinuationTokenAndVisitorData($continuationToken)) || (!$hasVisitorData && !isContinuationToken($continuationToken))) {
                 dieWithJsonMessage('Invalid pageToken');
             }
@@ -564,49 +565,21 @@
 
         if ($options['popular'])
         {
-            $popular = [];
-            if (!$continuationTokenProvided) {
-                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id");
+            $getRendererItems = function($result)
+            {
                 $contents = getTabs($result)[0]['tabRenderer']['content']['sectionListRenderer']['contents'];
                 $shelfRendererPath = 'itemSectionRenderer/contents/0/shelfRenderer';
                 $content = array_values(array_filter($contents, fn($content) => getValue($content, $shelfRendererPath)['title']['runs'][0]['text'] == 'Popular'))[0];
                 $shelfRenderer = getValue($content, $shelfRendererPath);
                 $gridRendererItems = $shelfRenderer['content']['gridRenderer']['items'];
-                $visitorData = getVisitorData($result);
-            }
-            else
-            {
-                $result = getVisitorDataResult($continuationToken);
-                $gridRendererItems = getContinuationItems($result);
-            }
-            foreach($gridRendererItems as $gridRendererItem)
-            {
-                if(!array_key_exists('continuationItemRenderer', $gridRendererItem))
-                {
-                    $gridVideoRenderer = $gridRendererItem['gridVideoRenderer'];
-                    $run = $gridVideoRenderer['shortBylineText']['runs'][0];
-                    $browseEndpoint = $run['navigationEndpoint']['browseEndpoint'];
-                    $title = $gridVideoRenderer['title'];
-                    $publishedAt = getPublishedAt(end(explode('views', $title['accessibility']['accessibilityData']['label'])));
-                    array_push($popular, [
-                        'videoId' => $gridVideoRenderer['videoId'],
-                        'thumbnails' => $gridVideoRenderer['thumbnail']['thumbnails'],
-                        'title' => $title['runs'][0]['text'],
-                        'publishedAt' => $publishedAt,
-                        'views' => getIntFromViewCount($gridVideoRenderer['viewCountText']['simpleText']),
-                        'channelTitle' => $run['text'],
-                        'channelId' => $browseEndpoint['browseId'],
-                        'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 1),
-                        'duration' => getIntFromDuration($gridVideoRenderer['thumbnailOverlays'][0]['thumbnailOverlayTimeStatusRenderer']['text']['simpleText']),
-                        'approval' => $gridVideoRenderer['ownerBadges'][0]['metadataBadgeRenderer']['tooltip'],
-                    ]);
-                }
-            }
-            if($gridRendererItem != null && array_key_exists('continuationItemRenderer', $gridRendererItem))
-            {
-                $item['nextPageToken'] = $gridRendererItem['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ',' . $visitorData;
-            }
-            $item['popular'] = $popular;
+                return $gridRendererItems;
+            };
+            $item['popular'] = getVideos($item, $id, "https://www.youtube.com/channel/$id", $getRendererItems, $continuationToken);
+        }
+
+        if ($options['recent'])
+        {
+            $item['recent'] = getVideos($item, $id, "https://www.youtube.com/channel/$id/recent", fn($result) => getTabByName($result, 'Recent')['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'], $continuationToken);
         }
 
         return $item;
@@ -660,4 +633,52 @@
         ];
         $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
         return $result;
+    }
+
+    function getVideo($gridRendererItem)
+    {
+        $gridVideoRenderer = $gridRendererItem['gridVideoRenderer'];
+        $run = $gridVideoRenderer['shortBylineText']['runs'][0];
+        $browseEndpoint = $run['navigationEndpoint']['browseEndpoint'];
+        $title = $gridVideoRenderer['title'];
+        $publishedAt = getPublishedAt(end(explode('views', $title['accessibility']['accessibilityData']['label'])));
+        return [
+            'videoId' => $gridVideoRenderer['videoId'],
+            'thumbnails' => $gridVideoRenderer['thumbnail']['thumbnails'],
+            'title' => $title['runs'][0]['text'],
+            'publishedAt' => $publishedAt,
+            'views' => getIntFromViewCount($gridVideoRenderer['viewCountText']['simpleText']),
+            'channelTitle' => $run['text'],
+            'channelId' => $browseEndpoint['browseId'],
+            'channelHandle' => substr($browseEndpoint['canonicalBaseUrl'], 1),
+            'duration' => getIntFromDuration($gridVideoRenderer['thumbnailOverlays'][0]['thumbnailOverlayTimeStatusRenderer']['text']['simpleText']),
+            'approval' => $gridVideoRenderer['ownerBadges'][0]['metadataBadgeRenderer']['tooltip'],
+        ];
+    }
+
+    function getVideos(&$item, $id, $url, $getGridRendererItems, $continuationToken)
+    {
+        $videos = [];
+        if ($continuationToken === '') {
+            $result = getJSONFromHTMLForcingLanguage($url);
+            $gridRendererItems = $getGridRendererItems($result);
+            $visitorData = getVisitorData($result);
+        }
+        else
+        {
+            $result = getVisitorDataResult($continuationToken);
+            $gridRendererItems = getContinuationItems($result);
+        }
+        foreach($gridRendererItems as $gridRendererItem)
+        {
+            if(!array_key_exists('continuationItemRenderer', $gridRendererItem))
+            {
+                array_push($videos, getVideo($gridRendererItem));
+            }
+        }
+        if($gridRendererItem != null && array_key_exists('continuationItemRenderer', $gridRendererItem))
+        {
+            $item['nextPageToken'] = $gridRendererItem['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ',' . $visitorData;
+        }
+        return $videos;
     }
