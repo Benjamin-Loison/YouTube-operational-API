@@ -47,29 +47,7 @@ function getAPI($postId, $order)
     $continuationToken = urldecode($contents[1]['itemSectionRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']);
 
    if ($order === 'time') {
-        $rawData = [
-            'context' => [
-                'client' => [
-                    'clientName' => 'WEB',
-                    'clientVersion' => MUSIC_VERSION
-                ]
-            ],
-            'continuation' => $continuationToken
-        ];
-
-        $http = [
-                'header' => [
-                'Content-Type: application/json'
-            ],
-            'method' => 'POST',
-            'content' => json_encode($rawData)
-        ];
-
-        $httpOptions = [
-            'http' => $http
-        ];
-
-        $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
+        $result = getContinuationJson($continuationToken);
         $continuationToken = urldecode($result['onResponseReceivedEndpoints'][0]['reloadContinuationItemsCommand']['continuationItems'][0]['commentsHeaderRenderer']['sortMenu']['sortFilterSubMenuRenderer']['subMenuItems'][1]['serviceEndpoint']['continuationCommand']['token']);
     }
 

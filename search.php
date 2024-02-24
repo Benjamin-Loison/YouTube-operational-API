@@ -95,23 +95,7 @@ function getAPI($id, $order, $continuationToken)
     $continuationTokenProvided = $continuationToken != '';
     if (isset($_GET['hashtag'])) {
         if ($continuationTokenProvided) {
-            $rawData = [
-                'context' => [
-                    'client' => [
-                        'clientName' => 'WEB',
-                        'clientVersion' => MUSIC_VERSION
-                    ]
-                ],
-                'continuation' => $continuationToken
-            ];
-            $opts = [
-                'http' => [
-                    'method' => 'POST',
-                    'header' => 'Content-Type: application/json',
-                    'content' => json_encode($rawData)
-                ]
-            ];
-            $json = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $opts);
+            $json = getContinuationJson($continuationToken);
         } else {
             $json = getJSONFromHTML('https://www.youtube.com/hashtag/' . urlencode($id));
         }

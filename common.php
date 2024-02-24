@@ -489,4 +489,41 @@
         return $result['contents']['twoColumnBrowseResultsRenderer']['tabs'];
     }
 
+    function getContinuationJson($continuationToken)
+    {
+        $containsVisitorData = str_contains($continuationToken, ',');
+        if($containsVisitorData)
+        {
+            $continuationTokenParts = explode(',', $continuationToken);
+            $continuationToken = $continuationTokenParts[0];
+        }
+        $rawData = [
+            'context' => [
+                'client' => [
+                    'clientName' => 'WEB',
+                    'clientVersion' => MUSIC_VERSION
+                ]
+            ],
+            'continuation' => $continuationToken
+        ];
+        if($containsVisitorData)
+        {
+            $rawData['context']['client']['visitorData'] = $continuationTokenParts[1];
+        }
+        $http = [
+            'header' => [
+                'Content-Type: application/json'
+            ],
+            'method' => 'POST',
+            'content' => json_encode($rawData)
+        ];
+
+        $httpOptions = [
+            'http' => $http
+        ];
+
+        $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
+        return $result;
+    }
+
 ?>

@@ -167,7 +167,7 @@
                     }
                 }
             } else {
-                $result = getVisitorDataResult($continuationToken);
+                $result = getContinuationJson($continuationToken);
             }
             $shorts = [];
             if (!$continuationTokenProvided) {
@@ -212,26 +212,7 @@
             if (!$continuationTokenProvided) {
                 $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/community", true);
             } else {
-                $rawData = [
-                    'context' => [
-                        'client' => [
-                            'clientName' => 'WEB',
-                            'clientVersion' => MUSIC_VERSION
-                        ]
-                    ],
-                    'continuation' => $continuationToken
-                ];
-                $http = [
-                    'header' => ['Content-Type: application/json'],
-                    'method' => 'POST',
-                    'content' => json_encode($rawData)
-                ];
-
-                $httpOptions = [
-                    'http' => $http
-                ];
-
-                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
+                $result = getContinuationJson($continuationToken);
             }
             $community = [];
             $contents = null;
@@ -276,28 +257,7 @@
                     array_push($itemsArray, [$sectionTitle, $content['items']]);
                 }
             } else {
-                $rawData = [
-                    'context' => [
-                        'client' => [
-                            'clientName' => 'WEB',
-                            'clientVersion' => MUSIC_VERSION
-                        ]
-                    ],
-                    'continuation' => $continuationToken
-                ];
-                $http = [
-                    'header' => [
-                        'Content-Type: application/json'
-                    ],
-                    'method' => 'POST',
-                    'content' => json_encode($rawData)
-                ];
-
-                $httpOptions = [
-                    'http' => $http
-                ];
-
-                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
+                $result = getContinuationJson($continuationToken);
                 $itemsArray = [[null, getContinuationItems($result)]];
             }
             $channelSections = [];
@@ -429,28 +389,7 @@
                     array_push($itemsArray, [$sectionTitle, $content['items']]);
                 }
             } else {
-                $rawData = [
-                    'context' => [
-                        'client' => [
-                            'clientName' => 'WEB',
-                            'clientVersion' => MUSIC_VERSION
-                        ]
-                    ],
-                    'continuation' => $continuationToken
-                ];
-                $http = [
-                    'header' => [
-                        'Content-Type: application/json'
-                    ],
-                    'method' => 'POST',
-                    'content' => json_encode($rawData)
-                ];
-
-                $httpOptions = [
-                    'http' => $http
-                ];
-
-                $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
+                $result = getContinuationJson($continuationToken);
                 $itemsArray = [[null, getContinuationItems($result)]];
             }
 
@@ -609,32 +548,6 @@
         return $result['responseContext']['webResponseContextExtensionData']['ytConfigData']['visitorData'];
     }
 
-    function getVisitorDataResult($continuationToken)
-    {
-        $continuationTokenParts = explode(',', $continuationToken);
-        $visitorData = $continuationTokenParts[1];
-        $rawData = [
-            'context' => [
-                'client' => [
-                    'clientName' => 'WEB',
-                    'clientVersion' => MUSIC_VERSION,
-                    'visitorData' => $visitorData,
-                ]
-            ],
-            'continuation' => $continuationTokenParts[0],
-        ];
-        $http = [
-            'header' => ['Content-Type: application/json'],
-            'method' => 'POST',
-            'content' => json_encode($rawData)
-        ];
-        $httpOptions = [
-            'http' => $http
-        ];
-        $result = getJSON('https://www.youtube.com/youtubei/v1/browse?key=' . UI_KEY, $httpOptions);
-        return $result;
-    }
-
     function getVideo($gridRendererItem)
     {
         $gridVideoRenderer = $gridRendererItem['gridVideoRenderer'];
@@ -666,7 +579,7 @@
         }
         else
         {
-            $result = getVisitorDataResult($continuationToken);
+            $result = getContinuationJson($continuationToken);
             $gridRendererItems = getContinuationItems($result);
         }
         foreach($gridRendererItems as $gridRendererItem)
