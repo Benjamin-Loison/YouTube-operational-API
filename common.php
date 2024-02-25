@@ -1,6 +1,5 @@
 <?php
 
-    include_once 'compatibility.php';
     include_once 'constants.php';
 
     ini_set('display_errors', 0);
@@ -257,8 +256,12 @@
         return checkRegex('Ug[w-z][a-zA-Z0-9-_]{16}4AaABAg', $commentId);
     }
 
+    // Assume `$path !== ''`.
     function doesPathExist($json, $path)
     {
+        if ($json === null) {
+            return false;
+        }
         $parts = explode('/', $path);
         $partsCount = count($parts);
         if ($partsCount == 1) {
@@ -267,15 +270,20 @@
         return array_key_exists($parts[0], $json) && doesPathExist($json[$parts[0]], join('/', array_slice($parts, 1, $partsCount - 1)));
     }
 
-    // assume path checked before
-    function getValue($json, $path)
+    function getValue($json, $path, $defaultPath = null, $defaultValue = null)
     {
+        // Alternatively could make a distinct return for `getValue` depending on path found or not to avoid `null` ambiguity.
+        if(!doesPathExist($json, $path))
+        {
+            return $defaultPath !== null ? getValue($json, $defaultPath) : $defaultValue;
+        }
         $parts = explode('/', $path);
         $partsCount = count($parts);
         if ($partsCount == 1) {
             return $json[$path];
         }
-        return getValue($json[$parts[0]], join('/', array_slice($parts, 1, $partsCount - 1)));
+        $value = getValue($json[$parts[0]], join('/', array_slice($parts, 1, $partsCount - 1)));
+        return $value;
     }
 
     function getIntValue($unitCount, $unit = '')
@@ -298,14 +306,14 @@
     function getCommunityPostFromContent($content)
     {
         $backstagePost = $content['backstagePostThreadRenderer']['post']; // for posts that are shared from other channels
-        $common = array_key_exists('backstagePostRenderer', $backstagePost) ? $backstagePost['backstagePostRenderer'] : $backstagePost['sharedPostRenderer'];
+        $common = getValue($backstagePost, 'backstagePostRenderer', 'sharedPostRenderer');
 
         $id = $common['postId'];
         $channelId = $common['publishedTimeText']['runs'][0]['navigationEndpoint']['browseEndpoint']['browseId'];
 
         // Except for `Image`, all other posts require text.
         $contentText = [];
-        $textContent = array_key_exists('contentText', $common) ? $common['contentText'] : $common['content']; // sharedPosts have the same content just in slightly different positioning
+        $textContent = getValue($common, 'contentText', 'content'); // sharedPosts have the same content just in slightly different positioning
         foreach ($textContent['runs'] as $textCommon) {
             $contentTextItem = ['text' => $textCommon['text']];
             if (array_key_exists('navigationEndpoint', $textCommon)) {
@@ -315,11 +323,7 @@
                     $contentTextItem['url'] = $text;
                 } else {
                     $navigationEndpoint = $textCommon['navigationEndpoint'];
-                    if (array_key_exists('commandMetadata', $navigationEndpoint)) {
-                        $url = $navigationEndpoint['commandMetadata']['webCommandMetadata']['url'];
-                    } else {
-                        $url = $navigationEndpoint['browseEndpoint']['canonicalBaseUrl'];
-                    }
+                    $url = getValue($navigationEndpoint, 'commandMetadata/webCommandMetadata/url', 'browseEndpoint/canonicalBaseUrl');
                     $contentTextItem['url'] = "https://www.youtube.com$url";
                 }
             }
@@ -340,12 +344,12 @@
             }
         }
 
-        $videoId = array_key_exists('videoRenderer', $backstageAttachment) ? $backstageAttachment['videoRenderer']['videoId'] : null;
+        $videoId = getValue($backstageAttachment, 'videoRenderer/videoId');
         $date = $common['publishedTimeText']['runs'][0]['text'];
         $edited = str_ends_with($date, ' (edited)');
         $date = str_replace(' (edited)', '', $date);
         $date = str_replace('shared ', '', $date);
-        $sharedPostId = array_key_exists('originalPost', $common) ? $common['originalPost']['backstagePostRenderer']['postId'] : null;
+        $sharedPostId = getValue($common, 'originalPost/backstagePostRenderer/postId');
 
         $poll = null;
         if (array_key_exists('pollRenderer', $backstageAttachment)) {
@@ -365,7 +369,7 @@
             ];
         }
 
-        $likes = getIntValue(array_key_exists('voteCount', $common) ? $common['voteCount']['simpleText'] : 0);
+        $likes = getIntValue(getValue($common, 'voteCount/simpleText', defaultValue : 0));
 
         // Retrieving comments when using `community?part=snippet` requires another HTTPS request to `browse` YouTube UI endpoint.
         // sharedPosts do not have 'actionButtons' so this next line will end up defaulting to 0 $comments
@@ -433,7 +437,7 @@
 
     function getTabByName($result, $tabName) {
         if (array_key_exists('contents', $result)) {
-            return array_values(array_filter(getTabs($result), fn($tab) => (array_key_exists('tabRenderer', $tab) && $tab['tabRenderer']['title'] === $tabName)))[0];
+            return array_values(array_filter(getTabs($result), fn($tab) => (getValue($tab, 'tabRenderer/title') === $tabName)))[0];
         } else {
             return null;
         }

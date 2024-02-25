@@ -209,7 +209,7 @@
 
                 $title = $compactVideoRenderer['title'];
                 $song = [
-                    'title' => $multipleMusics ? (array_key_exists('runs', $title) ? $title['runs'][0]['text'] : $title['simpleText']) : $infoRows[0]['infoRowRenderer']['defaultMetadata']['simpleText'],
+                    'title' => $multipleMusics ? getValue($title, 'runs/0/text', 'simpleText') : $infoRows[0]['infoRowRenderer']['defaultMetadata']['simpleText'],
                     'videoId' => $compactVideoRenderer['navigationEndpoint']['watchEndpoint']['videoId']
                 ];
 

@@ -176,7 +176,7 @@
             else {
                 $onResponseReceivedActions = $result['onResponseReceivedActions'];
                 $onResponseReceivedAction = $onResponseReceivedActions[count($onResponseReceivedActions) - 1];
-                $continuationItems = array_key_exists('appendContinuationItemsAction', $onResponseReceivedAction) ? $onResponseReceivedAction['appendContinuationItemsAction'] : $onResponseReceivedAction['reloadContinuationItemsCommand'];
+                $continuationItems = getValue($onResponseReceivedAction, 'appendContinuationItemsAction', 'reloadContinuationItemsCommand');
                 $reelShelfRendererItems = $continuationItems['continuationItems'];
             }
             foreach($reelShelfRendererItems as $reelShelfRendererItem) {
@@ -249,7 +249,7 @@
                     if (array_key_exists('shelfRenderer', $content)) {
                         $sectionTitle = $content['shelfRenderer']['title']['runs'][0]['text'];
                         $content = $content['shelfRenderer']['content'];
-                        $content = array_key_exists('horizontalListRenderer', $content) ? $content['horizontalListRenderer'] : $content['expandedShelfContentsRenderer'];
+                        $content = getValue($content, 'horizontalListRenderer', 'expandedShelfContentsRenderer');
                     } else {
                         $sectionTitle = $sectionListRenderer['subMenu']['channelSubMenuRenderer']['contentTypeSubMenuItems'][0]['title'];
                         $content = $content['gridRenderer'];
@@ -271,7 +271,7 @@
                     $items = array_slice($items, 0, count($items) - 1);
                 }
                 foreach($items as $sectionChannelItem) {
-                    $gridChannelRenderer = $sectionChannelItem[array_key_exists('gridChannelRenderer', $sectionChannelItem) ? 'gridChannelRenderer' : 'channelRenderer'];
+                    $gridChannelRenderer = $sectionChannelItem[getValue($sectionChannelItem, 'gridChannelRenderer', 'channelRenderer')];
                     // Condition required for channel `UC-1BnotsIsigEK4zLw20IDQ` which doesn't have a `CHANNELS` tab and using the `channel/CHANNEL_ID/channels` URL shows the `HOME` channel tab content.
                     if($gridChannelRenderer === null) {
                         goto breakChannelSectionsTreatment;
@@ -333,7 +333,7 @@
                 $urlComponents = parse_url($url);
                 parse_str($urlComponents['query'], $params);
                 $link = [
-                    'url' => array_key_exists('q', $params) ? $params['q'] : $url,
+                    'url' => getValue($params, 'q', defaultValue: $url),
                     'title' => $linkObject['title']['content'],
                     'favicon' => $linkObject['favicon']['sources']
                 ];
@@ -381,7 +381,7 @@
                     if (array_key_exists('shelfRenderer', $content)) {
                         $sectionTitle = $content['shelfRenderer']['title']['runs'][0]['text'];
                         $content = $content['shelfRenderer']['content'];
-                        $content = array_key_exists('horizontalListRenderer', $content) ? $content['horizontalListRenderer'] : $content['expandedShelfContentsRenderer'];
+                        $content = getValue($content, 'horizontalListRenderer', 'expandedShelfContentsRenderer');
                     } else {
                         $sectionTitle = $sectionListRenderer['subMenu']['channelSubMenuRenderer']['contentTypeSubMenuItems'][0]['title'];
                         $content = $content['gridRenderer'];
@@ -428,7 +428,7 @@
                         continue;
                     }
 
-                    $playlistRenderer = array_key_exists('gridPlaylistRenderer', $sectionPlaylistItem) ? $sectionPlaylistItem['gridPlaylistRenderer'] : (array_key_exists('playlistRenderer', $sectionPlaylistItem) ? $sectionPlaylistItem['playlistRenderer'] : $sectionPlaylistItem['gridShowRenderer']);
+                    $playlistRenderer = getValue($sectionPlaylistItem, 'gridPlaylistRenderer', defaultValue: getValue($sectionPlaylistItem, 'playlistRenderer', 'gridShowRenderer'));
                     $runs = $playlistRenderer['shortBylineText']['runs'];
                     if ($isCreatedPlaylists) {
                         $runs = [null];
@@ -478,13 +478,13 @@
                         $id = $browseId;
                     }
 
-                    $videoCount = intval((array_key_exists('videoCountText', $playlistRenderer) ? $playlistRenderer['videoCountText'] : $playlistRenderer['thumbnailOverlays'][0]['thumbnailOverlayBottomPanelRenderer']['text'])['runs'][0]['text']);
+                    $videoCount = intval(getValue($playlistRenderer, 'videoCountText', 'thumbnailOverlays/0/thumbnailOverlayBottomPanelRenderer/text')['runs'][0]['text']);
 
                     $sectionPlaylist = [
                         'id' => $id,
                         'thumbnailVideo' => $thumbnailVideo,
                         'firstVideos' => $firstVideos,
-                        'title' => array_key_exists('runs', $title) ? $title['runs'][0]['text'] : $title['simpleText'],
+                        'title' => getValue($title, 'runs/0/text', 'simpleText'),
                         'videoCount' => $videoCount,
                         'authors' => $authors,
                         // Does it always start with `Updated `?

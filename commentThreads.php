@@ -113,7 +113,8 @@ function getAPI($videoId, $commentId, $order, $continuationToken, $simulatedCont
     $items = array_merge($reloadContinuationItems !== null ? $reloadContinuationItems : [], $appendContinuationItems !== null ? $appendContinuationItems : []);
     if ($items !== [] && array_key_exists('continuationItemRenderer', end($items))) {
         $continuationItemRenderer = end($items)['continuationItemRenderer'];
-        $nextContinuationToken = urldecode(getValue($continuationItemRenderer, (array_key_exists('continuationEndpoint', $continuationItemRenderer) ? 'continuationEndpoint' : 'button/buttonRenderer/command') . '/continuationCommand/token'));
+        $commonSuffix = 'continuationCommand/token';
+        $nextContinuationToken = urldecode(getValue($continuationItemRenderer, "continuationEndpoint/$commonSuffix", "button/buttonRenderer/command/$commonSuffix"));
         $items = array_slice($items, 0, count($items) - 1);
     }
     $isTopLevelComment = true;
@@ -140,7 +141,7 @@ function getAPI($videoId, $commentId, $order, $continuationToken, $simulatedCont
             'authorHandle' => $isAuthorAHandle ? $author : null,
             'authorProfileImageUrls' => $comment['authorThumbnail']['thumbnails'],
             'authorChannelId' => ['value' => $comment['authorEndpoint']['browseEndpoint']['browseId']],
-            'likeCount' => array_key_exists('voteCount', $comment) ? getIntValue($comment['voteCount']['simpleText']) : 0,
+            'likeCount' => getIntValue(getValue($comment, 'voteCount/simpleText', defaultValue: 0)),
             'publishedAt' => $publishedAt,
             'wasEdited' => $wasEdited,
             'isPinned' => array_key_exists('pinnedCommentBadge', $comment),
