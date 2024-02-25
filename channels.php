@@ -137,7 +137,7 @@
 
         if ($options['upcomingEvents']) {
             $upcomingEvents = [];
-            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", [], '', 'var ', false, true);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", verifiesChannelRedirection: true);
             $subItems = getTabs($result)[0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['shelfRenderer']['content']['horizontalListRenderer']['items'];
             foreach ($subItems as $subItem) {
                 $path = 'gridVideoRenderer/upcomingEventData';
@@ -352,7 +352,7 @@
         }
 
         if ($options['snippet']) {
-            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", [], '', 'var ', false, true);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", verifiesChannelRedirection: true);
             $c4TabbedHeaderRenderer = $result['header']['c4TabbedHeaderRenderer'];
             $c4TabbedHeaderRendererKeys = ['avatar', 'banner', 'tvBanner', 'mobileBanner'];
             $c4TabbedHeaderRendererItems = array_map(fn($c4TabbedHeaderRendererKey) => $c4TabbedHeaderRenderer[$c4TabbedHeaderRendererKey]['thumbnails'], $c4TabbedHeaderRendererKeys);

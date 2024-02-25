@@ -289,7 +289,7 @@
         }
 
         if ($options['isPaidPromotion']) {
-            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", [], 'ytInitialPlayerResponse');
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", scriptVariable: 'ytInitialPlayerResponse');
             $isPaidPromotion = array_key_exists('paidContentOverlay', $json);
             $item['isPaidPromotion'] = $isPaidPromotion;
         }
@@ -357,7 +357,7 @@
         }
 
         if ($options['qualities']) {
-            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", [], 'ytInitialPlayerResponse');
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", scriptVariable: 'ytInitialPlayerResponse');
             $qualities = [];
             foreach ($json['streamingData']['adaptiveFormats'] as $quality) {
                 if (array_key_exists('qualityLabel', $quality)) {

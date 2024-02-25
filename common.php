@@ -163,7 +163,7 @@
                 'header' => ['Accept-Language: en']
             ]
         ];
-        return getJSONFromHTML($url, $opts, '', 'var ', false, $verifiesChannelRedirection);
+        return getJSONFromHTML($url, $opts, verifiesChannelRedirection: $verifiesChannelRedirection);
     }
 
     function checkRegex($regex, $str)
