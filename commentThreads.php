@@ -125,7 +125,7 @@ function getAPI($videoId, $commentId, $order, $continuationToken, $simulatedCont
         $texts = $comment['contentText']['runs'];
         $replies = $commentThread['replies'];
         $commentRepliesRenderer = $replies['commentRepliesRenderer'];
-        $text = implode(array_map(function($text) { return $text['text']; }, $texts));
+        $text = implode(array_map(fn($text) => $text['text'], $texts));
         $commentId = $comment['commentId'];
         $isHearted = array_key_exists('creatorHeart', $comment['actionButtons']['commentActionButtonsRenderer']);
         $publishedAt = $comment['publishedTimeText']['runs'][0]['text'];

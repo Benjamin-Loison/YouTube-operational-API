@@ -223,7 +223,7 @@
                         ]
                     ];
                 } else {
-                    $artists = array_map(function($title) { return ['title' => $title, 'channelId' => null]; }, explode(', ', $defaultMetadata['simpleText']));
+                    $artists = array_map(fn($title) => ['title' => $title, 'channelId' => null], explode(', ', $defaultMetadata['simpleText']));
                 }
 
                 $album = null;
@@ -246,7 +246,7 @@
                     if ($infoRowTitle === 'WRITERS') {
                         if (array_key_exists('expandedMetadata', $infoRowRenderer)) {
                             $writers = $infoRowRenderer['expandedMetadata']['runs'];
-                            $writers = array_values(array_filter(array_map(function($run) { $text = $run['text']; return $text !== ', ' ? $run['text'] : false; }, $writers)));
+                            $writers = array_values(array_filter(array_map(function($run) { $text = $run['text']; return $text !== ', ' ? $text : false; }, $writers)));
                         } else {
                             $writers = [$infoRowRenderer['defaultMetadata']['simpleText']];
                         }
