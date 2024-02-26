@@ -17,6 +17,7 @@
         ['part=membership&id=UCX6OQ3DkcsbYNE6H8uQQuVA', 'items/0/isMembershipEnabled', true],
         ['part=popular&id=UCyvTYozFRVuM_mKKyT6K50g', 'items/0', []],
         ['part=recent&id=UCyvTYozFRVuM_mKKyT6K50g', 'items/0', []],
+        ['part=letsPlay&id=UCyvTYozFRVuM_mKKyT6K50g', 'items/0', []],
     ];
 
     include_once 'common.php';
@@ -503,6 +504,31 @@
         if ($options['recent'])
         {
             $item['recent'] = getVideos($item, $id, "https://www.youtube.com/channel/$id/recent", fn($result) => getTabByName($result, 'Recent')['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'], $continuationToken);
+        }
+
+        if ($options['letsPlay'])
+        {
+            $letsPlay = [];
+            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/letsplay");
+            $gridRendererItems = getTabByName($result, 'Let\'s play')['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['shelfRenderer']['content']['gridRenderer']['items'];
+            foreach($gridRendererItems as $gridRendererItem)
+            {
+                $gridPlaylistRenderer = $gridRendererItem['gridPlaylistRenderer'];
+                $titleRun = $gridPlaylistRenderer['title']['runs'][0];
+                $playlistAuthorRun = $gridPlaylistRenderer['longBylineText']['runs'][0];
+                $playlistAuthorBrowseEndpoint = $playlistAuthorRun['navigationEndpoint']['browseEndpoint'];
+                array_push($letsPlay, [
+                    'id' => $gridPlaylistRenderer['playlistId'],
+                    'thumbnails' => $gridPlaylistRenderer['thumbnail']['thumbnails'],
+                    'title' => $titleRun['text'],
+                    'firstVideos' => getFirstVideos($gridPlaylistRenderer),
+                    'videoCount' => intval($gridPlaylistRenderer['videoCountText']['runs'][0]['text']),
+                    'authorName' => $playlistAuthorRun['text'],
+                    'authorChannelId' => $playlistAuthorBrowseEndpoint['browseId'],
+                    'authorChannelHandle' => substr($playlistAuthorBrowseEndpoint['canonicalBaseUrl'], 1),
+                ]);
+            }
+            $item['letsPlay'] = $letsPlay;
         }
 
         return $item;
