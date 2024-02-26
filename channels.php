@@ -393,17 +393,6 @@
                 $itemsArray = [[null, getContinuationItems($result)]];
             }
 
-            function getVideoFromItsThumbnails($videoThumbnails, $isVideo = true) {
-                $videoThumbnails = $videoThumbnails['thumbnails'];
-                // Maybe we can simplify URLs, as we used to as follows, but keep in mind that the resolution or the access may then become incorrect for both kind of thumbnails.
-                //$videoThumbnails[0]['url'] = explode('?', $videoThumbnails[0]['url'])[0];
-                $videoId = $isVideo ? substr($videoThumbnails[0]['url'], 23, 11) : null;
-                return [
-                    'id' => $videoId,
-                    'thumbnails' => $videoThumbnails
-                ];
-            }
-
             // Note that if there is a `Created playlist`, then there isn't any pagination mechanism on YouTube UI.
             // This comment was assuming that they were only `Created playlists` and `Saved playlists`, which isn't the case.
 
@@ -453,14 +442,9 @@
                     if (!array_key_exists($thumbnailRendererField, $thumbnailRenderer)) {
                         $thumbnailRendererField = 'showCustomThumbnailRenderer';
                     }
-                    $thumbnailVideo = getVideoFromItsThumbnails(($thumbnailRenderer[$thumbnailRendererField])['thumbnail'], $isThumbnailAVideo);
+                    $thumbnailVideo = getVideoFromItsThumbnails($thumbnailRenderer[$thumbnailRendererField]['thumbnail'], $isThumbnailAVideo);
 
-                    $firstVideos = array_key_exists('thumbnail', $playlistRenderer) ? [getVideoFromItsThumbnails($playlistRenderer['thumbnail'])] : array_map(fn($videoThumbnails) => getVideoFromItsThumbnails($videoThumbnails), (array_key_exists('thumbnails', $playlistRenderer) ? $playlistRenderer['thumbnails'] : []));
-
-                    $sidebarThumbnails = $playlistRenderer['sidebarThumbnails'];
-                    $secondToFourthVideo = $sidebarThumbnails !== null ? array_map(fn($videoThumbnails) => getVideoFromItsThumbnails($videoThumbnails), $sidebarThumbnails) : [];
-
-                    $firstVideos = array_merge($firstVideos, $secondToFourthVideo);
+                    $firstVideos = getFirstVideos($playlistRenderer);
 
                     $title = $playlistRenderer['title'];
 
@@ -594,4 +578,26 @@
             $item['nextPageToken'] = $gridRendererItem['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'] . ',' . $visitorData;
         }
         return $videos;
+    }
+
+    function getVideoFromItsThumbnails($videoThumbnails, $isVideo = true) {
+        $videoThumbnails = $videoThumbnails['thumbnails'];
+        // Maybe we can simplify URLs, as we used to as follows, but keep in mind that the resolution or the access may then become incorrect for both kind of thumbnails.
+        //$videoThumbnails[0]['url'] = explode('?', $videoThumbnails[0]['url'])[0];
+        $videoId = $isVideo ? substr($videoThumbnails[0]['url'], 23, 11) : null;
+        return [
+            'id' => $videoId,
+            'thumbnails' => $videoThumbnails
+        ];
+    }
+
+    function getFirstVideos($playlistRenderer)
+    {
+        $firstVideos = array_key_exists('thumbnail', $playlistRenderer) ? [getVideoFromItsThumbnails($playlistRenderer['thumbnail'])] : array_map(fn($videoThumbnails) => getVideoFromItsThumbnails($videoThumbnails), getValue($playlistRenderer, 'thumbnails', defaultValue: []));
+
+        $sidebarThumbnails = $playlistRenderer['sidebarThumbnails'];
+        $secondToFourthVideo = $sidebarThumbnails !== null ? array_map(fn($videoThumbnails) => getVideoFromItsThumbnails($videoThumbnails), $sidebarThumbnails) : [];
+
+        $firstVideos = array_merge($firstVideos, $secondToFourthVideo);
+        return $firstVideos;
     }
