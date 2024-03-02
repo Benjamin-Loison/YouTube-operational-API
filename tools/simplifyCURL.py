@@ -2,7 +2,10 @@
 
 # in fact this tool can be used not only for YouTube but for all automatization based on HTTP
 
-import os, subprocess, re, json
+import os
+import subprocess
+import re
+import json
 
 isWSL = True
 

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-import sys, json
+import sys
+import json
 
 def treatKey(obj, path, key):
     objKey = obj[key]

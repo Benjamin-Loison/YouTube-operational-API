@@ -12,7 +12,11 @@ For the moment this algorithm only removes unnecessary:
 - raw data
 '''
 
-import shlex, subprocess, json, copy, sys
+import shlex
+import subprocess
+import json
+import copy
+import sys
 from urllib.parse import urlparse, parse_qs, quote_plus
 
 # Could precise the input file and possibly remove the output one as the minimized requests start to be short.
