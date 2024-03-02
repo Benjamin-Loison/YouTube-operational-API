@@ -53,7 +53,10 @@
         $isClip = isset($_GET['clipId']);
         $field = $isClip ? 'clipId' : 'id';
         $ids = $_GET[$field];
-        $realIds = str_contains($ids, ',') ? explode(',', $ids, 50) : [$ids];
+        $realIds = explode(',', $ids);
+        if (count($realIds) > 50) {
+            dieWithJsonMessage("Too many $field");
+        }
         foreach ($realIds as $realId) {
             if ((!$isClip && !isVideoId($realId)) && !isClipId($realId)) {
                 dieWithJsonMessage("Invalid $field");
