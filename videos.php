@@ -54,9 +54,6 @@
         $field = $isClip ? 'clipId' : 'id';
         $ids = $_GET[$field];
         $realIds = str_contains($ids, ',') ? explode(',', $ids, 50) : [$ids];
-        if (count($realIds) == 0) {
-            dieWithJsonMessage('Invalid id');
-        }
         foreach ($realIds as $realId) {
             if ((!$isClip && !isVideoId($realId)) && !isClipId($realId)) {
                 dieWithJsonMessage("Invalid $field");

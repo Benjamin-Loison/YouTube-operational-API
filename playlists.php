@@ -31,9 +31,6 @@
         }
         $ids = $_GET['id'];
         $realIds = str_contains($ids, ',') ? explode(',', $ids, 50) : [$ids];
-        if (count($realIds) == 0) {
-            dieWithJsonMessage('Invalid id');
-        }
         foreach ($realIds as $realId) {
             if (!isPlaylistId($realId)) {
                 dieWithJsonMessage('Invalid id');
