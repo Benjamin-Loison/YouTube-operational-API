@@ -54,6 +54,7 @@
         $field = $isClip ? 'clipId' : 'id';
         $ids = $_GET[$field];
         $realIds = explode(',', $ids);
+        verifyMultipleIdsConfiguration($realIds, $field);
         if (count($realIds) > 50) {
             dieWithJsonMessage("Too many $field");
         }

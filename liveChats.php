@@ -32,6 +32,7 @@
 
         $ids = $_GET['id'];
         $realIds = explode(',', $ids);
+        verifyMultipleIdsConfiguration($realIds);
         if (count($realIds) > 50) {
             dieWithJsonMessage('Too many id');
         }

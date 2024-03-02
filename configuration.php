@@ -8,5 +8,6 @@
     // If not defined, a random value will be used to prevent denial-of-service.
     define('ADD_KEY_FORCE_SECRET', '');
     define('ADD_KEY_TO_INSTANCES', []);
+    define('MULTIPLE_IDS_ENABLED', True);
 
 ?>
