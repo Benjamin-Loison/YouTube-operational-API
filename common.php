@@ -530,10 +530,21 @@
         return $result;
     }
 
-    function verifyMultipleIdsConfiguration($realIds, $field = 'id') {
+    function verifyMultipleIdsConfiguration($realIds, $field) {
         if (count($realIds) >= 2 && !MULTIPLE_IDS_ENABLED) {
             dieWithJsonMessage("Multiple ${field}s are disabled on this instance");
         }
+    }
+
+    function verifyTooManyIds($realIds, $field) {
+        if (count($realIds) > 50) {
+            dieWithJsonMessage("Too many $field");
+        }
+    }
+
+    function verifyMultipleIds($realIds, $field = 'id') {
+        verifyMultipleIdsConfiguration($realIds, $field);
+        verifyTooManyIds($realIds, $field);
     }
 
 ?>

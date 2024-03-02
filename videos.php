@@ -54,10 +54,7 @@
         $field = $isClip ? 'clipId' : 'id';
         $ids = $_GET[$field];
         $realIds = explode(',', $ids);
-        verifyMultipleIdsConfiguration($realIds, $field);
-        if (count($realIds) > 50) {
-            dieWithJsonMessage("Too many $field");
-        }
+        verifyMultipleIds($realIds, $field);
         foreach ($realIds as $realId) {
             if ((!$isClip && !isVideoId($realId)) && !isClipId($realId)) {
                 dieWithJsonMessage("Invalid $field");

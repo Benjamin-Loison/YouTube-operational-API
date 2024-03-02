@@ -31,10 +31,7 @@
         }
         $ids = $_GET['id'];
         $realIds = explode(',', $ids);
-        verifyMultipleIdsConfiguration($realIds);
-        if (count($realIds) > 50) {
-            dieWithJsonMessage('Too many id');
-        }
+        verifyMultipleIds($realIds);
         foreach ($realIds as $realId) {
             if (!isPlaylistId($realId)) {
                 dieWithJsonMessage('Invalid id');
