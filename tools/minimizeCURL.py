@@ -25,7 +25,7 @@ if len(sys.argv) < 3:
     exit(1)
 
 curlCommandFilePath = sys.argv[1]
-wantedOutput = sys.argv[2]
+wantedOutput = sys.argv[2].encode('utf-8')
 
 # The purpose of these parameters is to reduce requests done when developing this script:
 removeHeaders = True
@@ -40,7 +40,7 @@ with open(curlCommandFilePath) as f:
 def executeCommand(command):
     # `stderr = subprocess.DEVNULL` is used to get rid of curl progress.
     # Could also add `-s` curl argument.
-    result = subprocess.check_output(command, shell = True, stderr = subprocess.DEVNULL).decode('utf-8')
+    result = subprocess.check_output(command, shell = True, stderr = subprocess.DEVNULL)
     return result
 
 def isCommandStillFine(command):
