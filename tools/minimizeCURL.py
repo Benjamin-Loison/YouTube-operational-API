@@ -40,7 +40,7 @@ with open(curlCommandFilePath) as f:
 def executeCommand(command):
     # `stderr = subprocess.DEVNULL` is used to get rid of curl progress.
     # Could also add `-s` curl argument.
-    result = subprocess.check_output(f'{command}', shell = True, stderr = subprocess.DEVNULL).decode('utf-8')
+    result = subprocess.check_output(command, shell = True, stderr = subprocess.DEVNULL).decode('utf-8')
     return result
 
 def isCommandStillFine(command):
