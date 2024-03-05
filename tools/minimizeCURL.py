@@ -93,7 +93,8 @@ if removeUrlParameters:
         for key in list(query):
             previousQuery = copy.deepcopy(query)
             del query[key]
-            url = urlParsed._replace(query = '&'.join([f'{parameter}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
+            # Make a function with below code.
+            url = urlParsed._replace(query = '&'.join([f'{quote_plus(parameter)}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
             arguments[urlIndex] = url
             command = shlex.join(arguments)
             if isCommandStillFine(command):
@@ -102,7 +103,7 @@ if removeUrlParameters:
                 break
             else:
                 query = previousQuery
-                url = urlParsed._replace(query = '&'.join([f'{parameter}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
+                url = urlParsed._replace(query = '&'.join([f'{quote_plus(parameter)}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
                 arguments[urlIndex] = url
                 command = shlex.join(arguments)
         if not changedSomething:
