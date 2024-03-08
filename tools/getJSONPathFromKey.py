@@ -1,5 +1,29 @@
 #!/usr/bin/python3
 
+'''
+This script purpose is to ease retrieving the JSON path associated to an interested YouTube data entry.
+For instance when looking for a feature on YouTube UI let say a YouTube video title that we want to automate the retrieval we plug as `filePath` of this script the returned YouTube UI HTML. This script will extract and update to the provided `filePath` the relevant JSON encoded in the appropriate JavaScript variable. Then this script looks recursively for the entry concerning the specific video title you are looking for.
+For instance:
+
+```bash
+curl -s 'https://www.youtube.com/watch?v=jNQXAC9IVRw' > jNQXAC9IVRw.html
+./getJSONPathFromKey.py jNQXAC9IVRw.html | grep 'Me at the zoo$'
+```
+```
+105 /contents/twoColumnWatchNextResults/results/results/contents/0/videoPrimaryInfoRenderer/title/runs/0/text Me at the zoo
+101 /playerOverlays/playerOverlayRenderer/videoDetails/playerOverlayVideoDetailsRenderer/title/simpleText Me at the zoo
+156 /engagementPanels/2/engagementPanelSectionListRenderer/content/structuredDescriptionContentRenderer/items/0/videoDescriptionHeaderRenderer/title/runs/0/text Me at the zoo
+170 /engagementPanels/2/engagementPanelSectionListRenderer/content/structuredDescriptionContentRenderer/items/3/reelShelfRenderer/items/0/reelItemRenderer/headline/simpleText Me at the zoo
+171 /engagementPanels/2/engagementPanelSectionListRenderer/content/structuredDescriptionContentRenderer/items/3/reelShelfRenderer/items/24/reelItemRenderer/headline/simpleText этому видио 17 лет - Me at the zoo
+```
+
+The first number is the path length to ease considering the shortest one.
+
+If for some reason you know the entry name but not the path you can provide the optional `entryName` `./getJSONPathFromKey.py jNQXAC9IVRw.html entryName` to get the whole path.
+
+As there are potentially multiple JavaScript variable names you can provide as the third argument the interesting JavaScript variable name.
+'''
+
 import sys
 import json
 
