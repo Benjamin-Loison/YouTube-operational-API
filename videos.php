@@ -5,9 +5,11 @@
     $videosTests = [
         ['part=contentDetails&id=g5xNzUA5Qf8', 'items/0/contentDetails/duration', 213],
         ['part=status&id=J8ZVxDK11Jo', 'items/0/status/embeddable', false],
-        ['part=status&id=g5xNzUA5Qf8', 'items/0/status/embeddable', true], // could allow subarray for JSON check in response likewise in a single request can check several features
+        ['part=status&id=g5xNzUA5Qf8', 'items/0/status/embeddable', true], // could allow subarray for JSON check in response that way in a single request can check several features
         ['part=music&id=FliCdfxdtTI', 'items/0/music/available', false],
-        ['part=music&id=ntG3GQdY_Ok', 'items/0/music/available', true]
+        ['part=music&id=ntG3GQdY_Ok', 'items/0/music/available', true],
+        ['part=isOriginal&id=FliCdfxdtTI', 'items/0/isOriginal', false],
+        ['part=isOriginal&id=iqKdEhx-dD4', 'items/0/isOriginal', true],
     ];
 
     include_once 'common.php';
