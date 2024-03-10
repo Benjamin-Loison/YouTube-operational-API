@@ -307,11 +307,7 @@
         }
 
         if ($options['mostReplayed']) {
-            $url = "https://www.youtube.com/watch?v=$id";
-            $html = getRemote($url);
-            $jsonStr = getJSONStringFromHTML($html);
-            $json = json_decode($jsonStr, true);
-            //$json = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
+            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
             $mutations = $json['frameworkUpdates']['entityBatchUpdate']['mutations'];
             $commonJsonPath = 'payload/macroMarkersListEntity/markersList';
             $jsonPath = "$commonJsonPath/markersDecoration";
@@ -350,10 +346,6 @@
             }
 
             $item['mostReplayed'] = $mostReplayed;
-            if(isset($_GET['debug']))
-            {
-                $item['debug'] = $html;//$json;
-            }
         }
 
         if ($options['qualities']) {
