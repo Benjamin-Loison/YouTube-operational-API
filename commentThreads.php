@@ -89,7 +89,7 @@ function getAPI($videoId, $commentId, $order, $continuationToken, $simulatedCont
         $opts = [
             'http' => [
                 'method' => 'POST',
-                'header' => 'Content-Type: application/json',
+                'header' => ['Content-Type: application/json'],
                 'content' => json_encode($rawData),
             ]
         ];

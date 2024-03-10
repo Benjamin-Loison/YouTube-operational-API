@@ -48,7 +48,7 @@ function getAPI($playlistId, $continuationToken)
             'continuation' => $continuationToken
         ];
         $http['method'] = 'POST';
-        $http['header'] = 'Content-Type: application/json';
+        $http['header'] = ['Content-Type: application/json'];
         $http['content'] = json_encode($rawData);
     } else {
         $url = "https://www.youtube.com/playlist?list=$playlistId";

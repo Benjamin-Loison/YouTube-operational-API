@@ -123,7 +123,7 @@ function getAPI($id, $order, $continuationToken)
         $opts = [
                'http' => [
                    'method' => 'POST',
-                   'header' => 'Content-Type: application/json',
+                   'header' => ['Content-Type: application/json'],
                    'content' => json_encode($rawData),
                ]
         ];
@@ -162,7 +162,7 @@ function getAPI($id, $order, $continuationToken)
         $opts = [
             'http' => [
                 'method' => 'POST',
-                'header' => 'Content-Type: application/json',
+                'header' => ['Content-Type: application/json'],
                 'content' => json_encode($rawData),
             ]
         ];

@@ -66,7 +66,7 @@
 
         $opts = [
             'http' => [
-                'header' => 'Content-Type: application/json',
+                'header' => ['Content-Type: application/json'],
                 'method'  => 'POST',
                 'content' => json_encode($rawData),
             ]
@@ -106,7 +106,7 @@
             $participants = [];
             $opts = [
                 'http' => [
-                    'header' => 'User-Agent: ' . USER_AGENT,
+                    'header' => ['User-Agent: ' . USER_AGENT],
                 ]
             ];
 
