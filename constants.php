@@ -9,7 +9,6 @@
     define('NEW_ADD_KEY_FORCE_SECRET', $newAddKeyForceSecret);
     use const NEW_ADD_KEY_FORCE_SECRET as ADD_KEY_FORCE_SECRET;
 
-    define('DOMAIN_NAME', $_SERVER['SERVER_NAME']);
     $protocol = (!empty($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on')) ? 'https' : 'http';
     define('WEBSITE_URL_BASE', "$protocol://{$_SERVER['HTTP_HOST']}");
     define('WEBSITE_URL', WEBSITE_URL_BASE . "{$_SERVER['REQUEST_URI']}");
