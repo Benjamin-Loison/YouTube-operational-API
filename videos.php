@@ -410,9 +410,7 @@
                     'header' => ['Cookie: PREF=f2=8000000'],
                 ]
             ];
-            $html = getRemote("https://www.youtube.com/watch?v=$id", $opts);
-            $jsonStr = getJSONStringFromHTML($html, 'ytInitialPlayerResponse');
-            $json = json_decode($jsonStr, true);
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", $opts, 'ytInitialPlayerResponse');
             $playabilityStatus = $json['playabilityStatus'];
             $isRestricted = array_key_exists('isBlockedInRestrictedMode', $playabilityStatus);
             $item['isRestricted'] = $isRestricted;
