@@ -356,7 +356,6 @@
             $result = getJSONFromHTML("https://www.youtube.com/channel/$id", verifiesChannelRedirection: true);
             $c4TabbedHeaderRenderer = $result['header']['c4TabbedHeaderRenderer'];
             $c4TabbedHeaderRendererKeys = ['avatar', 'banner', 'tvBanner', 'mobileBanner'];
-            $c4TabbedHeaderRendererItems = array_map(fn($c4TabbedHeaderRendererKey) => $c4TabbedHeaderRenderer[$c4TabbedHeaderRendererKey]['thumbnails'], $c4TabbedHeaderRendererKeys);
             $snippet = array_combine($c4TabbedHeaderRendererKeys, array_map(fn($c4TabbedHeaderRendererKey) => $c4TabbedHeaderRenderer[$c4TabbedHeaderRendererKey]['thumbnails'], $c4TabbedHeaderRendererKeys));
             $item['snippet'] = $snippet;
         }
@@ -498,12 +497,12 @@
                 $gridRendererItems = $shelfRenderer['content']['gridRenderer']['items'];
                 return $gridRendererItems;
             };
-            $item['popular'] = getVideos($item, $id, "https://www.youtube.com/channel/$id", $getRendererItems, $continuationToken);
+            $item['popular'] = getVideos($item, "https://www.youtube.com/channel/$id", $getRendererItems, $continuationToken);
         }
 
         if ($options['recent'])
         {
-            $item['recent'] = getVideos($item, $id, "https://www.youtube.com/channel/$id/recent", fn($result) => getTabByName($result, 'Recent')['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'], $continuationToken);
+            $item['recent'] = getVideos($item, "https://www.youtube.com/channel/$id/recent", fn($result) => getTabByName($result, 'Recent')['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['gridRenderer']['items'], $continuationToken);
         }
 
         if ($options['letsPlay'])
@@ -579,7 +578,7 @@
         ];
     }
 
-    function getVideos(&$item, $id, $url, $getGridRendererItems, $continuationToken)
+    function getVideos(&$item, $url, $getGridRendererItems, $continuationToken)
     {
         $videos = [];
         if ($continuationToken === '') {
