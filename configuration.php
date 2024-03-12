@@ -7,6 +7,11 @@
     define('GOOGLE_ABUSE_EXEMPTION', '');
     define('MULTIPLE_IDS_ENABLED', True);
 
+    define('HTTPS_PROXY_ADDRESS', '');
+    define('HTTPS_PROXY_PORT', 80);
+    define('HTTPS_PROXY_USERNAME', '');
+    define('HTTPS_PROXY_PASSWORD', '');
+
     // No-key endpoint:
     define('KEYS_FILE', 'ytPrivate/keys.txt');
     // Both following entries can be generated with `tr -dc A-Za-z0-9 </dev/urandom | head -c 32 ; echo`.

@@ -63,6 +63,21 @@
 
     function fileGetContentsAndHeadersFromOpts($url, $opts)
     {
+        if(HTTPS_PROXY_ADDRESS !== '')
+        {
+            if(!array_key_exists('http', $opts))
+            {
+                $opts['http'] = [];
+            }
+            $opts['http']['proxy'] = 'tcp://' . HTTPS_PROXY_ADDRESS . ':' . HTTPS_PROXY_PORT;
+            $opts['http']['request_fulluri'] = true;
+            if(HTTPS_PROXY_USERNAME !== '')
+            {
+                $headers = getValue($opts['http'], 'header', $defaultValue = []);
+                array_push($headers, 'Proxy-Authorization: Basic ' . base64_encode(HTTPS_PROXY_USERNAME . ':' . HTTPS_PROXY_PASSWORD));
+                $opts['http']['header'] = $headers;
+            }
+        }
         $context = getContextFromOpts($opts);
         $result = file_get_contents($url, false, $context);
         return [$result, $http_response_header];
