@@ -10,6 +10,8 @@
         ['part=music&id=ntG3GQdY_Ok', 'items/0/music/available', true],
         ['part=isOriginal&id=FliCdfxdtTI', 'items/0/isOriginal', false],
         ['part=isOriginal&id=iqKdEhx-dD4', 'items/0/isOriginal', true],
+        ['part=isPremium&id=FliCdfxdtTI', 'items/0/isPremium', false],
+        ['part=isPremium&id=dNJMI92NZJ0', 'items/0/isPremium', true],
     ];
 
     include_once 'common.php';
