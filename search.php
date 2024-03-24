@@ -242,7 +242,7 @@ function getAPI($id, $order, $continuationToken)
         $nextContinuationToken = $nextContinuationToken['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
     }
     if (isset($_GET['q'])) {
-        $nextContinuationToken = $continuationTokenProvided ? $json['continuationContents']['sectionListContinuation'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'][1]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
+        $nextContinuationToken = ($continuationTokenProvided ? $json['onResponseReceivedCommands'][0]['appendContinuationItemsAction']['continuationItems'] : $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'])[1]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
     }
     $nextContinuationToken = urldecode($nextContinuationToken);
     $answer = [
