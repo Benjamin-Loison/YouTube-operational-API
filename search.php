@@ -183,6 +183,10 @@ function getAPI($id, $order, $continuationToken)
             $path = 'richItemRenderer/content/videoRenderer';
         } elseif (isset($_GET['q'])) {
             $path = $isShort ? 'reelItemRenderer' : 'videoRenderer';
+            // Skip `People also watched`.
+            if(!$isShort && !array_key_exists($path, $item)) {
+                continue;
+            }
         } else {
             $path = 'gridVideoRenderer';
         }
