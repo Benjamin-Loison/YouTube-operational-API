@@ -83,6 +83,7 @@
                     'popular',
                     'recent',
                     'letsPlay',
+                    'explicitLyrics',
                 ],
                 'cId' => 'C_ID',
                 'id' => 'CHANNEL_ID',
