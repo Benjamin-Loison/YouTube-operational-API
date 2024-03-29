@@ -193,7 +193,7 @@
 
     function isContinuationTokenAndVisitorData($continuationTokenAndVisitorData)
     {
-        return checkRegex('[A-Za-z0-9=]+,[A-Za-z0-9=\-_]+', $continuationTokenAndVisitorData);
+        return checkRegex('[A-Za-z0-9=_]+,[A-Za-z0-9=\-_]+', $continuationTokenAndVisitorData);
     }
 
     function isPlaylistId($playlistId)
