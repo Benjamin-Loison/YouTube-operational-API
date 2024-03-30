@@ -39,6 +39,7 @@
         'clip',
         'activity',
         'explicitLyrics',
+        'game',
     ];
 
     // really necessary ?
@@ -453,6 +454,18 @@
         if ($options['explicitLyrics']) {
             $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
             $item['explicitLyrics'] = getValue($json, 'contents/twoColumnWatchNextResults/results/results/contents/1/videoSecondaryInfoRenderer/metadataRowContainer/metadataRowContainerRenderer/rows/0/metadataRowRenderer/contents/0/simpleText') === 'Explicit lyrics';
+        }
+
+        if ($options['game']) {
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
+            $richMetadataRenderer = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][1]['videoSecondaryInfoRenderer']['metadataRowContainer']['metadataRowContainerRenderer']['rows'][0]['richMetadataRowRenderer']['contents'][0]['richMetadataRenderer'];
+            $game = [
+                'title' => $richMetadataRenderer['title']['simpleText'],
+                'subtitle' => $richMetadataRenderer['subtitle']['simpleText'],
+                'channel' => $richMetadataRenderer['endpoint']['browseEndpoint']['browseId'],
+                'thumbnails' => $richMetadataRenderer['thumbnail']['thumbnails'],
+            ];
+            $item['game'] = $game;
         }
 
         return $item;
