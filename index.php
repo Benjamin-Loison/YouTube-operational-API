@@ -182,7 +182,6 @@
                     'snippet',
                     'clip',
                     'activity',
-                    'game',
                 ],
                 'id' => 'VIDEO_ID',
                 'clipId' => 'CLIP_ID',
