@@ -373,6 +373,7 @@
             foreach ($pollRenderer['choices'] as $choice) {
                 $returnedChoice = $choice['text']['runs'][0];
                 $returnedChoice['image'] = $choice['image'];
+                $returnedChoice['voteRatio'] = $choice['voteRatioIfNotSelected'];
                 array_push($choices, $returnedChoice);
             }
             $totalVotesStr = $pollRenderer['totalVotes']['simpleText'];
@@ -394,6 +395,9 @@
         $post = [
             'id' => $id,
             'channelId' => $channelId,
+            'channelName' => $common['authorText']['runs'][0]['text'],
+            'channelHandle' => substr($common['authorEndpoint']['browseEndpoint']['canonicalBaseUrl'], 1),
+            'channelThumbnails' => $common['authorThumbnail']['thumbnails'],
             'date' => $date,
             'contentText' => $contentText,
             'likes' => $likes,
