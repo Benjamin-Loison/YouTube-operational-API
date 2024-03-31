@@ -374,6 +374,7 @@
             foreach ($pollRenderer['choices'] as $choice) {
                 $returnedChoice = $choice['text']['runs'][0];
                 $returnedChoice['image'] = $choice['image'];
+                $returnedChoice['voteRatio'] = $choice['voteRatioIfNotSelected'];
                 array_push($choices, $returnedChoice);
             }
             $totalVotesStr = $pollRenderer['totalVotes']['simpleText'];

@@ -210,6 +210,7 @@
                     'snippet',
                 ],
                 'id' => 'POST_ID',
+                'channelId' => 'CHANNEL_ID',
                 'order' => [
                     'relevance',
                     'time',
