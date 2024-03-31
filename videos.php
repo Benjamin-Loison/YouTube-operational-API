@@ -14,6 +14,7 @@
         ['part=isPremium&id=dNJMI92NZJ0', 'items/0/isPremium', true],
         ['part=explicitLyrics&id=Ehoe35hTbuY', 'items/0/explicitLyrics', false],
         ['part=explicitLyrics&id=PvM79DJ2PmM', 'items/0/explicitLyrics', true],
+        ['part=explicitLyrics&id=ISEIxaPsp_I', 'items/0/explicitLyrics', true],
     ];
 
     include_once 'common.php';
