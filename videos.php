@@ -452,7 +452,8 @@
 
         if ($options['explicitLyrics']) {
             $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id");
-            $item['explicitLyrics'] = getValue($json, 'contents/twoColumnWatchNextResults/results/results/contents/1/videoSecondaryInfoRenderer/metadataRowContainer/metadataRowContainerRenderer/rows/0/metadataRowRenderer/contents/0/simpleText') === 'Explicit lyrics';
+            $rows = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][1]['videoSecondaryInfoRenderer']['metadataRowContainer']['metadataRowContainerRenderer']['rows'];
+            $item['explicitLyrics'] = $rows !== null && end($rows)['metadataRowRenderer']['contents'][0]['simpleText'] === 'Explicit lyrics';
         }
 
         return $item;
