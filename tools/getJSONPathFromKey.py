@@ -26,6 +26,7 @@ As there are potentially multiple JavaScript variable names you can provide as t
 
 import sys
 import json
+from lxml import html
 
 def treatKey(obj, path, key):
     objKey = obj[key]
@@ -76,9 +77,16 @@ with open(filePath) as f:
 if not isJSON:
     with open(filePath) as f:
         content = f.read()
-    # Should use a HTML and JavaScript parser instead of proceeding that way.
+
+    # Should use a JavaScript parser instead of proceeding that way.
     # Same comment concerning `getJSONStringFromHTMLScriptPrefix`, note that both parsing methods should be identical.
-    newContent = content.split(ytVariableName + ' = ')[1].split(';<')[0]
+    tree = html.fromstring(content)
+    ytVariableDeclaration = ytVariableName + ' = '
+    for script in tree.xpath('//script'):
+        scriptContent = script.text_content()
+        if ytVariableDeclaration in scriptContent:
+            newContent = scriptContent.split(ytVariableDeclaration)[1][:-1]
+            break
     with open(filePath, 'w') as f:
         f.write(newContent)
 
