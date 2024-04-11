@@ -71,7 +71,47 @@ brew services start httpd
 git clone https://github.com/Benjamin-Loison/YouTube-operational-API
 ```
 
-4. Verify that your API instance is reachable by trying to access:
+4. Install Protobuf dependency:
+
+### On Linux (Ubuntu, Debian and Mint):
+
+```sh
+sudo apt install composer protobuf-compiler
+```
+
+### On Windows:
+
+Download [composer](https://github.com/composer/windows-setup/releases/latest).
+
+Download [protoc](https://github.com/protocolbuffers/protobuf/releases/latest).
+
+### On MacOS:
+
+```sh
+brew install composer protobuf
+```
+
+In `YouTube-operational-API/` clone folder:
+
+```sh
+composer require google/protobuf
+```
+
+Generate code of PHP objects from `.proto` prototypes:
+
+### On Linux and MacOS:
+
+```sh
+protoc --php_out=proto/php/ --proto_path=proto/prototypes/ $(find proto/prototypes/ -type f)
+```
+
+### On Windows:
+
+```batch
+for /f "usebackq tokens=*" %a in (`dir /B "proto/prototypes"`) do protoc --php_out=proto/php/ --proto_path=proto/prototypes/ proto/prototypes/%a
+```
+
+5. Verify that your API instance is reachable by trying to access:
 
 - On Linux and Windows: http://localhost/YouTube-operational-API/
 - On MacOS: http://localhost:8080/YouTube-operational-API/
