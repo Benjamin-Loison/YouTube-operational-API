@@ -79,7 +79,9 @@ sudo apt install composer protobuf-compiler
 
 ### On Windows:
 
-TODO
+Download [composer](https://github.com/composer/windows-setup/releases/latest).
+
+Download [protoc](https://github.com/protocolbuffers/protobuf/releases/latest).
 
 ### On MacOS:
 
@@ -95,8 +97,16 @@ composer require google/protobuf
 
 Generate code of PHP objects from `.proto` prototypes:
 
+### On Linux and MacOS:
+
 ```sh
 protoc --php_out=proto/php/ --proto_path=proto/prototypes/ $(find proto/prototypes/ -type f)
+```
+
+### On Windows:
+
+```batch
+for /f "usebackq tokens=*" %a in (`dir /S /B "proto/prototypes"`) do protoc --php_out=proto/php/ --proto_path=proto/prototypes/ %a
 ```
 
 5. Verify that your API instance is reachable by trying to access:
