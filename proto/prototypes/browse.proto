@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+import "sub_browse.proto";
+
+message Browse {
+  string endpoint = 2;
+  SubBrowse subBrowse = 25;
+}
