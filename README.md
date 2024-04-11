@@ -74,7 +74,7 @@ git clone https://github.com/Benjamin-Loison/YouTube-operational-API
 ### On Linux (Ubuntu, Debian and Mint):
 
 ```sh
-sudo apt install composer
+sudo apt install composer protobuf-compiler
 ```
 
 ### On Windows:
@@ -84,7 +84,7 @@ TODO
 ### On MacOS:
 
 ```sh
-brew install composer
+brew install composer protobuf
 ```
 
 In `YouTube-operational-API/` clone folder:
