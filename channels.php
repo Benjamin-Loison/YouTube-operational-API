@@ -2,6 +2,8 @@
 
     header('Content-Type: application/json; charset=UTF-8');
 
+    include_once 'common.php';
+
     $channelsTests = [
         ['cId=FolkartTr', 'items/0/id', 'UCnS--2e1yzQCm5r4ClrMJBg'],
         ['handle=@Test-kq9ig', 'items/0/id', 'UCv_LqFI-0vMVYgNR3TeB3zQ'],
@@ -19,8 +21,6 @@
         ['part=recent&id=UCyvTYozFRVuM_mKKyT6K50g', 'items/0', []],
         ['part=letsPlay&id=UCyvTYozFRVuM_mKKyT6K50g', 'items/0', []],
     ];
-
-    include_once 'common.php';
 
     $realOptions = [
         'status',
