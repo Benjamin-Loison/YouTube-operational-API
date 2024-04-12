@@ -288,7 +288,8 @@ If a feature you are looking for which isn't working on <?php yt(); ?>, ask kind
 <?php
 
     $version = 'an unknown version.';
-    $hash = file_get_contents('.git/refs/heads/main');
+    $ref = str_replace("\n", '', str_replace('ref: ', '', file_get_contents('.git/HEAD')));
+    $hash = file_get_contents(".git/$ref");
     if ($hash !== false) {
         $version = "version: <a href=\"https://github.com/Benjamin-Loison/YouTube-operational-API/commit/$hash\">$hash</a>";
     }
