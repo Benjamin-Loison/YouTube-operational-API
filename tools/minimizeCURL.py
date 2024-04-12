@@ -47,6 +47,9 @@ def isCommandStillFine(command):
     result = executeCommand(command)
     return wantedOutput in result
 
+# For chromium support:
+command = command.replace(' \\\n ', '')
+
 print(len(command))
 # To verify that the user provided the correct `wantedOutput` to keep during the minimization.
 if not isCommandStillFine(command):
@@ -113,12 +116,15 @@ if removeCookies:
     print('Removing cookies')
 
     COOKIES_PREFIX = 'Cookie: '
+    COOKIES_PREFIX_LEN = len(COOKIES_PREFIX)
 
     cookiesIndex = None
     arguments = shlex.split(command)
     for argumentsIndex, argument in enumerate(arguments):
-        if argument.startswith(COOKIES_PREFIX):
+        # For Chromium support:
+        if argument[:COOKIES_PREFIX_LEN].title() == COOKIES_PREFIX:
             cookiesIndex = argumentsIndex
+            arguments[cookiesIndex] = COOKIES_PREFIX + argument[COOKIES_PREFIX_LEN:]
             break
 
     if cookiesIndex is not None:
