@@ -47,7 +47,7 @@ def isCommandStillFine(command):
     result = executeCommand(command)
     return wantedOutput in result
 
-# For chromium support:
+# For Chromium support:
 command = command.replace(' \\\n ', '')
 
 print(len(command))
