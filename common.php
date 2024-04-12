@@ -550,7 +550,7 @@
 
     function verifyMultipleIdsConfiguration($realIds, $field) {
         if (count($realIds) >= 2 && !MULTIPLE_IDS_ENABLED) {
-            dieWithJsonMessage("Multiple ${field}s are disabled on this instance");
+            dieWithJsonMessage("Multiple {$field}s are disabled on this instance");
         }
     }
 
