@@ -60,9 +60,7 @@
 
         $isClip = isset($_GET['clipId']);
         $field = $isClip ? 'clipId' : 'id';
-        $ids = $_GET[$field];
-        $realIds = explode(',', $ids);
-        verifyMultipleIds($realIds, $field);
+        $realIds = getMultipleIds($field);
         foreach ($realIds as $realId) {
             if ((!$isClip && !isVideoId($realId)) && !isClipId($realId)) {
                 dieWithJsonMessage("Invalid $field");

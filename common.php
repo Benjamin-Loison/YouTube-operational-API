@@ -201,6 +201,7 @@
         return checkRegex('[a-zA-Z0-9-_]+', $playlistId);
     }
 
+    // what's minimal length ?
     function isCId($cId)
     {
         return checkRegex('[a-zA-Z0-9]+', $cId);
@@ -563,6 +564,13 @@
     function verifyMultipleIds($realIds, $field = 'id') {
         verifyMultipleIdsConfiguration($realIds, $field);
         verifyTooManyIds($realIds, $field);
+    }
+
+    function getMultipleIds($field) {
+        $realIdsString = $_GET[$field];
+        $realIds = explode(',', $realIdsString);
+        verifyMultipleIds($realIds);
+        return $realIds;
     }
 
 ?>

@@ -56,48 +56,68 @@
                 }
             }
         }
-        $id = '';
+        $ids = [];
         if (isset($_GET['cId'])) {
-            $cId = $_GET['cId'];
-            if (!isCId($cId)) { // what's minimal length ?
-                dieWithJsonMessage('Invalid cId');
-            }
-            $result = getJSONFromHTML("https://www.youtube.com/c/$cId/about");
-            $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
-        } else if (isset($_GET['id'])) {
-            $id = $_GET['id'];
-            if (!isChannelId($id)) {
-                dieWithJsonMessage('Invalid id'); // could directly die within the function
-            }
-        } else if (isset($_GET['handle'])) {
-            $handle = $_GET['handle'];
-            if (!isHandle($handle)) {
-                dieWithJsonMessage('Invalid handle');
-            }
-            $result = getJSONFromHTML("https://www.youtube.com/$handle");
-            $params = $result['responseContext']['serviceTrackingParams'][0]['params'];
-            foreach($params as $param)
+            $realCIds = getMultipleIds('cId');
+            foreach ($realCIds as $realCId)
             {
-                if($param['key'] === 'browse_id')
-                {
-                    $id = $param['value'];
-                    break;
+                if (!isCId($realCId)) {
+                    dieWithJsonMessage('Invalid cId');
                 }
+                $result = getJSONFromHTML("https://www.youtube.com/c/$realCId/about");
+                $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
+                array_push($ids, $id);
+            }
+        } else if (isset($_GET['id'])) {
+            $realIds = getMultipleIds('id');
+            foreach ($realIds as $realId)
+            {
+                if (!isChannelId($realId)) {
+                    dieWithJsonMessage('Invalid id');
+                }
+            }
+            $ids = $realIds;
+        } else if (isset($_GET['handle'])) {
+            $realHandles = getMultipleIds('handle');
+            foreach ($realHandles as $realHandle)
+            {
+                if (!isHandle($realHandle)) {
+                    dieWithJsonMessage('Invalid handle');
+                }
+                $result = getJSONFromHTML("https://www.youtube.com/$realHandle");
+                $params = $result['responseContext']['serviceTrackingParams'][0]['params'];
+                foreach($params as $param)
+                {
+                    if($param['key'] === 'browse_id')
+                    {
+                        $id = $param['value'];
+                        break;
+                    }
+                }
+                array_push($ids, $id);
             }
         }
         else if (isset($_GET['forUsername'])) {
-            $username = $_GET['forUsername'];
-            if (!isUsername($username)) {
-                dieWithJsonMessage('Invalid forUsername');
+            $realUsernames = getMultipleIds('forUsername');
+            foreach ($realUsernames as $realUsername)
+            {
+                if (!isUsername($realUsername)) {
+                    dieWithJsonMessage('Invalid forUsername');
+                }
+                $result = getJSONFromHTML("https://www.youtube.com/user/$realUsername");
+                $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
+                array_push($ids, $id);
             }
-            $result = getJSONFromHTML("https://www.youtube.com/user/$username");
-            $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
         }
         else /*if (isset($_GET['raw']))*/ {
-            $raw = $_GET['raw'];
-            // Adding filter would be nice.
-            $result = getJSONFromHTML("https://www.youtube.com/$raw");
-            $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
+            $realRaws = getMultipleIds('raw');
+            foreach ($realRaws as $realRaw)
+            {
+                // Adding filter would be nice.
+                $result = getJSONFromHTML("https://www.youtube.com/$realRaw");
+                $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
+                array_push($ids, $id);
+            }
         }
         $order = 'time';
         if (isset($_GET['order'])) {
@@ -114,7 +134,7 @@
                 dieWithJsonMessage('Invalid pageToken');
             }
         }
-        echo getAPI($id, $order, $continuationToken);
+        echo getAPI($ids, $order, $continuationToken);
     } else if(!test()) {
         dieWithJsonMessage('Required parameters not provided');
     }
@@ -545,10 +565,12 @@
         return json_encode($answer, JSON_PRETTY_PRINT);
     }
 
-    function getAPI($id, $order, $continuationToken)
+    function getAPI($ids, $order, $continuationToken)
     {
         $items = [];
-        array_push($items, getItem($id, $order, $continuationToken));
+        foreach ($ids as $id) {
+            array_push($items, getItem($id, $order, $continuationToken));
+        }
         return returnItems($items);
     }
 
