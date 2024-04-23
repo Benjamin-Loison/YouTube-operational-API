@@ -454,6 +454,10 @@
         return ($isNegative ? -1 : 1) * $timeInt;
     }
 
+    function getFirstNodeContainingPath($nodes, $path) {
+        return array_values(array_filter($nodes, fn($node) => doesPathExist($node, $path)))[0];
+    }
+
     function getTabByName($result, $tabName) {
         if (array_key_exists('contents', $result)) {
             return array_values(array_filter(getTabs($result), fn($tab) => (getValue($tab, 'tabRenderer/title') === $tabName)))[0];
