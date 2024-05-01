@@ -382,7 +382,7 @@
 
         if ($options['membership']) {
             $result = getJSONFromHTML("https://www.youtube.com/channel/$id");
-            $item['isMembershipEnabled'] = array_key_exists('sponsorButton', $result['header']['c4TabbedHeaderRenderer']);
+            $item['isMembershipEnabled'] = doesPathExist($result, 'header/c4TabbedHeaderRenderer/sponsorButton') || getValue($result, 'header/pageHeaderRenderer/content/pageHeaderViewModel/actions/flexibleActionsViewModel/actionsRows/0/actions/1/buttonViewModel/targetId', $defaultValue = null) === 'sponsorships-button';
         }
 
         if ($options['playlists']) {
