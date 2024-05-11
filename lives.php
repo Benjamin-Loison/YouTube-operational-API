@@ -10,6 +10,7 @@
         'donations',
         'sponsorshipGifts',
         'memberships',
+        'poll',
     ];
 
     foreach ($realOptions as $realOption) {
@@ -124,6 +125,29 @@
                 }
             }
             $item['memberships'] = $memberships;
+        }
+
+        if ($options['poll']) {
+            $firstAction = $actions[0];
+            if(array_key_exists('showLiveChatActionPanelAction', $firstAction)) {
+                $pollRenderer = $firstAction['showLiveChatActionPanelAction']['panelToShow']['liveChatActionPanelRenderer']['contents']['pollRenderer'];
+                $pollHeaderRenderer = $pollRenderer['header']['pollHeaderRenderer'];
+                $liveChatPollStateEntity = $result['frameworkUpdates']['entityBatchUpdate']['mutations'][0]['payload']['liveChatPollStateEntity'];
+                $metadataTextRuns = explode(' • ', $liveChatPollStateEntity['metadataText']['runs'][0]['text']);
+                $poll = [
+                    'question' => $liveChatPollStateEntity['collapsedMetadataText']['runs'][2]['text'],
+                    'choices' => array_map(fn($choiceText, $choiceRatio) => [
+                        'text' => $choiceText['text']['runs'][0]['text'],
+                        'voteRatio' => $choiceRatio['value']['voteRatio'],
+                    ], $pollRenderer['choices'], $liveChatPollStateEntity['pollChoiceStates']),
+                    'channelName' => $metadataTextRuns[0],
+                    'timestamp' => str_replace("\u{00a0}", ' ', $metadataTextRuns[1]),
+                    'totalVotes' => intval(str_replace(' votes', '', $metadataTextRuns[2])),
+
+                    'channelThumbnails' => $pollHeaderRenderer['thumbnail']['thumbnails'],
+                ];
+            }
+            $item['poll'] = $poll;
         }
 
         return $item;
