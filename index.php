@@ -222,6 +222,7 @@
                     'donations',
                     'sponsorshipGifts',
                     'memberships',
+                    'poll',
                 ],
                 'id' => 'VIDEO_ID',
             ],
@@ -282,8 +283,8 @@ The source code is available on GitHub: <?php echo url('https://github.com/Benja
 
 <h2>Contact:</h2>
 If a feature you are looking for which isn't working on <?php yt(); ?>, ask kindly with the below contact:<br/>
-- <?php echo url('https://matrix.to/#/#youtube-operational-api:matrix.org', 'Matrix'); ?><br/>
-- <?php echo url('https://discord.gg/pDzafhGWzf', 'Discord'); ?>
+- <?php echo url('https://yt.lemnoslife.com/matrix', 'Matrix'); ?><br/>
+- <?php echo url('https://yt.lemnoslife.com/discord', 'Discord'); ?>
 
 <?php
 
