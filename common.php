@@ -566,4 +566,17 @@
         verifyTooManyIds($realIds, $field);
     }
 
+    function includeOnceProto($proto) {
+        $COMMON_PATH = 'proto/php';
+        include_once "$COMMON_PATH/$proto.php";
+        include_once "$COMMON_PATH/GPBMetadata/$proto.php";
+    }
+
+    function includeOnceProtos($protos) {
+        require_once __DIR__ . '/vendor/autoload.php';
+        foreach($protos as $proto) {
+            includeOnceProto($proto);
+        }
+    }
+
 ?>
