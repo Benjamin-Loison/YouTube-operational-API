@@ -4,6 +4,8 @@ header('Content-Type: application/json; charset=UTF-8');
 
 include_once 'common.php';
 
+includeOnceProtos(['Browse', 'SubBrowse']);
+
 $realOptions = [
     'snippet',
 ];
