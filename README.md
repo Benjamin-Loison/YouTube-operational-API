@@ -28,6 +28,8 @@ Download and run [WampServer 3](https://sourceforge.net/projects/wampserver/file
 
 ### On MacOS:
 
+Install `brew` by following https://brew.sh#install.
+
 On MacOS (Intel) use `/usr/local/` instead of `/opt/homebrew/`.
 
 ```zsh
@@ -49,7 +51,7 @@ echo '<IfModule php_module>
 sed -i '' 's/#LoadModule rewrite_module/LoadModule rewrite_module/' /opt/homebrew/etc/httpd/httpd.conf
 ```
 
-Replace `AllowOverride none` with `AllowOverride all` in `<Directory "/opt/homebrew/var/www">` in `/opt/homebrew/etc/httpd/httpd.conf`.
+Replace `AllowOverride None` with `AllowOverride All` in `<Directory "/opt/homebrew/var/www">` in `/opt/homebrew/etc/httpd/httpd.conf`.
 
 Then run:
 
