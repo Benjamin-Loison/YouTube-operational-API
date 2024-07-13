@@ -107,50 +107,40 @@ function getAPI($videoId, $commentId, $order, $continuationToken, $simulatedCont
     }
 
     $answerItems = [];
-    $onResponseReceivedEndpoints = $result['onResponseReceivedEndpoints'];
-    $reloadContinuationItems = $onResponseReceivedEndpoints[1]['reloadContinuationItemsCommand']['continuationItems'];
-    $appendContinuationItems = $onResponseReceivedEndpoints[0]['appendContinuationItemsAction']['continuationItems'];
-    $items = array_merge($reloadContinuationItems !== null ? $reloadContinuationItems : [], $appendContinuationItems !== null ? $appendContinuationItems : []);
-    if ($items !== [] && array_key_exists('continuationItemRenderer', end($items))) {
-        $continuationItemRenderer = end($items)['continuationItemRenderer'];
-        $commonSuffix = 'continuationCommand/token';
-        $nextContinuationToken = urldecode(getValue($continuationItemRenderer, "continuationEndpoint/$commonSuffix", "button/buttonRenderer/command/$commonSuffix"));
-        $items = array_slice($items, 0, count($items) - 1);
-    }
+    $items = $result['frameworkUpdates']['entityBatchUpdate']['mutations'];
     $isTopLevelComment = true;
     foreach ($items as $item) {
-        $commentThread = $item['commentThreadRenderer'];
-        $isTopLevelComment = array_key_exists('commentThreadRenderer', $item);
-        $comment = ($isTopLevelComment ? $commentThread['comment'] : $item)['commentRenderer'];
-        $texts = $comment['contentText']['runs'];
-        $replies = $commentThread['replies'];
-        $commentRepliesRenderer = $replies['commentRepliesRenderer'];
-        $text = implode(array_map(fn($text) => $text['text'], $texts));
-        $commentId = $comment['commentId'];
-        $isHearted = array_key_exists('creatorHeart', $comment['actionButtons']['commentActionButtonsRenderer']);
-        $publishedAt = $comment['publishedTimeText']['runs'][0]['text'];
+        $payload = $item['payload'];
+        if (array_key_exists('engagementToolbarStateEntityPayload', $payload)) {
+            $answerItems[$item['entityKey']]['snippet']['topLevelComment']['snippet']['creatorHeart'] = $payload['engagementToolbarStateEntityPayload']['heartState'] == 'TOOLBAR_HEART_STATE_HEARTED';
+        }
+        if (!array_key_exists('commentEntityPayload', $payload)) {
+            continue;
+        }
+        $comment = $payload['commentEntityPayload'];
+        $properties = $comment['properties'];
+        $author = $comment['author'];
+        $toolbar = $comment['toolbar'];
+        $publishedAt = $properties['publishedTime'];
         $publishedAt = str_replace(' (edited)', '', $publishedAt, $count);
-        $wasEdited = $count > 0;
-        $replyCount = $comment['replyCount'];
-        $author = $comment['authorText']['simpleText'];
-        $isAuthorAHandle = $author[0] === '@';
         $internalSnippet = [
-            'textOriginal' => $text,
-            'isHearted' => $isHearted,
-            'authorName' => $isAuthorAHandle ? null : $author,
-            'authorHandle' => $isAuthorAHandle ? $author : null,
-            'authorProfileImageUrls' => $comment['authorThumbnail']['thumbnails'],
-            'authorChannelId' => ['value' => $comment['authorEndpoint']['browseEndpoint']['browseId']],
-            'likeCount' => getIntValue(getValue($comment, 'voteCount/simpleText', defaultValue: 0)),
+            'content' => $properties['content']['content'],
             'publishedAt' => $publishedAt,
-            'wasEdited' => $wasEdited,
-            'isPinned' => array_key_exists('pinnedCommentBadge', $comment),
-            'authorIsChannelOwner' => $comment['authorIsChannelOwner'],
-            'videoCreatorHasReplied' => $commentRepliesRenderer !== null && array_key_exists('viewRepliesCreatorThumbnail', $commentRepliesRenderer),
-            // Could add the video creator thumbnails.
-            'totalReplyCount' => $replyCount !== null ? intval($replyCount) : 0,
-            'nextPageToken' => urldecode($replies['commentRepliesRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'])
+            'wasEdited' => $count > 0,
+            'authorChannelId' => $author['channelId'],
+            'authorHandle' => $author['displayName'],
+            'authorName' => str_replace('❤ by ', '', $toolbar['heartActiveTooltip']),
+            'authorAvatar' => $comment['avatar']['image']['sources'][0],
+            'isCreator' => $author['isCreator'],
+            'isArtist' => $author['isArtist'],
+            'likeCount' => getIntValue($toolbar['likeCountLiked']),
+            'totalReplyCount' => intval($toolbar['replyCount']),
+            'videoCreatorHasReplied' => false,
+            'isPinned' => false,
         ];
+
+        //$replies = $commentThread['replies'];
+        $commentId = $properties['commentId'];
         $answerItem = [
             'kind' => 'youtube#comment' . ($isTopLevelComment ? 'Thread' : ''),
             'etag' => 'NotImplemented',
@@ -164,8 +154,21 @@ function getAPI($videoId, $commentId, $order, $continuationToken, $simulatedCont
                 ]
             ] : $internalSnippet)
         ];
-        array_push($answerItems, $answerItem);
+        $answerItems[$properties['toolbarStateKey']] = $answerItem;
     }
+    foreach ($result['onResponseReceivedEndpoints'][1]['reloadContinuationItemsCommand']['continuationItems'] as $item) {
+        $commentThreadRenderer = $item['commentThreadRenderer'];
+        $toolbarStateKey = $commentThreadRenderer['commentViewModel']['commentViewModel']['toolbarStateKey'];
+        // How to avoid repeating path?
+        if (doesPathExist($commentThreadRenderer, 'replies/commentRepliesRenderer/viewRepliesCreatorThumbnail')) {
+            $answerItems[$toolbarStateKey]['snippet']['topLevelComment']['snippet']['videoCreatorHasReplied'] = true;
+        }
+        if (doesPathExist($commentThreadRenderer, 'commentViewModel/commentViewModel/pinnedText')) {
+            $answerItems[$toolbarStateKey]['snippet']['topLevelComment']['snippet']['isPinned'] = true;
+        }
+    }
+    $answerItems = array_values($answerItems);
+
     $answer = [
         'kind' => 'youtube#comment' . ($isTopLevelComment ? 'Thread' : '') . 'ListResponse',
         'etag' => 'NotImplemented',
