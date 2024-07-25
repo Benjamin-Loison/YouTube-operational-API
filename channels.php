@@ -65,7 +65,7 @@
                     dieWithJsonMessage('Invalid cId');
                 }
                 $result = getJSONFromHTML("https://www.youtube.com/c/$realCId/about");
-                $id = $result['header']['c4TabbedHeaderRenderer']['channelId'];
+                $id = $result['metadata']['channelMetadataRenderer']['externalId'];
                 array_push($ids, $id);
             }
         } else if (isset($_GET['id'])) {
