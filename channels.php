@@ -368,7 +368,7 @@
 
         if ($options['approval']) {
             $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id", true);
-            $badgeTooltipPath = 'header/c4TabbedHeaderRenderer/badges/0/metadataBadgeRenderer/tooltip';
+            $badgeTooltipPath = 'contents/twoColumnBrowseResultsRenderer/tabs/0/tabRenderer/content/sectionListRenderer/contents/1/itemSectionRenderer/contents/0/shelfRenderer/content/horizontalListRenderer/items/0/gridVideoRenderer/ownerBadges/0/metadataBadgeRenderer/tooltip';
             $item['approval'] = doesPathExist($result, $badgeTooltipPath) ? getValue($result, $badgeTooltipPath) : '';
         }
 
