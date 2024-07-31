@@ -368,8 +368,7 @@
 
         if ($options['approval']) {
             $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id", true);
-            $badgeTooltipPath = 'contents/twoColumnBrowseResultsRenderer/tabs/0/tabRenderer/content/sectionListRenderer/contents/1/itemSectionRenderer/contents/0/shelfRenderer/content/horizontalListRenderer/items/0/gridVideoRenderer/ownerBadges/0/metadataBadgeRenderer/tooltip';
-            $item['approval'] = doesPathExist($result, $badgeTooltipPath) ? getValue($result, $badgeTooltipPath) : '';
+            $item['approval'] = end(explode(', ', $result['header']['pageHeaderRenderer']['content']['pageHeaderViewModel']['title']['dynamicTextViewModel']['rendererContext']['accessibilityContext']['label']));
         }
 
         if ($options['snippet']) {
