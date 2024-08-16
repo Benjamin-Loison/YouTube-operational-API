@@ -139,7 +139,6 @@ function getAPI($videoId, $commentId, $order, $continuationToken, $simulatedCont
             'isPinned' => false,
         ];
 
-        //$replies = $commentThread['replies'];
         $commentId = $properties['commentId'];
         $answerItem = [
             'kind' => 'youtube#comment' . ($isTopLevelComment ? 'Thread' : ''),
@@ -166,6 +165,7 @@ function getAPI($videoId, $commentId, $order, $continuationToken, $simulatedCont
         if (doesPathExist($commentThreadRenderer, 'commentViewModel/commentViewModel/pinnedText')) {
             $answerItems[$toolbarStateKey]['snippet']['topLevelComment']['snippet']['isPinned'] = true;
         }
+        $answerItems[$toolbarStateKey]['snippet']['topLevelComment']['snippet']['nextPageToken'] = $commentThreadRenderer['replies']['commentRepliesRenderer']['contents'][0]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token'];
     }
     $answerItems = array_values($answerItems);
 
