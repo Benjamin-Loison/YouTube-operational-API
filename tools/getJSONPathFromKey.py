@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 '''
 This script purpose is to ease retrieving the JSON path associated to an interested YouTube data entry.

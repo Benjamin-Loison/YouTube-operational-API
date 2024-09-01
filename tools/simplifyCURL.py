@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 # in fact this tool can be used not only for YouTube but for all automatization based on HTTP
 

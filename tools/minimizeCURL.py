@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 ## /!\ Assume that the content of `curlCommandFilePath` is trusted /!\
 # TODO: precising or/and lowering this trust level would be interesting
