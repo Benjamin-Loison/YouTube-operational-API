@@ -3,18 +3,34 @@
     header('Content-Type: application/json; charset=UTF-8');
 
     $videosTests = [
+        ['part=id&clipId=UgkxU2HSeGL_NvmDJ-nQJrlLwllwMDBdGZFs', 'items/0/videoId', 'NiXD4xVJM5Y'],
+        ['part=clip&clipId=UgkxU2HSeGL_NvmDJ-nQJrlLwllwMDBdGZFs', 'items/0/clip', json_decode(file_get_contents('tests/part=clip&clipId=UgkxU2HSeGL_NvmDJ-nQJrlLwllwMDBdGZFs.json'), true)],
         ['part=contentDetails&id=g5xNzUA5Qf8', 'items/0/contentDetails/duration', 213],
         ['part=status&id=J8ZVxDK11Jo', 'items/0/status/embeddable', false],
         ['part=status&id=g5xNzUA5Qf8', 'items/0/status/embeddable', true], // could allow subarray for JSON check in response that way in a single request can check several features
+        ['part=short&id=NiXD4xVJM5Y', 'items/0/short/available', false],
+        ['part=short&id=ydPkyvWtmg4', 'items/0/short/available', true],
+        ['part=musics&id=DUT5rEU6pqM', 'items/0/musics/0', json_decode(file_get_contents('tests/part=musics&id=DUT5rEU6pqM.json'), true)],
+        ['part=musics&id=4sC3mbkP_x8', 'items/0/musics', json_decode(file_get_contents('tests/part=musics&id=4sC3mbkP_x8.json'), true)],
         ['part=music&id=FliCdfxdtTI', 'items/0/music/available', false],
         ['part=music&id=ntG3GQdY_Ok', 'items/0/music/available', true],
+        ['part=isPaidPromotion&id=Q6gtj1ynstU', 'items/0/isPaidPromotion', false],
+        ['part=isPaidPromotion&id=PEorJqo2Qaw', 'items/0/isPaidPromotion', true],
+        ['part=isMemberOnly&id=Q6gtj1ynstU', 'items/0/isMemberOnly', false],
+        ['part=isMemberOnly&id=Ln9yZDtfcWg', 'items/0/isMemberOnly', true],
+        ['part=qualities&id=IkXH9H2ofa0', 'items/0/qualities', json_decode(file_get_contents('tests/part=qualities&id=IkXH9H2ofa0.json'), true)],
+        ['part=chapters&id=n8vmXvoVjZw', 'items/0/chapters', json_decode(file_get_contents('tests/part=chapters&id=n8vmXvoVjZw.json'), true)],
         ['part=isOriginal&id=FliCdfxdtTI', 'items/0/isOriginal', false],
         ['part=isOriginal&id=iqKdEhx-dD4', 'items/0/isOriginal', true],
         ['part=isPremium&id=FliCdfxdtTI', 'items/0/isPremium', false],
         ['part=isPremium&id=dNJMI92NZJ0', 'items/0/isPremium', true],
+        ['part=isRestricted&id=IkXH9H2ofa0', 'items/0/isRestricted', false],
+        ['part=isRestricted&id=ORdWE_ffirg', 'items/0/isRestricted', true],
+        ['part=snippet&id=IkXH9H2ofa0', 'items/0/snippet', json_decode(file_get_contents('tests/part=snippet&id=IkXH9H2ofa0.json'), true)],
+        ['part=activity&id=V6z0qF54RZ4', 'items/0/activity', json_decode(file_get_contents('tests/part=activity&id=V6z0qF54RZ4.json'), true)],
+        ['part=mostReplayed&id=XiCrniLQGYc', 'items/0/mostReplayed/markers/0/intensityScoreNormalized', 1],
         ['part=explicitLyrics&id=Ehoe35hTbuY', 'items/0/explicitLyrics', false],
         ['part=explicitLyrics&id=PvM79DJ2PmM', 'items/0/explicitLyrics', true],
-        ['part=explicitLyrics&id=ISEIxaPsp_I', 'items/0/explicitLyrics', true],
     ];
 
     include_once 'common.php';
