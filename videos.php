@@ -360,10 +360,7 @@
 
         if ($options['isOriginal']) {
             $json = getJson("https://www.youtube.com/watch?v=$id");
-            $isOriginal = doesPathExist($json, 'contents/twoColumnWatchNextResults/results/results/contents/1/videoSecondaryInfoRenderer/metadataRowContainer/metadataRowContainerRenderer/rows/2/metadataRowRenderer/contents/0/simpleText');
-            if (!$isOriginal) {
-                $isOriginal = str_contains($html, 'xtags=' . urlencode('acont=original'));
-            }
+            $isOriginal = doesPathExist($json, 'contents/twoColumnWatchNextResults/results/results/contents/1/videoSecondaryInfoRenderer/metadataRowContainer/metadataRowContainerRenderer/rows/2/metadataRowRenderer/contents/0/simpleText') or str_contains($html, 'xtags=' . urlencode('acont=original'));
             $item['isOriginal'] = $isOriginal;
         }
 
