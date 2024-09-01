@@ -59,13 +59,12 @@ function getAPI($playlistId, $continuationToken)
         'http' => $http
     ];
 
-    $res = getRemote($url, $httpOptions);
-
-    if (!$continuationTokenProvided) {
-        $res = getJSONStringFromHTML($res);
+    if ($continuationTokenProvided) {
+        $result = getJSON($url, $httpOptions);
+    } else
+        $result = getJSONFromHTML($url, $httpOptions);
     }
 
-    $result = json_decode($res, true);
     $answerItems = [];
     $items = $continuationTokenProvided ? getContinuationItems($result) : getTabs($result)[0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['playlistVideoListRenderer']['contents'];
     $itemsCount = count($items);
