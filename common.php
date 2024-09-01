@@ -10,12 +10,12 @@
         {
             if($_GET['instanceKey'] !== RESTRICT_USAGE_TO_KEY)
             {
-                die("The provided `instanceKey` isn't correct!");
+                die("The provided <code>instanceKey</code> isn't correct!");
             }
         }
         else
         {
-            die('This instance requires that you provide the appropriate `instanceKey` parameter!');
+            die('This instance requires that you provide the appropriate <code>instanceKey</code> parameter!');
         }
     }
 
