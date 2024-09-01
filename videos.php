@@ -364,7 +364,7 @@
             $json = json_decode($jsonStr, true);
             $isOriginal = doesPathExist($json, 'contents/twoColumnWatchNextResults/results/results/contents/1/videoSecondaryInfoRenderer/metadataRowContainer/metadataRowContainerRenderer/rows/2/metadataRowRenderer/contents/0/simpleText');
             if (!$isOriginal) {
-                $isOriginal = str_contains($html, 'xtags=acont%3Doriginal');
+                $isOriginal = str_contains($html, 'xtags=' . urlencode('acont=original'));
             }
             $item['isOriginal'] = $isOriginal;
         }
