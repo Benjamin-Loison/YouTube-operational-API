@@ -242,7 +242,7 @@
         }
 
         if(isset($_GET['clipId'])) {
-            $json = getJSONFromHTML("https://www.youtube.com/clip/$id");
+            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/clip/$id");
             if ($options['id']) {
                 $videoId = $json['currentVideoEndpoint']['watchEndpoint']['videoId'];
                 $item['videoId'] = $videoId;
@@ -253,10 +253,14 @@
                 foreach ($engagementPanels as $engagementPanel) {
                     if (doesPathExist($engagementPanel, $path)) {
                         $loopCommand = getValue($engagementPanel, $path);
+                        $clipAttributionRenderer = $engagementPanel['engagementPanelSectionListRenderer']['content']['clipSectionRenderer']['contents'][0]['clipAttributionRenderer'];
+                        $createdText = explode(' · ', $clipAttributionRenderer['createdText']['simpleText']);
                         $clip = [
                             'title' => $engagementPanel['engagementPanelSectionListRenderer']['content']['clipSectionRenderer']['contents'][0]['clipAttributionRenderer']['title']['runs'][0]['text'],
                             'startTimeMs' => intval($loopCommand['startTimeMs']),
-                            'endTimeMs' => intval($loopCommand['endTimeMs'])
+                            'endTimeMs' => intval($loopCommand['endTimeMs']),
+                            'viewCount' => getIntValue($createdText[0], 'view'),
+                            'publishedAt' => $createdText[1],
                         ];
                         $item['clip'] = $clip;
                         break;
