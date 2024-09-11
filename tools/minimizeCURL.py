@@ -187,6 +187,7 @@ if removeRawData:
                         command = shlex.join(arguments)
                 if not changedSomething:
                     break
+        # JSON recursive case.
         else:
             def getPaths(d):
                 if isinstance(d, dict):
@@ -199,13 +200,19 @@ if removeRawData:
                         yield f'/{i}'
                         yield from (f'/{i}{p}' for p in getPaths(value))
 
+            # If a single unknown entry is necessary, then this algorithm seems to most efficiently goes from parents to children if necessary to remove other entries. Hence, it seems to proceed in a linear number of HTTPS requests and not a quadratic one.
+            # Try until no more change to remove unnecessary entries. If assume a logical behavior as just mentioned, would not a single loop iteration be enough? Not with current design, see (1).
             while True:
                 changedSomething = False
                 rawDataParsed = json.loads(rawData)
-                # Note that the path goes from parents to children which is quite a wanted behavior to quickly remove useless chunks.
+                # Note that the path goes from parents to children if necessary which is quite a wanted behavior to quickly remove useless chunks.
                 paths = getPaths(rawDataParsed)
+                # For all entries, copy current `rawData` and try to remove an entry.
                 for pathsIndex, path in enumerate(paths):
+                    # Copy current `rawData`.
                     rawDataParsedCopy = copy.deepcopy(rawDataParsed)
+                    # Remove an entry.
+                    # Pay attention that integer keys need to be consider as such, so not as `str` as face a `list` instead of a `dict`.
                     entry = rawDataParsedCopy
                     pathParts = path[1:].split('/')
                     for pathPart in pathParts[:-1]:
@@ -214,16 +221,20 @@ if removeRawData:
                     lastPathPart = pathParts[-1]
                     lastPathPart = lastPathPart if not lastPathPart.isdigit() else int(lastPathPart)
                     del entry[lastPathPart]
+                    # Test if the removed entry was necessary.
                     arguments[rawDataIndex] = json.dumps(rawDataParsedCopy)
                     command = shlex.join(arguments)
+                    # (1) If it was unnecessary, then reconsider paths excluding possible children paths of this unnecessary entry, ensuring optimized complexity it seems.
                     if isCommandStillFine(command):
                         print(len(command), 'still fine')
                         changedSomething = True
                         rawData = json.dumps(rawDataParsedCopy)
                         break
+                    # If it was necessary, we consider possible children paths of this necessary entry and other paths.
                     else:
                         arguments[rawDataIndex] = json.dumps(rawDataParsed)
                         command = shlex.join(arguments)
+                # If a loop iteration considering all paths, does not change anything, then the request cannot be minimized further.
                 if not changedSomething:
                     break
 
