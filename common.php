@@ -269,7 +269,7 @@
 
     function isCommentId($commentId)
     {
-        return checkRegex('Ug[w-z][a-zA-Z0-9-_]{16}4AaABAg', $commentId);
+        return checkRegex('Ug[w-z][a-zA-Z0-9-_]{16}4AaABAg(|.[a-zA-Z0-9-]{22})', $commentId);
     }
 
     // Assume `$path !== ''`.
