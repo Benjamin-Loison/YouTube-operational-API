@@ -10,7 +10,7 @@ YouTube operational API works when [YouTube Data API v3](https://developers.goog
 ### On Linux (Ubuntu, Debian and Mint):
 
 ```
-sudo apt install apache2 php
+sudo apt install apache2 php git
 sudo a2enmod rewrite headers
 ```
 
