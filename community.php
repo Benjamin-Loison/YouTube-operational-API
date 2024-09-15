@@ -4,11 +4,6 @@ header('Content-Type: application/json; charset=UTF-8');
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-include_once 'proto/php/Browse.php';
-include_once 'proto/php/GPBMetadata/Browse.php';
-include_once 'proto/php/SubBrowse.php';
-include_once 'proto/php/GPBMetadata/SubBrowse.php';
-
 include_once 'common.php';
 
 includeOnceProtos(['Browse', 'SubBrowse']);
