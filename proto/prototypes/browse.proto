@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-import "sub_browse.proto";
+message SubBrowse {
+  string postId = 22;
+}
 
 message Browse {
   string endpoint = 2;
