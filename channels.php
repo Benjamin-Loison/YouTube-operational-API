@@ -203,17 +203,16 @@
             foreach($reelShelfRendererItems as $reelShelfRendererItem) {
                 if(!array_key_exists('richItemRenderer', $reelShelfRendererItem))
                     continue;
-                $reelItemRenderer = $reelShelfRendererItem['richItemRenderer']['content']['reelItemRenderer'];
-                $viewCount = getIntValue($reelItemRenderer['viewCountText']['simpleText'], 'view');
-                $frame0Thumbnails = $reelItemRenderer['navigationEndpoint']['reelWatchEndpoint']['thumbnail']['thumbnails'];
-
+                $shortsLockupViewModel = $reelShelfRendererItem['richItemRenderer']['content']['shortsLockupViewModel'];
+                $overlayMetadata = $shortsLockupViewModel['overlayMetadata'];
+                $reelWatchEndpoint = $shortsLockupViewModel['onTap']['innertubeCommand']['reelWatchEndpoint'];
                 $short = [
-                    'videoId' => $reelItemRenderer['videoId'],
-                    'title' => $reelItemRenderer['headline']['simpleText'],
+                    'videoId' => $reelWatchEndpoint['videoId'],
+                    'viewCount' => getIntValue($overlayMetadata['secondaryText']['content'], 'view'),
+                    'title' => $overlayMetadata['primaryText']['content'],
                     // Both `sqp` and `rs` parameters are required to crop correctly the thumbnail.
-                    'thumbnails' => $reelItemRenderer['thumbnail']['thumbnails'],
-                    'viewCount' => $viewCount,
-                    'frame0Thumbnails' => $frame0Thumbnails,
+                    'thumbnail' => $shortsLockupViewModel['thumbnail']['sources'][0],
+                    'frame0Thumbnail' => $reelWatchEndpoint['thumbnail']['thumbnails'],
                 ];
                 if (!$continuationTokenProvided) {
                     $browseEndpoint = $tabRenderer['endpoint']['browseEndpoint'];
