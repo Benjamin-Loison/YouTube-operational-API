@@ -591,4 +591,9 @@
         }
     }
 
+    // Source: https://www.php.net/manual/en/function.base64-encode.php#103849
+    function base64url_encode($data) {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
 ?>

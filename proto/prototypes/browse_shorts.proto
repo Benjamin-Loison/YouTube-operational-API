@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+message BrowseShorts {
+  Sub0BrowseShorts two = 2;
+  int32 three = 3;
+  string four = 4;
+}
+
+message Sub0BrowseShorts {
+  string two = 2;
+  string three = 3;
+}
+
+message Sub1BrowseShorts {
+  Sub2BrowseShorts two = 2;
+}
+
+message Sub2BrowseShorts {
+  Sub3BrowseShorts eighteen = 18;
+}
+
+message Sub3BrowseShorts {
+  Sub4_7BrowseShorts seven = 7;
+  Sub4_9BrowseShorts nine = 9;
+}
+
+message Sub4_7BrowseShorts {
+  int32 twelve = 12;
+}
+
+message Sub4_9BrowseShorts {
+}

@@ -13,6 +13,16 @@
 
 include_once 'common.php';
 
+includeOnceProtos([
+    'BrowseShorts',
+    'Sub0BrowseShorts',
+    'Sub1BrowseShorts',
+    'Sub2BrowseShorts',
+    'Sub3BrowseShorts',
+    'Sub4_7BrowseShorts',
+    'Sub4_9BrowseShorts',
+]);
+
 $realOptions = [
     'id',
     'snippet',
@@ -112,13 +122,31 @@ function getAPI($id, $order, $continuationToken)
                     'clientVersion' => MUSIC_VERSION
                 ]
             ],
-            'query' => str_replace('"', '\"', $_GET['q'])
         ];
+        if(isset($_GET['type']) && $_GET['type'] === 'short') {
+            $sub1BrowseShorts = (new \Sub1BrowseShorts())
+                        ->setTwo((new \Sub2BrowseShorts())
+                            ->setEighteen((new \Sub3BrowseShorts())
+                                ->setSeven((new \Sub4_7BrowseShorts())
+                                    ->setTwelve(26))
+                                    ->setNine(new \Sub4_9BrowseShorts())));
+            $browseShorts = (new \BrowseShorts())
+                ->setTwo((new \Sub0BrowseShorts())
+                    ->setTwo($_GET['q'])
+                    ->setThree(base64_encode($sub1BrowseShorts->serializeToString())))
+                ->setThree(52047873)
+                ->setFour('search-page');
+
+            $continuation = base64url_encode($browseShorts->serializeToString());
+            $rawData['continuation'] = $continuation;
+        } else {
+            $rawData['query'] = str_replace('"', '\"', $_GET['q']);
+            if($typeBase64 !== '') {
+                $rawData['params'] = $typeBase64;
+            }
+        }
         if($continuationTokenProvided) {
             $rawData['continuation'] = $continuationToken;
-        }
-        if($typeBase64 !== '') {
-            $rawData['params'] = $typeBase64;
         }
         $opts = [
                'http' => [
@@ -130,15 +158,7 @@ function getAPI($id, $order, $continuationToken)
         $json = getJSON('https://www.youtube.com/youtubei/v1/search?key=' . UI_KEY, $opts);
         if(isset($_GET['type']) && $_GET['type'] === 'short')
         {
-            $contents = $json['contents']['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'];
-            foreach($contents as $content)
-            {
-                if(array_key_exists('reelShelfRenderer', $content))
-                {
-                    $items = $content['reelShelfRenderer']['items'];
-                    break;
-                }
-            }
+            $items = $json['onResponseReceivedCommands'][0]['reloadContinuationItemsCommand']['continuationItems'][0]['twoColumnSearchResultsRenderer']['primaryContents']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'];
         }
         else
         {
@@ -178,13 +198,12 @@ function getAPI($id, $order, $continuationToken)
     for ($itemsIndex = 0; $itemsIndex < $itemsCount - ($continuationTokenProvided || $_GET['hashtag'] ? 1 : 0); $itemsIndex++) { // check upper bound for hashtags
         $item = $items[$itemsIndex];
         $path = '';
-        $isShort = isset($_GET['type']) && $_GET['type'] === 'short';
         if (isset($_GET['hashtag'])) {
             $path = 'richItemRenderer/content/videoRenderer';
         } elseif (isset($_GET['q'])) {
-            $path = $isShort ? 'reelItemRenderer' : 'videoRenderer';
+            $path = 'videoRenderer';
             // Skip `People also watched`.
-            if(!$isShort && !array_key_exists($path, $item)) {
+            if(!array_key_exists($path, $item)) {
                 continue;
             }
         } else {
@@ -203,11 +222,11 @@ function getAPI($id, $order, $continuationToken)
             ];
         }
         if ($options['snippet']) {
-            $title = $isShort ? $gridVideoRenderer['headline']['simpleText'] : $gridVideoRenderer['title']['runs'][0]['text'];
+            $title = $gridVideoRenderer['title']['runs'][0]['text'];
             $run = $gridVideoRenderer['ownerText']['runs'][0];
             $browseEndpoint = $run['navigationEndpoint']['browseEndpoint'];
             $channelId = $browseEndpoint['browseId'];
-            $views = call_user_func($isShort ? 'getIntValue' : 'getIntFromViewCount', $gridVideoRenderer['viewCountText']['simpleText'], 'view');
+            $views = getIntFromViewCount($gridVideoRenderer['viewCountText']['simpleText']);
             $badges = $gridVideoRenderer['badges'];
             $badges = !empty($badges) ? array_map(fn($badge) => $badge['metadataBadgeRenderer']['label'], $badges) : [];
             $chapters = $gridVideoRenderer['expandableMetadata']['expandableMetadataRenderer']['expandedContent']['horizontalCardListRenderer']['cards'];
@@ -226,7 +245,7 @@ function getAPI($id, $order, $continuationToken)
                 'channelTitle' => $run['text'],
                 'channelHandle' => $channelHandle[0] === '@' ? $channelHandle : null,
                 'timestamp' => $gridVideoRenderer['publishedTimeText']['simpleText'],
-                'duration' => $isShort ? getIntValue(end(explode('- ', str_replace(' - play video', '', $gridVideoRenderer['accessibility']['accessibilityData']['label']))), 'second') : getIntFromDuration($gridVideoRenderer['lengthText']['simpleText']),
+                'duration' => getIntFromDuration($gridVideoRenderer['lengthText']['simpleText']),
                 'views' => $views,
                 'badges' => $badges,
                 'channelApproval' => $gridVideoRenderer['ownerBadges'][0]['metadataBadgeRenderer']['tooltip'],
