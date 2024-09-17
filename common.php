@@ -163,7 +163,7 @@
             if(doesPathExist($json, $redirectedToChannelIdPath))
             {
                 $redirectedToChannelId = getValue($json, $redirectedToChannelIdPath);
-                $url = preg_replace('/[\w-_]{24}/', $redirectedToChannelId, $url);
+                $url = preg_replace('/[\w\-_]{24}/', $redirectedToChannelId, $url);
                 // Does a redirection of redirection for a channel exist?
                 return getJSONFromHTML($url, $opts, $scriptVariable, $prefix, $forceLanguage, $verifiesChannelRedirection);
             }
@@ -198,7 +198,7 @@
 
     function isPlaylistId($playlistId)
     {
-        return checkRegex('[\w-_]+', $playlistId);
+        return checkRegex('[\w\-_]+', $playlistId);
     }
 
     // what's minimal length ?
@@ -214,12 +214,12 @@
 
     function isChannelId($channelId)
     {
-        return checkRegex('UC[\w-_]{22}', $channelId);
+        return checkRegex('UC[\w\-_]{22}', $channelId);
     }
 
     function isVideoId($videoId)
     {
-        return checkRegex('[\w-_]{11}', $videoId);
+        return checkRegex('[\w\-_]{11}', $videoId);
     }
 
     function isHashtag($hashtag)
@@ -239,7 +239,7 @@
 
     function isClipId($clipId)
     {
-        return checkRegex('Ug[\w-_]{34}', $clipId);
+        return checkRegex('Ug[\w\-_]{34}', $clipId);
     }
 
     function isEventType($eventType)
@@ -254,22 +254,22 @@
 
     function isYouTubeDataAPIV3Key($youtubeDataAPIV3Key)
     {
-        return checkRegex('AIzaSy[A-D][\w-_]{32}', $youtubeDataAPIV3Key);
+        return checkRegex('AIzaSy[A-D][\w\-_]{32}', $youtubeDataAPIV3Key);
     }
 
     function isHandle($handle)
     {
-        return checkRegex('@[\w-_.]{3,}', $handle);
+        return checkRegex('@[\w\-_.]{3,}', $handle);
     }
 
     function isPostId($postId)
     {
-        return (checkRegex('Ug[w-z][\w-_]{16}4AaABCQ', $postId) || checkRegex('Ugkx[\w-_]{32}', $postId));
+        return (checkRegex('Ug[w-z][\w\-_]{16}4AaABCQ', $postId) || checkRegex('Ugkx[\w\-_]{32}', $postId));
     }
 
     function isCommentId($commentId)
     {
-        return checkRegex('Ug[w-z][\w-_]{16}4AaABAg(|.[\w-]{22})', $commentId);
+        return checkRegex('Ug[w-z][\w\-_]{16}4AaABAg(|.[\w\-]{22})', $commentId);
     }
 
     // Assume `$path !== ''`.
