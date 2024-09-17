@@ -411,7 +411,7 @@
 
         if ($options['statistics']) {
             $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
-            preg_match('/like this video along with ([0-9,]+) other people/', $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']['videoActions']['menuRenderer']['topLevelButtons'][0]['segmentedLikeDislikeButtonViewModel']['likeButtonViewModel']['likeButtonViewModel']['toggleButtonViewModel']['toggleButtonViewModel']['defaultButtonViewModel']['buttonViewModel']['accessibilityText'], $viewCount);
+            preg_match('/like this video along with ([\d,]+) other people/', $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']['videoActions']['menuRenderer']['topLevelButtons'][0]['segmentedLikeDislikeButtonViewModel']['likeButtonViewModel']['likeButtonViewModel']['toggleButtonViewModel']['toggleButtonViewModel']['defaultButtonViewModel']['buttonViewModel']['accessibilityText'], $viewCount);
             $statistics = [
                 'viewCount' => getIntValue($json['playerOverlays']['playerOverlayRenderer']['videoDetails']['playerOverlayVideoDetailsRenderer']['subtitle']['runs'][2]['text'], 'view'),
                 'likeCount' => getIntValue($viewCount[1]),

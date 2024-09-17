@@ -163,7 +163,7 @@
             if(doesPathExist($json, $redirectedToChannelIdPath))
             {
                 $redirectedToChannelId = getValue($json, $redirectedToChannelIdPath);
-                $url = preg_replace('/[a-zA-Z0-9-_]{24}/', $redirectedToChannelId, $url);
+                $url = preg_replace('/[\w-_]{24}/', $redirectedToChannelId, $url);
                 // Does a redirection of redirection for a channel exist?
                 return getJSONFromHTML($url, $opts, $scriptVariable, $prefix, $forceLanguage, $verifiesChannelRedirection);
             }
@@ -188,48 +188,48 @@
 
     function isContinuationToken($continuationToken)
     {
-        return checkRegex('[A-Za-z0-9=\-_]+', $continuationToken);
+        return checkRegex('[\w=\-_]+', $continuationToken);
     }
 
     function isContinuationTokenAndVisitorData($continuationTokenAndVisitorData)
     {
-        return checkRegex('[A-Za-z0-9=_]+,[A-Za-z0-9=\-_]*', $continuationTokenAndVisitorData);
+        return checkRegex('[\w=_]+,[\w=\-_]*', $continuationTokenAndVisitorData);
     }
 
     function isPlaylistId($playlistId)
     {
-        return checkRegex('[a-zA-Z0-9-_]+', $playlistId);
+        return checkRegex('[\w-_]+', $playlistId);
     }
 
     // what's minimal length ?
     function isCId($cId)
     {
-        return checkRegex('[a-zA-Z0-9]+', $cId);
+        return checkRegex('\w+', $cId);
     }
 
     function isUsername($username)
     {
-        return checkRegex('[a-zA-Z0-9]+', $username);
+        return checkRegex('\w+', $username);
     }
 
     function isChannelId($channelId)
     {
-        return checkRegex('UC[a-zA-Z0-9-_]{22}', $channelId);
+        return checkRegex('UC[\w-_]{22}', $channelId);
     }
 
     function isVideoId($videoId)
     {
-        return checkRegex('[a-zA-Z0-9-_]{11}', $videoId);
+        return checkRegex('[\w-_]{11}', $videoId);
     }
 
     function isHashtag($hashtag)
     {
-        return true; // checkRegex('[a-zA-Z0-9_]+', $hashtag); // 'é' is a valid hashtag for instance
+        return true; // checkRegex('[\w_]+', $hashtag); // 'é' is a valid hashtag for instance
     }
 
     function isSAPISIDHASH($SAPISIDHASH)
     {
-        return checkRegex('[1-9][0-9]{9}_[a-f0-9]{40}', $SAPISIDHASH);
+        return checkRegex('[1-9]\d{9}_[a-f\d]{40}', $SAPISIDHASH);
     }
 
     function isQuery($q)
@@ -239,7 +239,7 @@
 
     function isClipId($clipId)
     {
-        return checkRegex('Ug[a-zA-Z0-9-_]{34}', $clipId);
+        return checkRegex('Ug[\w-_]{34}', $clipId);
     }
 
     function isEventType($eventType)
@@ -254,22 +254,22 @@
 
     function isYouTubeDataAPIV3Key($youtubeDataAPIV3Key)
     {
-        return checkRegex('AIzaSy[A-D][a-zA-Z0-9-_]{32}', $youtubeDataAPIV3Key);
+        return checkRegex('AIzaSy[A-D][\w-_]{32}', $youtubeDataAPIV3Key);
     }
 
     function isHandle($handle)
     {
-        return checkRegex('@[a-zA-Z0-9-_.]{3,}', $handle);
+        return checkRegex('@[\w-_.]{3,}', $handle);
     }
 
     function isPostId($postId)
     {
-        return (checkRegex('Ug[w-z][a-zA-Z0-9-_]{16}4AaABCQ', $postId) || checkRegex('Ugkx[a-zA-Z0-9-_]{32}', $postId));
+        return (checkRegex('Ug[w-z][\w-_]{16}4AaABCQ', $postId) || checkRegex('Ugkx[\w-_]{32}', $postId));
     }
 
     function isCommentId($commentId)
     {
-        return checkRegex('Ug[w-z][a-zA-Z0-9-_]{16}4AaABAg(|.[a-zA-Z0-9-]{22})', $commentId);
+        return checkRegex('Ug[w-z][\w-_]{16}4AaABAg(|.[\w-]{22})', $commentId);
     }
 
     // Assume `$path !== ''`.
@@ -313,7 +313,7 @@
         $unitCount = str_replace('K', '*1_000', $unitCount);
         $unitCount = str_replace('M', '*1_000_000', $unitCount);
         $unitCount = str_replace('B', '*1_000_000_000', $unitCount);
-        if(checkRegex('[0-9_.*KMB]+', $unitCount)) {
+        if(checkRegex('[\d_.*KMB]+', $unitCount)) {
             $unitCount = eval("return round($unitCount);");
         }
         return intval($unitCount);
