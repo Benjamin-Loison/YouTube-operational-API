@@ -47,10 +47,16 @@ def isCommandStillFine(command):
     result = executeCommand(command)
     return wantedOutput in result
 
+def getCommandLengthFormatted(command):
+    return f'{len(command):,}'
+
+def printThatCommandIsStillFine(command):
+    print(f'Command with length {getCommandLengthFormatted(command)} is still fine.')
+
 # For Chromium support:
 command = command.replace(' \\\n ', '')
 
-print(len(command))
+print(f'Initial command length: {getCommandLengthFormatted(command)}.')
 # To verify that the user provided the correct `wantedOutput` to keep during the minimization.
 if not isCommandStillFine(command):
     print('The wanted output isn\'t contained in the result of the original curl command!')
@@ -70,7 +76,7 @@ if removeHeaders:
                 del arguments[argumentsIndex : argumentsIndex + 2]
                 command = shlex.join(arguments)
                 if isCommandStillFine(command):
-                    print(len(command), 'still fine')
+                    printThatCommandIsStillFine(command)
                     changedSomething = True
                     break
                 else:
@@ -101,7 +107,7 @@ if removeUrlParameters:
             arguments[urlIndex] = url
             command = shlex.join(arguments)
             if isCommandStillFine(command):
-                print(len(command), 'still fine')
+                printThatCommandIsStillFine(command)
                 changedSomething = True
                 break
             else:
@@ -138,7 +144,7 @@ if removeCookies:
                 arguments[cookiesIndex] = COOKIES_PREFIX + '; '.join(cookiesParsedCopy)
                 command = shlex.join(arguments)
                 if isCommandStillFine(command):
-                    print(len(command), 'still fine')
+                    printThatCommandIsStillFine(command)
                     changedSomething = True
                     cookies = '; '.join(cookiesParsedCopy)
                     break
@@ -178,7 +184,7 @@ if removeRawData:
                     arguments[rawDataIndex] = '&'.join(rawDataPartsCopy)
                     command = shlex.join(arguments)
                     if isCommandStillFine(command):
-                        print(len(command), 'still fine')
+                        printThatCommandIsStillFine(command)
                         changedSomething = True
                         rawData = '&'.join(rawDataPartsCopy)
                         break
@@ -226,7 +232,7 @@ if removeRawData:
                     command = shlex.join(arguments)
                     # (1) If it was unnecessary, then reconsider paths excluding possible children paths of this unnecessary entry, ensuring optimized complexity it seems.
                     if isCommandStillFine(command):
-                        print(len(command), 'still fine')
+                        printThatCommandIsStillFine(command)
                         changedSomething = True
                         rawData = json.dumps(rawDataParsedCopy)
                         break
