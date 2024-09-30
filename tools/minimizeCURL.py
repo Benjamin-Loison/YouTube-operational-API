@@ -33,6 +33,12 @@ removeUrlParameters = True
 removeCookies = True
 removeRawData = True
 
+PRINT_TRY_TO_REMOVE = False
+
+def printTryToRemove(toRemove):
+    if PRINT_TRY_TO_REMOVE:
+        print(f'Try to remove: {toRemove}!')
+
 # Pay attention to provide a command giving plaintext output, so might required to remove `Accept-Encoding` HTTPS header.
 with open(curlCommandFilePath) as f:
     command = f.read()
@@ -73,6 +79,7 @@ if removeHeaders:
             argument, nextArgument = arguments[argumentsIndex : argumentsIndex + 2]
             if argument == '-H':
                 previousCommand = command
+                printTryToRemove(arguments[argumentsIndex : argumentsIndex + 2])
                 del arguments[argumentsIndex : argumentsIndex + 2]
                 command = shlex.join(arguments)
                 if isCommandStillFine(command):
@@ -101,6 +108,7 @@ if removeUrlParameters:
         query = parse_qs(urlParsed.query)
         for key in list(query):
             previousQuery = copy.deepcopy(query)
+            printTryToRemove(key)
             del query[key]
             # Make a function with below code.
             url = urlParsed._replace(query = '&'.join([f'{quote_plus(parameter)}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
@@ -140,6 +148,7 @@ if removeCookies:
             cookiesParsed = cookies.replace(COOKIES_PREFIX, '').split('; ')
             for cookiesParsedIndex, cookie in enumerate(cookiesParsed):
                 cookiesParsedCopy = cookiesParsed[:]
+                printTryToRemove(cookie)
                 del cookiesParsedCopy[cookiesParsedIndex]
                 arguments[cookiesIndex] = COOKIES_PREFIX + '; '.join(cookiesParsedCopy)
                 command = shlex.join(arguments)
