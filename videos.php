@@ -217,9 +217,12 @@
             $musics = [];
 
             $engagementPanels = $json['engagementPanels'];
-            $cardsPath = 'engagementPanelSectionListRenderer/content/structuredDescriptionContentRenderer/items/2/horizontalCardListRenderer/cards';
+            $cardsPath = 'engagementPanelSectionListRenderer/content/structuredDescriptionContentRenderer/items';
             $engagementPanel = getFirstNodeContainingPath($engagementPanels, $cardsPath);
             $cards = getValue($engagementPanel, $cardsPath);
+            $cardsPath = 'horizontalCardListRenderer/cards';
+            $structuredDescriptionContentRendererItem = getFirstNodeContainingPath($cards, $cardsPath);
+            $cards = getValue($structuredDescriptionContentRendererItem, $cardsPath);
 
             foreach ($cards as $card) {
                 $videoAttributeViewModel = $card['videoAttributeViewModel'];
