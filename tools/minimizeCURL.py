@@ -105,7 +105,7 @@ if removeUrlParameters:
     while True:
         changedSomething = False
         urlParsed = urlparse(url)
-        query = parse_qs(urlParsed.query)
+        query = parse_qs(urlParsed.query, keep_blank_values = True)
         for key in list(query):
             previousQuery = copy.deepcopy(query)
             printTryToRemove(key)
