@@ -9,7 +9,6 @@ authors:
   - given-names: Benjamin
     family-names: Loison
 repository-code: 'https://github.com/Benjamin-Loison/YouTube-operational-API'
-url: 'https://yt.lemnoslife.com'
 abstract: >-
   YouTube operational API works when YouTube Data API v3
   fails.
