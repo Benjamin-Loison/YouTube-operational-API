@@ -3,7 +3,9 @@ YouTube operational API works when [YouTube Data API v3](https://developers.goog
 
 ## Install your own instance of the API:
 
-1. If not already hosting a website ([click here](https://github.com/Benjamin-Loison/YouTube-operational-API/wiki/Home/1c7139f68af217d41d0a201a97eaecf87c139a8b#install-your-own-instance-of-the-api-on-a-nginx-web-server) if you prefer nginx), run in a terminal:
+1. If you do not own a server, then I recommend Oracle always free VPS (see https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm). Note that at account creation only some *home regions*, including *Marseille* (France), propose more powerful *Ampere A1* shapes.
+
+2. If not already hosting a website ([click here](https://github.com/Benjamin-Loison/YouTube-operational-API/wiki/Home/1c7139f68af217d41d0a201a97eaecf87c139a8b#install-your-own-instance-of-the-api-on-a-nginx-web-server) if you prefer nginx), run in a terminal:
 
 ### On Linux (Ubuntu, Debian and Mint):
 
@@ -57,19 +59,19 @@ Then run:
 brew services start httpd
 ```
 
-2. Now that you are hosting a website, get the current working directory of your terminal into the folder that is online.
+3. Now that you are hosting a website, get the current working directory of your terminal into the folder that is online.
 
 - On Linux, use `cd /var/www/html/`
 - On Windows, use `cd C:\wamp64\www\`
 - On MacOS, use `cd /opt/homebrew/var/www/`
 
-3. Clone this repository by using:
+4. Clone this repository by using:
 
 ```sh
 git clone https://github.com/Benjamin-Loison/YouTube-operational-API
 ```
 
-4. Install Protobuf dependency:
+5. Install Protobuf dependency:
 
 ### On Linux (Ubuntu, Debian and Mint):
 
@@ -109,7 +111,7 @@ protoc --php_out=proto/php/ --proto_path=proto/prototypes/ $(find proto/prototyp
 for /f "usebackq tokens=*" %a in (`dir /S /B "proto/prototypes"`) do protoc --php_out=proto/php/ --proto_path=proto/prototypes/ %a
 ```
 
-5. Verify that your API instance is reachable by trying to access:
+6. Verify that your API instance is reachable by trying to access:
 
 - On Linux and Windows: http://localhost/YouTube-operational-API/
 - On MacOS: http://localhost:8080/YouTube-operational-API/
