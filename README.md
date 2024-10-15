@@ -7,7 +7,7 @@ YouTube operational API works when [YouTube Data API v3](https://developers.goog
 
 2. If not already hosting a website ([click here](https://github.com/Benjamin-Loison/YouTube-operational-API/wiki/Home/1c7139f68af217d41d0a201a97eaecf87c139a8b#install-your-own-instance-of-the-api-on-a-nginx-web-server) if you prefer nginx), run in a terminal:
 
-### On Linux (Ubuntu, Debian and Mint):
+### On Linux (Debian, Mint and Ubuntu):
 
 ```
 sudo apt install apache2 php git
