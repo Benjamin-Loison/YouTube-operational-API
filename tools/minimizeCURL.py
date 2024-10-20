@@ -51,7 +51,8 @@ def executeCommand(command):
 
 def isCommandStillFine(command):
     result = executeCommand(command)
-    return wantedOutput in result
+    isCommandStillFineResult = wantedOutput in result
+    return isCommandStillFineResult
 
 def getCommandLengthFormatted(command):
     return f'{len(command):,}'
