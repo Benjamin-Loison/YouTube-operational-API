@@ -154,6 +154,15 @@
 
     function getJSONFromHTML($url, $opts = [], $scriptVariable = '', $prefix = 'var ', $forceLanguage = false, $verifiesChannelRedirection = false)
     {
+        if($forceLanguage) {
+            $HEADER = 'Accept-Language: en';
+            if(!doesPathExist($opts, 'http/header')) {
+                $opts['http']['header'] = [$HEADER];
+            } else {
+                array_push($opts['http']['header'], $HEADER);
+            }
+        }
+
         $html = getRemote($url, $opts);
         $jsonStr = getJSONStringFromHTML($html, $scriptVariable, $prefix);
         $json = json_decode($jsonStr, true);
@@ -169,16 +178,6 @@
             }
         }
         return $json;
-    }
-
-    function getJSONFromHTMLForcingLanguage($url, $verifiesChannelRedirection = false)
-    {
-        $opts = [
-            'http' => [
-                'header' => ['Accept-Language: en']
-            ]
-        ];
-        return getJSONFromHTML($url, $opts, verifiesChannelRedirection: $verifiesChannelRedirection);
     }
 
     function checkRegex($regex, $str)

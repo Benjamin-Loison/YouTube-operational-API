@@ -45,7 +45,7 @@
     function getItem($id)
     {
         global $options;
-        $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/playlist?list=$id");
+        $result = getJSONFromHTML("https://www.youtube.com/playlist?list=$id", forceLanguage: true);
 
         $item = [
             'kind' => 'youtube#playlist',

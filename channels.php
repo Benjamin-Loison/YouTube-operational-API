@@ -151,14 +151,14 @@
         $continuationTokenProvided = $continuationToken != '';
 
         if ($options['status']) {
-            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id", true);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", forceLanguage: true, verifiesChannelRedirection: true);
             $status = $result['alerts'][0]['alertRenderer']['text']['simpleText'];
             $item['status'] = $status;
         }
 
         if ($options['upcomingEvents']) {
             $upcomingEvents = [];
-            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", verifiesChannelRedirection: true);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", forceLanguage: true, verifiesChannelRedirection: true);
             $subItems = getTabs($result)[0]['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['shelfRenderer']['content']['horizontalListRenderer']['items'];
             foreach ($subItems as $subItem) {
                 $path = 'gridVideoRenderer/upcomingEventData';
@@ -175,7 +175,7 @@
 
         if ($options['shorts']) {
             if (!$continuationTokenProvided) {
-                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/shorts", true);
+                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/shorts", forceLanguage: true, verifiesChannelRedirection: true);
                 $visitorData = getVisitorData($result);
                 $tab = getTabByName($result, 'Shorts');
                 $tabRenderer = $tab['tabRenderer'];
@@ -230,7 +230,7 @@
 
         if ($options['community']) {
             if (!$continuationTokenProvided) {
-                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/community", true);
+                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/community", forceLanguage: true, verifiesChannelRedirection: true);
             } else {
                 $result = getContinuationJson($continuationToken);
             }
@@ -258,7 +258,7 @@
 
         if ($options['channels']) {
             if (!$continuationTokenProvided) {
-                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/channels", true);
+                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/channels", forceLanguage: true, verifiesChannelRedirection: true);
 
                 $tab = getTabByName($result, 'Channels');
                 $sectionListRenderer = $tab['tabRenderer']['content']['sectionListRenderer'];
@@ -323,7 +323,7 @@
         }
 
         if ($options['about']) {
-            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/about", true);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id/about", forceLanguage: true, verifiesChannelRedirection: true);
 
             $c4TabbedHeaderRenderer = $result['header']['c4TabbedHeaderRenderer'];
             $item['countryChannelId'] = $c4TabbedHeaderRenderer['channelId'];
@@ -366,7 +366,7 @@
         }
 
         if ($options['approval']) {
-            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id", true);
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id", forceLanguage: true, verifiesChannelRedirection: true);
             $item['approval'] = end(explode(', ', $result['header']['pageHeaderRenderer']['content']['pageHeaderViewModel']['title']['dynamicTextViewModel']['rendererContext']['accessibilityContext']['label']));
         }
 
@@ -385,7 +385,7 @@
 
         if ($options['playlists']) {
             if (!$continuationTokenProvided) {
-                $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/playlists", true);
+                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/playlists", forceLanguage: true, verifiesChannelRedirection: true);
 
                 $tab = getTabByName($result, 'Playlists');
                 if ($tab === null) {
@@ -526,7 +526,7 @@
         if ($options['letsPlay'])
         {
             $letsPlay = [];
-            $result = getJSONFromHTMLForcingLanguage("https://www.youtube.com/channel/$id/letsplay");
+            $result = getJSONFromHTML("https://www.youtube.com/channel/$id/letsplay", forceLanguage: true);
             $gridRendererItems = getTabByName($result, 'Let\'s play')['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'][0]['shelfRenderer']['content']['gridRenderer']['items'];
             foreach($gridRendererItems as $gridRendererItem)
             {
@@ -602,7 +602,7 @@
     {
         $videos = [];
         if ($continuationToken === '') {
-            $result = getJSONFromHTMLForcingLanguage($url);
+            $result = getJSONFromHTML($url, forceLanguage: true);
             $gridRendererItems = $getGridRendererItems($result);
             $visitorData = getVisitorData($result);
         }

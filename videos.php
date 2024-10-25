@@ -245,7 +245,7 @@
         }
 
         if(isset($_GET['clipId'])) {
-            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/clip/$id");
+            $json = getJSONFromHTML("https://www.youtube.com/clip/$id", forceLanguage: true);
             if ($options['id']) {
                 $videoId = $json['currentVideoEndpoint']['watchEndpoint']['videoId'];
                 $item['videoId'] = $videoId;
@@ -291,7 +291,7 @@
         }
 
         if ($options['mostReplayed']) {
-            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", forceLanguage: true);
             $mutations = $json['frameworkUpdates']['entityBatchUpdate']['mutations'];
             $commonJsonPath = 'payload/macroMarkersListEntity/markersList';
             $jsonPath = "$commonJsonPath/markersDecoration";
@@ -400,7 +400,7 @@
         }
 
         if ($options['snippet']) {
-            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", forceLanguage: true);
             $contents = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'];
             // Note that `publishedAt` has a day only precision.
             $publishedAt = strtotime($contents[0]['videoPrimaryInfoRenderer']['dateText']['simpleText']);
@@ -413,7 +413,7 @@
         }
 
         if ($options['statistics']) {
-            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", forceLanguage: true);
             preg_match('/like this video along with ([\d,]+) other people/', $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0]['videoPrimaryInfoRenderer']['videoActions']['menuRenderer']['topLevelButtons'][0]['segmentedLikeDislikeButtonViewModel']['likeButtonViewModel']['likeButtonViewModel']['toggleButtonViewModel']['toggleButtonViewModel']['defaultButtonViewModel']['buttonViewModel']['accessibilityText'], $viewCount);
             $statistics = [
                 'viewCount' => getIntValue($json['playerOverlays']['playerOverlayRenderer']['videoDetails']['playerOverlayVideoDetailsRenderer']['subtitle']['runs'][2]['text'], 'view'),
@@ -423,7 +423,7 @@
         }
 
         if ($options['activity']) {
-            $json = getJSONFromHTMLForcingLanguage("https://www.youtube.com/watch?v=$id");
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", forceLanguage: true);
             $activity = $json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][1]['videoSecondaryInfoRenderer']['metadataRowContainer']['metadataRowContainerRenderer']['rows'][0]['richMetadataRowRenderer']['contents'][0]['richMetadataRenderer'];
             $name = $activity['title']['simpleText'];
             $year = $activity['subtitle']['simpleText'];
