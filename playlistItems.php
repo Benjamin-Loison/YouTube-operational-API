@@ -61,7 +61,7 @@ function getAPI($playlistId, $continuationToken)
 
     if ($continuationTokenProvided) {
         $result = getJSON($url, $httpOptions);
-    } else
+    } else {
         $result = getJSONFromHTML($url, $httpOptions);
     }
 
