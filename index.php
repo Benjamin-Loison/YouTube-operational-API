@@ -175,6 +175,7 @@
                     'isMemberOnly',
                     'mostReplayed',
                     'qualities',
+                    'captions',
                     'chapters',
                     'isOriginal',
                     'isRestricted',

@@ -48,6 +48,7 @@
         'isMemberOnly',
         'mostReplayed',
         'qualities',
+        'captions',
         'location',
         'chapters',
         'isOriginal',
@@ -344,6 +345,19 @@
                 }
             }
             $item['qualities'] = $qualities;
+        }
+
+        if ($options['captions']) {
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", scriptVariable: 'ytInitialPlayerResponse', forceLanguage: true);
+            $captions = [];
+            foreach ($json['captions']['playerCaptionsTracklistRenderer']['captionTracks'] as $caption) {
+                array_push($captions, [
+                    'name' => $caption['name']['simpleText'],
+                    'languageCode' => $caption['languageCode'],
+                    'kind' => $caption['kind'],
+                ]);
+            }
+            $item['captions'] = $captions;
         }
 
         if ($options['location']) {
