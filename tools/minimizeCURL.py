@@ -190,6 +190,7 @@ if removeRawData:
                 rawDataParts = rawData.split('&')
                 for rawDataPartsIndex, rawDataPart in enumerate(rawDataParts):
                     rawDataPartsCopy = copy.deepcopy(rawDataParts)
+                    printTryToRemove(rawDataPartsCopy[rawDataPartsIndex])
                     del rawDataPartsCopy[rawDataPartsIndex]
                     arguments[rawDataIndex] = '&'.join(rawDataPartsCopy)
                     command = shlex.join(arguments)
@@ -236,6 +237,7 @@ if removeRawData:
                         entry = entry[pathPart]
                     lastPathPart = pathParts[-1]
                     lastPathPart = lastPathPart if not lastPathPart.isdigit() else int(lastPathPart)
+                    printTryToRemove(path)
                     del entry[lastPathPart]
                     # Test if the removed entry was necessary.
                     arguments[rawDataIndex] = json.dumps(rawDataParsedCopy)
