@@ -21,8 +21,8 @@
 
     function getContextFromOpts($opts)
     {
-		if (GOOGLE_ABUSE_EXEMPTION !== '') {
-			// Can maybe leverage an approach like [issues/321](https://github.com/Benjamin-Loison/YouTube-operational-API/issues/321).
+        if (GOOGLE_ABUSE_EXEMPTION !== '') {
+            // Can maybe leverage an approach like [issues/321](https://github.com/Benjamin-Loison/YouTube-operational-API/issues/321).
             $cookieToAdd = 'GOOGLE_ABUSE_EXEMPTION=' . GOOGLE_ABUSE_EXEMPTION;
             // Can't we simplify the following code?
             if (array_key_exists('http', $opts)) {
