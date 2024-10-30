@@ -421,7 +421,8 @@
             $description = $contents[1]['videoSecondaryInfoRenderer']['attributedDescription']['content'];
             $snippet = [
                 'publishedAt' => $publishedAt,
-                'description' => $description
+                'description' => $description,
+                'title' => $contents[0]['videoPrimaryInfoRenderer']['title']['runs'][0]['text'],
             ];
             $item['snippet'] = $snippet;
         }
