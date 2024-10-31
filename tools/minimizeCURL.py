@@ -83,10 +83,11 @@ if removeHeaders:
     print('Removing headers')
 
     # Should try to minimize the number of requests done, by testing half of parameters at each request.
+    previousArgumentsIndex = 0
     while True:
         changedSomething = False
         arguments = shlex.split(command)
-        for argumentsIndex in range(len(arguments) - 1):
+        for argumentsIndex in range(previousArgumentsIndex, len(arguments) - 1):
             argument, nextArgument = arguments[argumentsIndex : argumentsIndex + 2]
             if argument == '-H':
                 previousCommand = command
@@ -95,6 +96,7 @@ if removeHeaders:
                 command = shlex.join(arguments)
                 if isCommandStillFine(command):
                     printThatCommandIsStillFine(command)
+                    previousArgumentsIndex = argumentsIndex
                     changedSomething = True
                     break
                 else:
@@ -113,11 +115,12 @@ if removeUrlParameters:
             break
 
     url = arguments[urlIndex]
+    previousKeyIndex = 0
     while True:
         changedSomething = False
         urlParsed = urlparse(url)
         query = parse_qs(urlParsed.query, keep_blank_values = True)
-        for key in list(query):
+        for keyIndex, key in enumerate(list(query)[previousKeyIndex:]):
             previousQuery = copy.deepcopy(query)
             printTryToRemove(key)
             del query[key]
@@ -128,6 +131,7 @@ if removeUrlParameters:
             if isCommandStillFine(command):
                 printThatCommandIsStillFine(command)
                 changedSomething = True
+                previousKeyIndex = keyIndex
                 break
             else:
                 query = previousQuery
@@ -154,10 +158,11 @@ if removeCookies:
 
     if cookiesIndex is not None:
         cookies = arguments[cookiesIndex]
+        previousCookiesParsedIndex = 0
         while True:
             changedSomething = False
             cookiesParsed = cookies.replace(COOKIES_PREFIX, '').split('; ')
-            for cookiesParsedIndex, cookie in enumerate(cookiesParsed):
+            for cookiesParsedIndex, cookie in enumerate(cookiesParsed[previousCookiesParsedIndex:]):
                 cookiesParsedCopy = cookiesParsed[:]
                 printTryToRemove(cookie)
                 del cookiesParsedCopy[cookiesParsedIndex]
@@ -166,6 +171,7 @@ if removeCookies:
                 if isCommandStillFine(command):
                     printThatCommandIsStillFine(command)
                     changedSomething = True
+                    previousCookiesParsedIndex = cookiesParsedIndex
                     cookies = '; '.join(cookiesParsedCopy)
                     break
                 else:
@@ -195,10 +201,11 @@ if removeRawData:
         # Could interwine both cases but don't seem to clean much the code due to `getPaths` notably.
         # Just firstly making a common function to all parts minimizer would make sense.
         if not isJson:
+            previousRawDataPartsIndex = 0
             while rawData != '':
                 changedSomething = False
                 rawDataParts = rawData.split('&')
-                for rawDataPartsIndex, rawDataPart in enumerate(rawDataParts):
+                for rawDataPartsIndex, rawDataPart in enumerate(rawDataParts[previousRawDataPartsIndex:]):
                     rawDataPartsCopy = copy.deepcopy(rawDataParts)
                     printTryToRemove(rawDataPartsCopy[rawDataPartsIndex])
                     del rawDataPartsCopy[rawDataPartsIndex]
@@ -207,6 +214,7 @@ if removeRawData:
                     if isCommandStillFine(command):
                         printThatCommandIsStillFine(command)
                         changedSomething = True
+                        previousRawDataPartsIndex = rawDataPartsIndex
                         rawData = '&'.join(rawDataPartsCopy)
                         break
                     else:
@@ -229,13 +237,14 @@ if removeRawData:
 
             # If a single unknown entry is necessary, then this algorithm seems to most efficiently goes from parents to children if necessary to remove other entries. Hence, it seems to proceed in a linear number of HTTPS requests and not a quadratic one.
             # Try until no more change to remove unnecessary entries. If assume a logical behavior as just mentioned, would not a single loop iteration be enough? Not with current design, see (1).
+            previousPathsIndex = 0
             while True:
                 changedSomething = False
                 rawDataParsed = json.loads(rawData)
                 # Note that the path goes from parents to children if necessary which is quite a wanted behavior to quickly remove useless chunks.
                 paths = getPaths(rawDataParsed)
                 # For all entries, copy current `rawData` and try to remove an entry.
-                for pathsIndex, path in enumerate(paths):
+                for pathsIndex, path in enumerate(list(paths)[previousPathsIndex:]):
                     # Copy current `rawData`.
                     rawDataParsedCopy = copy.deepcopy(rawDataParsed)
                     # Remove an entry.
@@ -256,6 +265,7 @@ if removeRawData:
                     if isCommandStillFine(command):
                         printThatCommandIsStillFine(command)
                         changedSomething = True
+                        previousPathsIndex = pathsIndex
                         rawData = json.dumps(rawDataParsedCopy)
                         break
                     # If it was necessary, we consider possible children paths of this necessary entry and other paths.
