@@ -52,9 +52,16 @@ def executeCommand(command):
         return b''
     return result
 
+def writeCommand(fileName, command):
+    with open(f'{fileName}.sh', 'w') as f:
+        f.write(command)
+
 def isCommandStillFine(command):
     result = executeCommand(command)
     isCommandStillFineResult = wantedOutput in result
+    # [Benjamin-Loison/cpython/issues/48](https://github.com/Benjamin-Loison/cpython/issues/48)
+    if isCommandStillFineResult:
+        writeCommand('partially_minimized_curl', command)
     return isCommandStillFineResult
 
 def getCommandLengthFormatted(command):
@@ -272,5 +279,4 @@ if HTTP_METHOD in command:
 
 # First test `print`ing, before potentially removing `minimized_curl` writing.
 print(command)
-with open('minimized_curl.sh', 'w') as f:
-    f.write(command)
+writeCommand('minimized_curl', command)
