@@ -115,6 +115,9 @@ if removeUrlParameters:
             urlIndex = argumentsIndex
             break
 
+    def getUrl(urlParsed, query):
+        return urlParsed._replace(query = '&'.join([f'{quote_plus(parameter)}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
+
     url = arguments[urlIndex]
     previousKeyIndex = 0
     while True:
@@ -126,7 +129,7 @@ if removeUrlParameters:
             printTryToRemove(key)
             del query[key]
             # Make a function with below code.
-            url = urlParsed._replace(query = '&'.join([f'{quote_plus(parameter)}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
+            url = getUrl(urlParsed, query)
             arguments[urlIndex] = url
             command = shlex.join(arguments)
             if isCommandStillFine(command):
@@ -136,7 +139,7 @@ if removeUrlParameters:
                 break
             else:
                 query = previousQuery
-                url = urlParsed._replace(query = '&'.join([f'{quote_plus(parameter)}={quote_plus(query[parameter][0])}' for parameter in query])).geturl()
+                url = getUrl(urlParsed, query)
                 arguments[urlIndex] = url
                 command = shlex.join(arguments)
         if not changedSomething:
