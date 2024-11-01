@@ -18,6 +18,7 @@ import json
 import copy
 import sys
 from urllib.parse import urlparse, parse_qs, quote_plus
+import re
 
 # Could precise the input file and possibly remove the output one as the minimized requests start to be short.
 if len(sys.argv) < 3:
@@ -110,7 +111,7 @@ if removeUrlParameters:
 
     arguments = shlex.split(command)
     for argumentsIndex, argument in enumerate(arguments):
-        if argument.startswith('http'):
+        if re.match('https?://', argument):
             urlIndex = argumentsIndex
             break
 
