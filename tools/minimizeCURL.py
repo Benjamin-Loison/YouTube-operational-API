@@ -36,6 +36,8 @@ removeRawData = True
 
 PRINT_TRY_TO_REMOVE = False
 
+VERIFY_INITIAL_COMMAND = False
+
 def printTryToRemove(toRemove):
     if PRINT_TRY_TO_REMOVE:
         print(f'Try to remove: {toRemove}!')
@@ -76,7 +78,7 @@ command = command.replace(' \\\n ', '')
 
 print(f'Initial command length: {getCommandLengthFormatted(command)}.')
 # To verify that the user provided the correct `wantedOutput` to keep during the minimization.
-if not isCommandStillFine(command):
+if VERIFY_INITIAL_COMMAND and not isCommandStillFine(command):
     print('The wanted output isn\'t contained in the result of the original curl command!')
     exit(1)
 
