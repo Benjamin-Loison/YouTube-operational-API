@@ -201,10 +201,11 @@
         return checkRegex('[\w\-_]+', $playlistId);
     }
 
-    // what's minimal length ?
+    // What's the minimal length ?
+    // Are there forbidden characters?
     function isCId($cId)
     {
-        return checkRegex('\w+', $cId);
+        return true;
     }
 
     function isUsername($username)
