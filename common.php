@@ -58,7 +58,7 @@
     function getHeadersFromOpts($url, $opts)
     {
         $context = getContextFromOpts($opts);
-        $headers = get_headers($url, false, $context);
+        $headers = get_headers($url, true, $context);
         return $headers;
     }
 
@@ -88,7 +88,8 @@
     {
         $opts = [
             'http' => [
-                'ignore_errors' => true
+                'ignore_errors' => true,
+                'follow_location' => false,
             ]
         ];
         $http_response_header = getHeadersFromOpts($url, $opts);
