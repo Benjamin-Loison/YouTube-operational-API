@@ -19,6 +19,7 @@ import copy
 import sys
 from urllib.parse import urlparse, parse_qs, quote_plus
 import re
+import os
 
 # Could precise the input file and possibly remove the output one as the minimized requests start to be short.
 if len(sys.argv) < 3:
@@ -36,7 +37,7 @@ removeRawData = True
 
 PRINT_TRY_TO_REMOVE = False
 
-VERIFY_INITIAL_COMMAND = False
+VERIFY_INITIAL_COMMAND = True
 
 def printTryToRemove(toRemove):
     if PRINT_TRY_TO_REMOVE:
@@ -55,16 +56,21 @@ def executeCommand(command):
         return b''
     return result
 
+def getCommandScript(fileName):
+    return f'{fileName}.sh'
+
 def writeCommand(fileName, command):
-    with open(f'{fileName}.sh', 'w') as f:
+    with open(getCommandScript(fileName), 'w') as f:
         f.write(command)
+
+PARTIALLY_MINIMIZED_CURL_SCRIPT_NAME = 'partially_minimized_curl'
 
 def isCommandStillFine(command):
     result = executeCommand(command)
     isCommandStillFineResult = wantedOutput in result
     # [Benjamin-Loison/cpython/issues/48](https://github.com/Benjamin-Loison/cpython/issues/48)
     if isCommandStillFineResult:
-        writeCommand('partially_minimized_curl', command)
+        writeCommand(PARTIALLY_MINIMIZED_CURL_SCRIPT_NAME, command)
     return isCommandStillFineResult
 
 def getCommandLengthFormatted(command):
@@ -296,3 +302,5 @@ if HTTP_METHOD in command:
 # First test `print`ing, before potentially removing `minimized_curl` writing.
 print(command)
 writeCommand('minimized_curl', command)
+
+os.remove(getCommandScript(PARTIALLY_MINIMIZED_CURL_SCRIPT_NAME))
