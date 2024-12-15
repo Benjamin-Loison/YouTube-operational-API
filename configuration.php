@@ -6,6 +6,7 @@
     // Web-scraping endpoints:
     define('GOOGLE_ABUSE_EXEMPTION', '');
     define('MULTIPLE_IDS_ENABLED', True);
+    define('MULTIPLE_IDS_MAXIMUM', 50);
 
     define('HTTPS_PROXY_ADDRESS', '');
     define('HTTPS_PROXY_PORT', 80);

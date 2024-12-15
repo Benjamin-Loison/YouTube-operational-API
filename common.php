@@ -1,6 +1,7 @@
 <?php
 
     include_once 'constants.php';
+    include_once 'configuration.php';
 
     ini_set('display_errors', 0);
 
@@ -563,7 +564,7 @@
     }
 
     function verifyTooManyIds($realIds, $field) {
-        if (count($realIds) > 50) {
+        if (count($realIds) > MULTIPLE_IDS_MAXIMUM) {
             dieWithJsonMessage("Too many $field");
         }
     }
