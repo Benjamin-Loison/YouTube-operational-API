@@ -360,7 +360,7 @@
                 array_push($links, $link);
             }
             $about['links'] = $links;
-            $about['handle'] = $c4TabbedHeaderRenderer['channelHandleText']['runs'][0]['text'];
+            $about['handle'] = substr($result['contents']['twoColumnBrowseResultsRenderer']['tabs'][0]['tabRenderer']['endpoint']['browseEndpoint']['canonicalBaseUrl'], 1);
 
             $item['about'] = $about;
         }
