@@ -237,7 +237,7 @@
             $community = [];
             $contents = null;
             if (!$continuationTokenProvided) {
-                $tab = getTabByName($result, 'Community');
+                $tab = getTabByName($result, 'Posts');
                 $contents = $tab['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'];
             } else {
                 $contents = $result['onResponseReceivedEndpoints'][0]['appendContinuationItemsAction']['continuationItems'];

@@ -328,7 +328,7 @@
         $common = getValue($backstagePost, 'backstagePostRenderer', 'sharedPostRenderer');
 
         $id = $common['postId'];
-        $channelId = $common['publishedTimeText']['runs'][0]['navigationEndpoint']['browseEndpoint']['browseId'];
+        $channelId = $common['authorEndpoint']['browseEndpoint']['browseId'];
 
         // Except for `Image`, all other posts require text.
         $contentText = [];
@@ -401,7 +401,7 @@
             'channelId' => $channelId,
             'channelName' => $common['authorText']['runs'][0]['text'],
             'channelHandle' => substr($common['authorEndpoint']['browseEndpoint']['canonicalBaseUrl'], 1),
-            'channelThumbnails' => $common['authorThumbnail']['thumbnails'],
+            'channelThumbnails' => array_map(function($thumbnail) { $thumbnail['url'] = 'https:' . $thumbnail['url']; return $thumbnail; }, $common['authorThumbnail']['thumbnails']),
             'date' => $date,
             'contentText' => $contentText,
             'likes' => $likes,
