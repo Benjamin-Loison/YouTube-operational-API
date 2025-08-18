@@ -230,14 +230,15 @@
 
         if ($options['community']) {
             if (!$continuationTokenProvided) {
-                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/community", forceLanguage: true, verifiesChannelRedirection: true);
+                define('COMMUNITY_TAB_NAME', 'Posts');
+                $result = getJSONFromHTML("https://www.youtube.com/channel/$id/" . strtolower(COMMUNITY_TAB_NAME), forceLanguage: true, verifiesChannelRedirection: true);
             } else {
                 $result = getContinuationJson($continuationToken);
             }
             $community = [];
             $contents = null;
             if (!$continuationTokenProvided) {
-                $tab = getTabByName($result, 'Posts');
+                $tab = getTabByName($result, COMMUNITY_TAB_NAME);
                 $contents = $tab['tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer']['contents'];
             } else {
                 $contents = $result['onResponseReceivedEndpoints'][0]['appendContinuationItemsAction']['continuationItems'];
