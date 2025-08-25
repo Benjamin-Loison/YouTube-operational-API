@@ -195,7 +195,7 @@
 
     function isContinuationTokenAndVisitorData($continuationTokenAndVisitorData)
     {
-        return checkRegex('[\w=_]+,[\w=\-_]*', $continuationTokenAndVisitorData);
+        return checkRegex('[\w=\-_]+,[\w=\-_]*', $continuationTokenAndVisitorData);
     }
 
     function isPlaylistId($playlistId)
