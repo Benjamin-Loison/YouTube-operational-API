@@ -1,6 +1,5 @@
 FROM php:apache AS builder
-RUN apt-get update && apt-get install -y git protobuf-compiler \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y git protobuf-compiler
 COPY --from=composer/composer:latest-bin /composer /usr/bin/composer
 COPY . /app
 WORKDIR /app
