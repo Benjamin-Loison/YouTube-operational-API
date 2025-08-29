@@ -31,7 +31,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$COMMIT_SHA .
+          docker build --build-arg VERSION=$COMMIT_SHA -t $IMAGE_NAME:latest -t $IMAGE_NAME:$COMMIT_SHA .
 
       - name: Push Docker image
         run: |
