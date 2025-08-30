@@ -292,7 +292,7 @@ If a feature you are looking for which isn't working on <?php yt(); ?>, ask kind
 <?php
 
     $version = $_ENV['VERSION'];
-    if (!$version){
+    if (!$version) {
         $ref = str_replace("\n", '', str_replace('ref: ', '', file_get_contents('.git/HEAD')));
         $hash = file_get_contents(".git/$ref");
         if ($hash !== false) {
