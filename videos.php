@@ -2,6 +2,8 @@
 
     header('Content-Type: application/json; charset=UTF-8');
 
+    include_once 'common.php';
+
     $videosTests = [
         ['part=id&clipId=UgkxU2HSeGL_NvmDJ-nQJrlLwllwMDBdGZFs', 'items/0/videoId', 'NiXD4xVJM5Y'],
         ['part=clip&clipId=UgkxU2HSeGL_NvmDJ-nQJrlLwllwMDBdGZFs', 'items/0/clip', json_decode(file_get_contents('tests/part=clip&clipId=UgkxU2HSeGL_NvmDJ-nQJrlLwllwMDBdGZFs.json'), true)],
@@ -32,8 +34,6 @@
         ['part=explicitLyrics&id=Ehoe35hTbuY', 'items/0/explicitLyrics', false],
         ['part=explicitLyrics&id=PvM79DJ2PmM', 'items/0/explicitLyrics', true],
     ];
-
-    include_once 'common.php';
 
     $realOptions = [
         'id',
