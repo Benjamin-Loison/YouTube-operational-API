@@ -120,25 +120,15 @@ If you want me to advertise your instance (if you have opened your port, and hav
 
 ## Run the API with Docker
 
-1. Install [Docker](https://www.docker.com) and make sure that its daemon is running.
-
-2. Create a `.env` file and update it with your preferred port:
+Start the container using:
 
 ```sh
-cp .env.sample .env
+docker run -p 8080:80 benjaminloison/youtube-operational-api
 ```
 
-3. Start the container with `docker-compose`:
-
-```sh
-# start in the foreground
-docker-compose up
-# start in the background
-docker-compose up -d
-```
-
-4. Verify that your API instance is reachable by trying to access:
-- http://localhost:8080 (update preferred port if not 8080)
+Then verify that the API is running by opening your browser or using an HTTP client:
+[http://localhost:80](http://localhost:80)
+> Note: If you prefer a different port, adjust the -p 8080:80 option accordingly.
 
 ## Contact:
 
