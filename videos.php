@@ -145,8 +145,9 @@
         }
 
         if ($options['contentDetails']) {
+            $json = getJSONFromHTML("https://www.youtube.com/watch?v=$id", scriptVariable: 'ytInitialPlayerResponse');
             $contentDetails = [
-                'duration' => intval($result['videoDetails']['lengthSeconds'])
+                'duration' => intval($json['videoDetails']['lengthSeconds'])
             ];
             $item['contentDetails'] = $contentDetails;
         }
